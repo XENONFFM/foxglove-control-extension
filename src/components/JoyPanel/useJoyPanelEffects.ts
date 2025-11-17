@@ -121,7 +121,7 @@ export function useJoyPanelEffects({
   useEffect(() => {
     if (config.publishMode) {
       setPubTopic(config.pubJoyTopic);
-      context.advertise?.(config.pubJoyTopic, "sensor_msgs/Joy");
+      context.advertise?.(config.pubJoyTopic, "sensor_msgs/msg/Joy");
     } else if (pubTopic) {
       context.unadvertise?.(pubTopic);
       setPubTopic(undefined);
