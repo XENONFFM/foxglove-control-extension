@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamepad Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a1a;
+            padding: 0;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            background: #1a1a1a;
+            padding: 0;
+        }
+
+        .header {
+            background: #2a2a2a;
+            padding: 20px 40px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .gamepad-id {
+            font-size: 18px;
+            color: #b0b0b0;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        .info-grid {
+            display: flex;
+            gap: 0;
+            padding: 0;
+            background: #222;
+        }
+
+        .info-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 40px;
+            border-right: 1px solid #3a3a3a;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        .info-item:last-child {
+            border-right: none;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .info-value.connected {
+            color: #4ade80;
+        }
+
+        .info-value.disconnected {
+            color: #f87171;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 40px;
+            background: #1a1a1a;
+            border-right: 1px solid #3a3a3a;
+        }
+
+        .buttons-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 20px;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+        }
+
+        .button-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 8px;
+            background: #252525;
+            border-radius: 8px;
+            text-align: center;
+            min-height: 80px;
+            transition: all 0.1s ease;
+        }
+
+        .button-cell.pressed {
+            background: #3a3a3a;
+        }
+
+        .button-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .button-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e0e0e0;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        }
+
+        .button-cell.pressed .button-value {
+            color: #4ade80;
+        }
+
+        .axes-section {
+            margin-bottom: 40px;
+        }
+
+        .sticks-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .stick-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stick-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .stick-visualization {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            background: #252525;
+            border: 2px solid #3a3a3a;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .stick-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .stick-crosshair::before,
+        .stick-crosshair::after {
+            content: '';
+            position: absolute;
+            background: #3a3a3a;
+        }
+
+        .stick-crosshair::before {
+            left: 50%;
+            top: 10%;
+            bottom: 10%;
+            width: 1px;
+            transform: translateX(-50%);
+        }
+
+        .stick-crosshair::after {
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            transform: translateY(-50%);
+        }
+
+        .stick-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #4ade80;
+            border: 3px solid #4ade80;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.05s ease-out;
+            box-shadow: 0 2px 8px rgba(74, 222, 128, 0.5);
+        }
+
+        .stick-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .value-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            background: #252525;
+            border-radius: 6px;
+        }
+
+        .value-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .value-number {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e0e0e0;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        }
+
+        .controls-section {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .control-button {
+            flex: 1;
+            min-width: 140px;
+            padding: 14px 20px;
+            background: #252525;
+            border: 2px solid #3a3a3a;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .control-button:hover {
+            background: #2a2a2a;
+            border-color: #4a4a4a;
+        }
+
+        .control-button.active {
+            background: #4ade80;
+            color: #1a1a1a;
+            border-color: #4ade80;
+        }
+
+        .control-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .vibration-status {
+            font-size: 12px;
+            color: #888;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .gamepad-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a1a;
+            padding: 40px;
+        }
+
+        .gamepad-svg-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gamepad-svg-container svg {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .buttons-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .buttons-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .sticks-section {
+                grid-template-columns: 1fr;
+            }
+
+            .left-panel {
+                padding: 20px;
+            }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.connected {
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+        }
+
+        .status-indicator.disconnected {
+            background: #f87171;
+            box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="gamepad-id" id="gamepad-id">No gamepad connected</div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Index</div>
+                <div class="info-value" id="gamepad-index">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Connected</div>
+                <div class="info-value disconnected" id="gamepad-connected">No</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Mapping</div>
+                <div class="info-value" id="gamepad-mapping">standard</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Timestamp</div>
+                <div class="info-value" id="gamepad-timestamp">401619.52061</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Vibration</div>
+                <div class="info-value" id="gamepad-vibration">Yes</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <!-- Buttons Section -->
+                <div class="buttons-section">
+                    <div class="buttons-grid">
+                        <div class="button-cell" id="btn-cell-0">
+                            <div class="button-label">B0</div>
+                            <div class="button-value" id="btn-0">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-1">
+                            <div class="button-label">B1</div>
+                            <div class="button-value" id="btn-1">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-2">
+                            <div class="button-label">B2</div>
+                            <div class="button-value" id="btn-2">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-3">
+                            <div class="button-label">B3</div>
+                            <div class="button-value" id="btn-3">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-4">
+                            <div class="button-label">B4</div>
+                            <div class="button-value" id="btn-4">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-5">
+                            <div class="button-label">B5</div>
+                            <div class="button-value" id="btn-5">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-6">
+                            <div class="button-label">B6</div>
+                            <div class="button-value" id="btn-6">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-7">
+                            <div class="button-label">B7</div>
+                            <div class="button-value" id="btn-7">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-8">
+                            <div class="button-label">B8</div>
+                            <div class="button-value" id="btn-8">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-9">
+                            <div class="button-label">B9</div>
+                            <div class="button-value" id="btn-9">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-10">
+                            <div class="button-label">B10</div>
+                            <div class="button-value" id="btn-10">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-11">
+                            <div class="button-label">B11</div>
+                            <div class="button-value" id="btn-11">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-12">
+                            <div class="button-label">B12</div>
+                            <div class="button-value" id="btn-12">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-13">
+                            <div class="button-label">B13</div>
+                            <div class="button-value" id="btn-13">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-14">
+                            <div class="button-label">B14</div>
+                            <div class="button-value" id="btn-14">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-15">
+                            <div class="button-label">B15</div>
+                            <div class="button-value" id="btn-15">0.00</div>
+                        </div>
+                        <div class="button-cell" id="btn-cell-16">
+                            <div class="button-label">B16</div>
+                            <div class="button-value" id="btn-16">0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticks Section -->
+                <div class="axes-section">
+                    <div class="section-title">Analog Sticks</div>
+                    <div class="sticks-section">
+                        <div class="stick-container">
+                            <div class="stick-label">L STICK</div>
+                            <div class="stick-visualization">
+                                <div class="stick-crosshair"></div>
+                                <div class="stick-dot" id="lstick-dot"></div>
+                            </div>
+                            <div class="stick-values">
+                                <div class="value-item">
+                                    <div class="value-label">AXIS 0</div>
+                                    <div class="value-number" id="lstick-axis0">0.44857</div>
+                                </div>
+                                <div class="value-item">
+                                    <div class="value-label">AXIS 1</div>
+                                    <div class="value-number" id="lstick-axis1">-1.00000</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stick-container">
+                            <div class="stick-label">R STICK</div>
+                            <div class="stick-visualization">
+                                <div class="stick-crosshair"></div>
+                                <div class="stick-dot" id="rstick-dot"></div>
+                            </div>
+                            <div class="stick-values">
+                                <div class="value-item">
+                                    <div class="value-label">AXIS 2</div>
+                                    <div class="value-number" id="rstick-axis2">0.00000</div>
+                                </div>
+                                <div class="value-item">
+                                    <div class="value-label">AXIS 3</div>
+                                    <div class="value-number" id="rstick-axis3">0.00000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls Section -->
+                <div class="controls-section">
+                    <button class="control-button" id="test-circularity">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                        Test Circularity
+                    </button>
+                    <button class="control-button" id="vibration-1sec">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M2 12h20"></path>
+                        </svg>
+                        Vibration, 1 sec
+                    </button>
+                    <button class="control-button" id="vibration-infinite">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3.9,12C3.9,10.29 4.95,8.5 7.9,8.5C10.85,8.5 12.4,10.29 12.4,12C12.4,13.71 10.85,15.5 7.9,15.5C4.95,15.5 3.9,13.71 3.9,12M20.1,12C20.1,13.71 18.55,15.5 15.6,15.5C12.65,15.5 11.6,13.71 11.6,12C11.6,10.29 12.65,8.5 15.6,8.5C18.55,8.5 20.1,10.29 20.1,12Z"></path>
+                        </svg>
+                        Vibration, infinite
+                    </button>
+                </div>
+                <div class="vibration-status" id="vibration-status"></div>
+            </div>
+
+            <!-- Right Panel - Gamepad Visual -->
+            <div class="gamepad-visual">
+                <div class="gamepad-svg-container">
+                    <svg id="gamepad-svg" viewBox="0 0 441 383" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="XBox">
+                            <path id="LOutline" d="M220.5 294.5C220.5 294.5 195 294.5 150 294.5C105 294.5 81.5 378.5 49.5 378.5C17.5 378.5 4 363.9 4 317.5C4 271.1 43.5 165.5 55 137.5C66.5 109.5 95.5 92.0001 128 92.0001C154 92.0001 200.5 92.0001 220.5 92.0001" stroke="hsl(210,50%,85%)" stroke-width="3" stroke-opacity="0.3"></path>
+                            <path id="ROutline" d="M220 294.5C220 294.5 245.5 294.5 290.5 294.5C335.5 294.5 359 378.5 391 378.5C423 378.5 436.5 363.9 436.5 317.5C436.5 271.1 397 165.5 385.5 137.5C374 109.5 345 92.0001 312.5 92.0001C286.5 92.0001 240 92.0001 220 92.0001" stroke="hsl(210,50%,85%)" stroke-width="3" stroke-opacity="0.3"></path>
+                            <circle id="LStickOutline" cx="113" cy="160" r="37.5" stroke="hsl(210,50%,85%)" stroke-opacity="0.3" stroke-width="3"></circle>
+                            <circle id="RStickOutline" cx="278" cy="238" r="37.5" stroke="hsl(210,50%,85%)" stroke-opacity="0.3" stroke-width="3"></circle>
+                            <circle id="DOutline" cx="166" cy="238" r="37.5" stroke="hsl(210,50%,85%)" stroke-opacity="0.3" stroke-width="3"></circle>
+                            <circle id="LeftStick" cx="166" cy="238" r="28" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            <circle id="LStickDot" cx="166" cy="238" r="20" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0)" stroke-width="3"></circle>
+                            <circle id="BOutline" cx="329" cy="160" r="37.5" stroke="hsl(210,50%,85%)" stroke-opacity="0.3" stroke-width="3"></circle>
+                            <circle id="RightStick" cx="278" cy="238" r="28" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            <circle id="RStickDot" cx="278" cy="238" r="20" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0)" stroke-width="3"></circle>
+                            <g transform="translate(-53, -78)">
+                                <g id="DUp">
+                                    <mask id="path-8-inside-1" fill="white">
+                                        <path d="M177.669 222.335C180.793 219.21 180.816 213.997 176.868 212.014C176.327 211.743 175.776 211.491 175.215 211.258C172.182 210.002 168.931 209.355 165.648 209.355C162.365 209.355 159.114 210.002 156.081 211.258C155.521 211.491 154.969 211.743 154.429 212.014C150.48 213.997 150.503 219.21 153.627 222.335L159.991 228.698C163.116 231.823 168.181 231.823 171.305 228.698L177.669 222.335Z"></path>
+                                    </mask>
+                                    <path id="d-up-path" d="M177.669 222.335C180.793 219.21 180.816 213.997 176.868 212.014C176.327 211.743 175.776 211.491 175.215 211.258C172.182 210.002 168.931 209.355 165.648 209.355C162.365 209.355 159.114 210.002 156.081 211.258C155.521 211.491 154.969 211.743 154.429 212.014C150.48 213.997 150.503 219.21 153.627 222.335L159.991 228.698C163.116 231.823 168.181 231.823 171.305 228.698L177.669 222.335Z" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="6" mask="url(#path-8-inside-1)"></path>
+                                </g>
+                                <g id="DRight">
+                                    <mask id="path-9-inside-2" fill="white">
+                                        <path d="M181.447 249.669C184.571 252.793 189.785 252.816 191.768 248.868C192.039 248.327 192.291 247.776 192.523 247.215C193.78 244.182 194.426 240.931 194.426 237.648C194.426 234.365 193.78 231.114 192.523 228.081C192.291 227.521 192.039 226.969 191.768 226.429C189.785 222.48 184.571 222.503 181.447 225.627L175.083 231.991C171.959 235.116 171.959 240.181 175.083 243.305L181.447 249.669Z"></path>
+                                    </mask>
+                                    <path id="d-right-path" d="M181.447 249.669C184.571 252.793 189.785 252.816 191.768 248.868C192.039 248.327 192.291 247.776 192.523 247.215C193.78 244.182 194.426 240.931 194.426 237.648C194.426 234.365 193.78 231.114 192.523 228.081C192.291 227.521 192.039 226.969 191.768 226.429C189.785 222.48 184.571 222.503 181.447 225.627L175.083 231.991C171.959 235.116 171.959 240.181 175.083 243.305L181.447 249.669Z" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="6" mask="url(#path-9-inside-2)"></path>
+                                </g>
+                                <g id="DDown">
+                                    <mask id="path-10-inside-3" fill="white">
+                                        <path d="M154.113 253.447C150.989 256.571 150.966 261.785 154.914 263.767C155.455 264.039 156.006 264.291 156.566 264.523C159.6 265.78 162.85 266.426 166.134 266.426C169.417 266.426 172.667 265.78 175.701 264.523C176.261 264.291 176.812 264.039 177.353 263.767C181.301 261.785 181.279 256.571 178.154 253.447L171.79 247.083C168.666 243.959 163.601 243.959 160.477 247.083L154.113 253.447Z"></path>
+                                    </mask>
+                                    <path id="d-down-path" d="M154.113 253.447C150.989 256.571 150.966 261.785 154.914 263.767C155.455 264.039 156.006 264.291 156.566 264.523C159.6 265.78 162.85 266.426 166.134 266.426C169.417 266.426 172.667 265.78 175.701 264.523C176.261 264.291 176.812 264.039 177.353 263.767C181.301 261.785 181.279 256.571 178.154 253.447L171.79 247.083C168.666 243.959 163.601 243.959 160.477 247.083L154.113 253.447Z" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="6" mask="url(#path-10-inside-3)"></path>
+                                </g>
+                                <g id="DLeft">
+                                    <mask id="path-11-inside-4" fill="white">
+                                        <path d="M150.335 226.113C147.21 222.989 141.997 222.966 140.014 226.914C139.743 227.455 139.491 228.006 139.258 228.566C138.002 231.6 137.355 234.85 137.355 238.134C137.355 241.417 138.002 244.667 139.258 247.701C139.491 248.261 139.743 248.812 140.014 249.353C141.997 253.301 147.21 253.279 150.335 250.154L156.698 243.79C159.823 240.666 159.823 235.601 156.698 232.477L150.335 226.113Z"></path>
+                                    </mask>
+                                    <path id="d-left-path" d="M150.335 226.113C147.21 222.989 141.997 222.966 140.014 226.914C139.743 227.455 139.491 228.006 139.258 228.566C138.002 231.6 137.355 234.85 137.355 238.134C137.355 241.417 138.002 244.667 139.258 247.701C139.491 248.261 139.743 248.812 140.014 249.353C141.997 253.301 147.21 253.279 150.335 250.154L156.698 243.79C159.823 240.666 159.823 235.601 156.698 232.477L150.335 226.113Z" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="6" mask="url(#path-11-inside-4)"></path>
+                                </g>
+                            </g>
+                            <g id="BTop">
+                                <circle id="b-up-path" cx="329" cy="140" r="10" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            </g>
+                            <g id="BRight">
+                                <circle id="b-right-path" cx="349" cy="160" r="10" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            </g>
+                            <g id="BBottom">
+                                <circle id="b-down-path" cx="329" cy="180" r="10" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            </g>
+                            <g id="BLeft">
+                                <circle id="b-left-path" cx="309" cy="160" r="10" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            </g>
+                            <g id="LMeta">
+                                <circle id="l-meta-circle" cx="185" cy="162" r="10" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            </g>
+                            <g id="RMeta">
+                                <circle id="r-meta-circle" cx="259" cy="162" r="10" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></circle>
+                            </g>
+                            <rect id="l1-rect" x="111.5" y="61.5" width="41" height="13" rx="6.5" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></rect>
+                            <rect id="r1-rect" x="289.5" y="61.5" width="41" height="13" rx="6.5" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></rect>
+                            <path id="l2-path" d="M152.5 37C152.5 41.1421 149.142 44.5 145 44.5H132C127.858 44.5 124.5 41.1421 124.5 37V16.5C124.5 8.76801 130.768 2.5 138.5 2.5C146.232 2.5 152.5 8.76801 152.5 16.5V37Z" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></path>
+                            <path id="r2-path" d="M317.5 37C317.5 41.1421 314.142 44.5 310 44.5H297C292.858 44.5 289.5 41.1421 289.5 37V16.5C289.5 8.76801 295.768 2.5 303.5 2.5C311.232 2.5 317.5 8.76801 317.5 16.5V37Z" fill="rgba(0,0,0,0)" stroke="rgba(255,255,255,0.3)" stroke-width="3"></path>
+                            <line x1="30" y1="210" x2="130" y2="300" stroke-width="3" stroke="hsl(210,50%,85%)" opacity="0.3"></line>
+                            <line x1="411" y1="210" x2="311" y2="300" stroke-width="3" stroke="hsl(210,50%,85%)" opacity="0.3"></line>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vibrationTimeout = null;
+        let infiniteVibrating = false;
+
+        // Request gamepad access
+        function pollGamepads() {
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+            let foundGamepad = false;
+            
+            for (let i = 0; i < gamepads.length; i++) {
+                const gamepad = gamepads[i];
+                
+                if (gamepad) {
+                    foundGamepad = true;
+                    updateGamepadInfo(gamepad, i);
+                    updateButtons(gamepad);
+                    updateSticks(gamepad);
+                }
+            }
+
+            if (!foundGamepad) {
+                // Show disconnected state
+                document.getElementById('gamepad-id').textContent = 'No gamepad connected';
+                document.getElementById('gamepad-connected').textContent = 'No';
+                document.getElementById('gamepad-connected').className = 'info-value disconnected';
+            }
+
+            requestAnimationFrame(pollGamepads);
+        }
+
+        function updateGamepadInfo(gamepad, index) {
+            document.getElementById('gamepad-id').textContent = gamepad.id;
+            document.getElementById('gamepad-index').textContent = index;
+            document.getElementById('gamepad-connected').textContent = 'Yes';
+            document.getElementById('gamepad-connected').className = 'info-value connected';
+            document.getElementById('gamepad-mapping').textContent = gamepad.mapping || 'standard';
+            document.getElementById('gamepad-timestamp').textContent = gamepad.timestamp.toFixed(5);
+            
+            // Check for vibration support
+            const hasVibration = gamepad.vibrationActuator ? 'Yes' : 'No';
+            document.getElementById('gamepad-vibration').textContent = hasVibration;
+        }
+
+        function updateButtons(gamepad) {
+            // Button mapping to SVG element IDs
+            const buttonToSvgMap = {
+                0: 'b-down-path',      // A / Bottom
+                1: 'b-right-path',     // B / Right
+                2: 'b-left-path',      // X / Left
+                3: 'b-up-path',        // Y / Top
+                4: 'l1-rect',          // LB / L1
+                5: 'r1-rect',          // RB / R1
+                6: 'l2-path',          // LT / L2
+                7: 'r2-path',          // RT / R2
+                8: 'l-meta-circle',    // Back / Select
+                9: 'r-meta-circle',    // Start
+                12: 'd-up-path',       // D-Pad Up
+                13: 'd-down-path',     // D-Pad Down
+                14: 'd-left-path',     // D-Pad Left
+                15: 'd-right-path'     // D-Pad Right
+            };
+
+            for (let i = 0; i < gamepad.buttons.length; i++) {
+                const button = gamepad.buttons[i];
+                const buttonElement = document.getElementById(`btn-${i}`);
+                const buttonCell = document.getElementById(`btn-cell-${i}`);
+                
+                if (buttonElement) {
+                    const value = typeof button === 'object' ? button.value : button;
+                    buttonElement.textContent = value.toFixed(2);
+                    
+                    if (buttonCell) {
+                        if (value > 0.1) {
+                            buttonCell.classList.add('pressed');
+                        } else {
+                            buttonCell.classList.remove('pressed');
+                        }
+                    }
+                }
+
+                // Update SVG button color based on press value
+                if (buttonToSvgMap[i]) {
+                    const svgElement = document.getElementById(buttonToSvgMap[i]);
+                    if (svgElement) {
+                        const value = typeof button === 'object' ? button.value : button;
+                        const opacity = 0.3 + (value * 0.7);
+                        svgElement.setAttribute('stroke', `rgba(74, 222, 128, ${opacity})`);
+                        svgElement.setAttribute('fill', `rgba(74, 222, 128, ${value * 0.3})`);
+                    }
+                }
+            }
+        }
+
+        function updateSticks(gamepad) {
+            // Left stick (axes 0 and 1)
+            const lstickAxisX = gamepad.axes[0] || 0;
+            const lstickAxisY = gamepad.axes[1] || 0;
+            
+            document.getElementById('lstick-axis0').textContent = lstickAxisX.toFixed(5);
+            document.getElementById('lstick-axis1').textContent = lstickAxisY.toFixed(5);
+            
+            // Update stick dot position (90px is max radius, half of 180px)
+            const lstickDot = document.getElementById('lstick-dot');
+            const lstickMaxRadius = 75; // Leave some margin
+            lstickDot.style.left = `calc(50% + ${lstickAxisX * lstickMaxRadius}px)`;
+            lstickDot.style.top = `calc(50% + ${lstickAxisY * lstickMaxRadius}px)`;
+            
+            // Update SVG left stick position
+            const lstickCircle = document.getElementById('LeftStick');
+            lstickCircle.setAttribute('cx', 166 + lstickAxisX * 12);
+            lstickCircle.setAttribute('cy', 238 + lstickAxisY * 12);
+            const lstickMagnitude = Math.sqrt(lstickAxisX * lstickAxisX + lstickAxisY * lstickAxisY);
+            lstickCircle.setAttribute('stroke', `rgba(74, 222, 128, ${0.3 + lstickMagnitude * 0.7})`);
+            lstickCircle.setAttribute('fill', `rgba(74, 222, 128, ${lstickMagnitude * 0.2})`);
+            
+            const lstickDotSvg = document.getElementById('LStickDot');
+            lstickDotSvg.setAttribute('cx', 166 + lstickAxisX * 12);
+            lstickDotSvg.setAttribute('cy', 238 + lstickAxisY * 12);
+            const lPressed = gamepad.buttons[10] ? gamepad.buttons[10].value : 0;
+            lstickDotSvg.setAttribute('fill', `rgba(74, 222, 128, ${lPressed * 0.8})`);
+            lstickDotSvg.setAttribute('stroke', `rgba(74, 222, 128, ${lPressed})`);
+
+            // Right stick (axes 2 and 3)
+            const rstickAxisX = gamepad.axes[2] || 0;
+            const rstickAxisY = gamepad.axes[3] || 0;
+            
+            document.getElementById('rstick-axis2').textContent = rstickAxisX.toFixed(5);
+            document.getElementById('rstick-axis3').textContent = rstickAxisY.toFixed(5);
+            
+            // Update stick dot position
+            const rstickDot = document.getElementById('rstick-dot');
+            rstickDot.style.left = `calc(50% + ${rstickAxisX * lstickMaxRadius}px)`;
+            rstickDot.style.top = `calc(50% + ${rstickAxisY * lstickMaxRadius}px)`;
+            
+            // Update SVG right stick position
+            const rstickCircle = document.getElementById('RightStick');
+            rstickCircle.setAttribute('cx', 278 + rstickAxisX * 12);
+            rstickCircle.setAttribute('cy', 238 + rstickAxisY * 12);
+            const rstickMagnitude = Math.sqrt(rstickAxisX * rstickAxisX + rstickAxisY * rstickAxisY);
+            rstickCircle.setAttribute('stroke', `rgba(74, 222, 128, ${0.3 + rstickMagnitude * 0.7})`);
+            rstickCircle.setAttribute('fill', `rgba(74, 222, 128, ${rstickMagnitude * 0.2})`);
+            
+            const rstickDotSvg = document.getElementById('RStickDot');
+            rstickDotSvg.setAttribute('cx', 278 + rstickAxisX * 12);
+            rstickDotSvg.setAttribute('cy', 238 + rstickAxisY * 12);
+            const rPressed = gamepad.buttons[11] ? gamepad.buttons[11].value : 0;
+            rstickDotSvg.setAttribute('fill', `rgba(74, 222, 128, ${rPressed * 0.8})`);
+            rstickDotSvg.setAttribute('stroke', `rgba(74, 222, 128, ${rPressed})`);
+        }
+
+        // Control buttons
+        document.getElementById('test-circularity').addEventListener('click', function() {
+            this.classList.add('active');
+            setTimeout(() => {
+                this.classList.remove('active');
+            }, 200);
+        });
+
+        document.getElementById('vibration-1sec').addEventListener('click', async function() {
+            const gamepads = navigator.getGamepads();
+            const gamepad = gamepads ? gamepads[0] : null;
+            
+            if (gamepad?.vibrationActuator) {
+                try {
+                    await gamepad.vibrationActuator.playEffect('dual-rumble', {
+                        startDelay: 0,
+                        duration: 1000,
+                        strongMagnitude: 1.0,
+                        weakMagnitude: 0.5,
+                    });
+                    this.classList.add('active');
+                    document.getElementById('vibration-status').textContent = 'Vibrating... (1s)';
+                    
+                    clearTimeout(vibrationTimeout);
+                    vibrationTimeout = setTimeout(() => {
+                        this.classList.remove('active');
+                        document.getElementById('vibration-status').textContent = '';
+                    }, 1000);
+                } catch (e) {
+                    document.getElementById('vibration-status').textContent = 'Vibration not supported';
+                }
+            } else {
+                document.getElementById('vibration-status').textContent = 'No gamepad with vibration support connected';
+            }
+        });
+
+        document.getElementById('vibration-infinite').addEventListener('click', async function() {
+            const gamepads = navigator.getGamepads();
+            const gamepad = gamepads ? gamepads[0] : null;
+            
+            if (gamepad?.vibrationActuator) {
+                try {
+                    if (!infiniteVibrating) {
+                        infiniteVibrating = true;
+                        this.classList.add('active');
+                        document.getElementById('vibration-status').textContent = 'Vibrating... (infinite)';
+                        
+                        // Keep vibrating
+                        const vibrateLoop = async () => {
+                            if (infiniteVibrating) {
+                                const gamepads = navigator.getGamepads();
+                                const currentGamepad = gamepads ? gamepads[0] : null;
+                                if (currentGamepad?.vibrationActuator) {
+                                    try {
+                                        await currentGamepad.vibrationActuator.playEffect('dual-rumble', {
+                                            startDelay: 0,
+                                            duration: 500,
+                                            strongMagnitude: 1.0,
+                                            weakMagnitude: 0.5,
+                                        });
+                                        setTimeout(vibrateLoop, 500);
+                                    } catch (e) {
+                                        console.error('Vibration error:', e);
+                                        infiniteVibrating = false;
+                                    }
+                                }
+                            }
+                        };
+                        vibrateLoop();
+                    } else {
+                        infiniteVibrating = false;
+                        this.classList.remove('active');
+                        document.getElementById('vibration-status').textContent = '';
+                    }
+                } catch (e) {
+                    document.getElementById('vibration-status').textContent = 'Vibration not supported';
+                }
+            } else {
+                document.getElementById('vibration-status').textContent = 'No gamepad with vibration support connected';
+            }
+        });
+
+        // Start polling gamepads
+        pollGamepads();
+    </script>
+</body>
+</html>

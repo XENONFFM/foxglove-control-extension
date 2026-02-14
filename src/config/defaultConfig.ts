@@ -18,6 +18,14 @@ export const createDefaultConfig = (context?: PanelExtensionContext): PanelConfi
     layoutName: partialConfig.layoutName ?? "steamdeck",
     gamepadJoyTransform: partialConfig.gamepadJoyTransform ?? "Default",
     gamepadId: partialConfig.gamepadId ?? 0,
+    twistMapping: partialConfig.twistMapping ?? {
+      linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+    },
     options: {
       availableControllers: [],
     },

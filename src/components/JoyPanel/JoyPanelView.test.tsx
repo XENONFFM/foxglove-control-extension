@@ -18,7 +18,6 @@ describe("JoyPanelView", () => {
   };
 
   const mockHandleKbSwitch = jest.fn();
-  const mockInteractiveCb = jest.fn();
 
   it("renders keyboard switch when data source is keyboard", () => {
     render(
@@ -27,7 +26,6 @@ describe("JoyPanelView", () => {
         joy={mockJoy}
         kbEnabled={true}
         handleKbSwitch={mockHandleKbSwitch}
-        interactiveCb={mockInteractiveCb}
       />,
     );
 
@@ -41,7 +39,6 @@ describe("JoyPanelView", () => {
         joy={mockJoy}
         kbEnabled={true}
         handleKbSwitch={mockHandleKbSwitch}
-        interactiveCb={mockInteractiveCb}
       />,
     );
 

@@ -3,7 +3,7 @@ import React from "react";
 
 import { PanelConfig } from "../../config";
 import { Joy } from "../../types";
-import { GamepadView } from "../GamepadView/GamepadView";
+import { GamepadTester } from "../GamepadTester/GamepadTester";
 import { SimpleButtonView } from "../SimpleButtonView";
 
 export function JoyPanelView({
@@ -11,13 +11,11 @@ export function JoyPanelView({
   joy,
   kbEnabled,
   handleKbSwitch,
-  interactiveCb,
 }: {
   readonly config: PanelConfig;
-  readonly joy: Joy | undefined;
+  readonly joy: unknown;
   readonly kbEnabled: boolean;
   readonly handleKbSwitch: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  readonly interactiveCb: (interactiveJoy: Joy) => void;
 }): JSX.Element {
   if (joy == undefined && config.displayMode === "custom") {
     return <div>No Joystick detected</div>;
@@ -33,14 +31,8 @@ export function JoyPanelView({
           />
         </FormGroup>
       ) : null}
-      {config.displayMode === "auto" ? <SimpleButtonView joy={joy} /> : null}
-      {config.displayMode === "custom" ? (
-        <GamepadView
-          joy={joy as unknown as Joy}
-          cbInteractChange={interactiveCb}
-          layoutName={config.layoutName}
-        />
-      ) : null}
+      {config.displayMode === "auto" ? <SimpleButtonView joy={joy as Joy | undefined} /> : null}
+      {config.displayMode === "custom" ? <GamepadTester /> : null}
     </div>
   );
 }

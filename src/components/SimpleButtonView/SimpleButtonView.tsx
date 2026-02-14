@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-key */
 import { Button, LinearProgress } from "@mui/material";
 
 import { Joy } from "../../types";

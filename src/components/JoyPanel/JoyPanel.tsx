@@ -74,7 +74,6 @@ export function JoyPanel({ context }: { readonly context: PanelExtensionContext 
       joy={joy}
       kbEnabled={kbEnabled}
       handleKbSwitch={callbacks.handleKbSwitch}
-      interactiveCb={callbacks.interactiveCb}
     />
   );
 }

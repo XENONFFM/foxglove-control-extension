@@ -12,3 +12,17 @@ export type Joy = {
   axes: number[];
   buttons: number[];
 };
+
+// geometry_msgs/Vector3 message definition
+export type Vector3 = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+// geometry_msgs/Twist message definition
+// http://docs.ros.org/en/api/geometry_msgs/html/msg/Twist.html
+export type Twist = {
+  linear: Vector3;
+  angular: Vector3;
+};

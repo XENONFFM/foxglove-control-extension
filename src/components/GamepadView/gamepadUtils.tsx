@@ -5,7 +5,6 @@ const colPrim = "blue";
 const colSec = "cornflowerblue";
 const colAlt = "red";
 
-
 export function generateButton(
   value: number,
   x: number,
@@ -14,7 +13,7 @@ export function generateButton(
   radius: number,
   downCb: (e: React.PointerEvent) => void,
   upCb: (e: React.PointerEvent) => void,
-) {
+): JSX.Element {
   return (
     <>
       <circle
@@ -41,7 +40,7 @@ export function generateButton(
   );
 }
 
-export function generateBar(value: number, x: number, y: number, rot: number) {
+export function generateBar(value: number, x: number, y: number, rot: number): JSX.Element {
   const width = 80;
   const height = 10;
   const fracwidth = ((-value + 1) * width) / 2;
@@ -82,7 +81,7 @@ export function generateStick(
   downCb: (e: React.PointerEvent) => void,
   moveCb: (e: React.PointerEvent) => void,
   upCb: (e: React.PointerEvent) => void,
-) {
+): JSX.Element {
   const offX = -valueX * radius;
   const offY = -valueY * radius;
 
@@ -112,7 +111,13 @@ export function generateStick(
   );
 }
 
-export function generateDPad(valueX: number, valueY: number, x: number, y: number, radius: number) {
+export function generateDPad(
+  valueX: number,
+  valueY: number,
+  x: number,
+  y: number,
+  radius: number,
+): JSX.Element {
   const transform = "translate(" + x.toString() + "," + y.toString() + ")";
 
   return (
@@ -149,4 +154,3 @@ export function generateDPad(valueX: number, valueY: number, x: number, y: numbe
     </>
   );
 }
-
