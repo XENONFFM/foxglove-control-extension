@@ -11,6 +11,8 @@ export const createDefaultConfig = (context?: PanelExtensionContext): PanelConfi
     subJoyTopic: partialConfig.subJoyTopic ?? "/joy",
     pubJoyTopic: partialConfig.pubJoyTopic ?? "/joy",
     publishMode: partialConfig.publishMode ?? false,
+    publishTwistMode: partialConfig.publishTwistMode ?? false,
+    pubTwistTopic: partialConfig.pubTwistTopic ?? "/cmd_vel",
     publishFrameId: partialConfig.publishFrameId ?? "",
     dataSource: partialConfig.dataSource ?? "sub-joy-topic",
     displayMode: partialConfig.displayMode ?? "auto",
@@ -19,12 +21,12 @@ export const createDefaultConfig = (context?: PanelExtensionContext): PanelConfi
     gamepadJoyTransform: partialConfig.gamepadJoyTransform ?? "Default",
     gamepadId: partialConfig.gamepadId ?? 0,
     twistMapping: partialConfig.twistMapping ?? {
-      linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      linearX: { sourceType: "axis", sourceIndex: 1, scale: 1, invert: true },
       linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
       linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
       angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
       angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-      angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      angularZ: { sourceType: "axis", sourceIndex: 0, scale: 1, invert: false },
     },
     options: {
       availableControllers: [],

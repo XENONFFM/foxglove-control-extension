@@ -15,6 +15,8 @@ const mockContext: PanelExtensionContext = {
     subJoyTopic: "/joy",
     pubJoyTopic: "/joy",
     publishMode: false,
+    publishTwistMode: false,
+    pubTwistTopic: "/cmd_vel",
     publishFrameId: "",
     dataSource: "sub-joy-topic",
     displayMode: "auto",

@@ -9,11 +9,21 @@ describe("settingsActionReducer", () => {
       gamepadId: 0,
       publishMode: false,
       pubJoyTopic: "/joy",
+      publishTwistMode: false,
+      pubTwistTopic: "/cmd_vel",
       publishFrameId: "",
       displayMode: "auto",
       debugGamepad: false,
       layoutName: "steamdeck",
       gamepadJoyTransform: "xbox",
+      twistMapping: {
+        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      },
       options: { availableControllers: [] },
     };
 
@@ -34,11 +44,21 @@ describe("buildSettingsTree", () => {
       gamepadId: 0,
       publishMode: false,
       pubJoyTopic: "/joy",
+      publishTwistMode: false,
+      pubTwistTopic: "/cmd_vel",
       publishFrameId: "",
       displayMode: "auto",
       debugGamepad: false,
       layoutName: "steamdeck",
       gamepadJoyTransform: "default",
+      twistMapping: {
+        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      },
       options: { availableControllers: [] },
     };
 
@@ -47,9 +67,11 @@ describe("buildSettingsTree", () => {
     expect(tree.dataSource).toBeDefined();
     expect(tree.publish).toBeDefined();
     expect(tree.display).toBeDefined();
+    expect(tree.twistMapping).toBeDefined();
 
     expect(tree.dataSource?.fields?.dataSource?.value).toBe("sub-joy-topic");
     expect(tree.publish?.fields?.publishMode?.value).toBe(false);
+    expect(tree.publish?.fields?.publishTwistMode?.value).toBe(false);
     expect(tree.display?.fields?.displayMode?.value).toBe("auto");
   });
 });

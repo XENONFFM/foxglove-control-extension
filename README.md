@@ -33,6 +33,15 @@ With Node and Foxglove installed
 - `npm run local-install` to build and install for a local copy of the Foxglove Studio Desktop App
 - `npm run package` to package it up into a `.foxe` file
 
+### Browser dev harness (no Foxglove required)
+
+If you want to iterate on the panel UI without launching Foxglove, run the local Vite dev harness:
+
+- `npm install`
+- `npm run dev`
+
+This starts a browser app that renders the Joystick panel with a mocked Foxglove context. You can tweak the initial panel state in [dev/mockPanelContext.ts](dev/mockPanelContext.ts).
+
 ### Snap Users
 
 Right now it seems that this panel will **not** work with the `snap` version of Foxglove Studio. Snaps do not allow joystick input by default and I am looking into what is required to use it (possibly the Foxglove team enabling the `joystick` interface).

@@ -20,6 +20,8 @@ export interface UseJoyPanelStateResult {
   setJoy: React.Dispatch<React.SetStateAction<Joy | undefined>>;
   pubTopic: string | undefined;
   setPubTopic: React.Dispatch<React.SetStateAction<string | undefined>>;
+  pubTwistTopic: string | undefined;
+  setPubTwistTopic: React.Dispatch<React.SetStateAction<string | undefined>>;
   kbEnabled: boolean;
   setKbEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   trackedKeys: Map<string, KbMap> | undefined;
@@ -36,6 +38,7 @@ export function useJoyPanelState(context?: PanelExtensionContext): UseJoyPanelSt
   const [messages, setMessages] = useState<undefined | Immutable<MessageEvent[]>>();
   const [joy, setJoy] = useState<Joy | undefined>();
   const [pubTopic, setPubTopic] = useState<string | undefined>();
+  const [pubTwistTopic, setPubTwistTopic] = useState<string | undefined>();
   const [kbEnabled, setKbEnabled] = useState<boolean>(true);
   const [trackedKeys, setTrackedKeys] = useState<Map<string, KbMap> | undefined>(() =>
     createKeyboardMapping(),
@@ -59,6 +62,8 @@ export function useJoyPanelState(context?: PanelExtensionContext): UseJoyPanelSt
     setJoy,
     pubTopic,
     setPubTopic,
+    pubTwistTopic,
+    setPubTwistTopic,
     kbEnabled,
     setKbEnabled,
     trackedKeys,

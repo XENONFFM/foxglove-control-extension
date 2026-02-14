@@ -35,7 +35,7 @@
 	"features": {
 		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
 		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/devcontainers-contrib/features/jest:2": {},
+		"ghcr.io/devcontainers-extra/features/jest:2": {},
         "ghcr.io/devcontainers/features/git:1": {
             "version": "latest"
         }

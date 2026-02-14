@@ -5,6 +5,7 @@ import { useJoyPanelCallbacks } from "./joyPanelCallbacks";
 import { useJoyPanelState } from "./useJoyPanelState";
 import { buildSettingsTree, settingsActionReducer } from "../../config/panelSettings";
 import { Joy, KbMap } from "../../types";
+import { joyToTwist } from "../../utils/twistMapping";
 
 export type JoyPanelEffectsProps = {
   context: PanelExtensionContext;
@@ -14,6 +15,8 @@ export type JoyPanelEffectsProps = {
   setJoy: (joy: Joy | undefined) => void;
   pubTopic: string | undefined;
   setPubTopic: (topic: string | undefined) => void;
+  pubTwistTopic: string | undefined;
+  setPubTwistTopic: (topic: string | undefined) => void;
   kbEnabled: boolean;
   trackedKeys: Map<string, KbMap> | undefined;
   messages: ReturnType<typeof useJoyPanelState>["messages"];
@@ -28,6 +31,8 @@ export function useJoyPanelEffects({
   setJoy,
   pubTopic,
   setPubTopic,
+  pubTwistTopic,
+  setPubTwistTopic,
   kbEnabled,
   trackedKeys,
   messages,
@@ -128,12 +133,38 @@ export function useJoyPanelEffects({
     }
   }, [config.pubJoyTopic, config.publishMode, context, pubTopic, setPubTopic]);
 
+  // Advertise the twist topic to publish
+  useEffect(() => {
+    if (config.publishTwistMode) {
+      setPubTwistTopic(config.pubTwistTopic);
+      context.advertise?.(config.pubTwistTopic, "geometry_msgs/msg/Twist");
+    } else if (pubTwistTopic) {
+      context.unadvertise?.(pubTwistTopic);
+      setPubTwistTopic(undefined);
+    }
+  }, [config.pubTwistTopic, config.publishTwistMode, context, pubTwistTopic, setPubTwistTopic]);
+
   // Publish the joy message
   useEffect(() => {
     if (config.publishMode && pubTopic && pubTopic === config.pubJoyTopic && joy) {
       context.publish?.(pubTopic, joy);
     }
   }, [context, config.pubJoyTopic, config.publishMode, joy, pubTopic]);
+
+  // Publish the twist message
+  useEffect(() => {
+    if (config.publishTwistMode && pubTwistTopic && pubTwistTopic === config.pubTwistTopic && joy) {
+      const twist = joyToTwist(joy, config.twistMapping);
+      context.publish?.(pubTwistTopic, twist);
+    }
+  }, [
+    context,
+    config.pubTwistTopic,
+    config.publishTwistMode,
+    joy,
+    pubTwistTopic,
+    config.twistMapping,
+  ]);
 
   // Save state
   useEffect(() => {

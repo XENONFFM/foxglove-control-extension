@@ -25,6 +25,8 @@ export type PanelConfig = {
   gamepadId: number;
   publishMode: boolean;
   pubJoyTopic: string;
+  publishTwistMode: boolean;
+  pubTwistTopic: string;
   publishFrameId: string;
   displayMode: string;
   debugGamepad: boolean;

@@ -1,36 +1,20 @@
 import { InputMapping, TwistMapping } from "../config/types";
-import { Twist, Vector3 } from "../types";
-import { Joy } from "../types";
+import { Joy, Twist } from "../types";
 
 /**
  * Get the value of an input source (axis or button) from a gamepad or joy message
  */
-function getInputValue(
-  mapping: InputMapping,
-  source: Gamepad | Joy,
-): number {
+function getInputValue(mapping: InputMapping, source: Joy): number {
   if (mapping.sourceType === "none") {
     return 0;
   }
 
   let value = 0;
 
-  if (source instanceof Gamepad) {
-    if (mapping.sourceType === "axis" && mapping.sourceIndex < source.axes.length) {
-      value = source.axes[mapping.sourceIndex] ?? 0;
-    } else if (mapping.sourceType === "button" && mapping.sourceIndex < source.buttons.length) {
-      const button = source.buttons[mapping.sourceIndex];
-      if (button != null) {
-        value = button.pressed ? 1 : 0;
-      }
-    }
-  } else {
-    // Joy message
-    if (mapping.sourceType === "axis" && mapping.sourceIndex < source.axes.length) {
-      value = source.axes[mapping.sourceIndex] ?? 0;
-    } else if (mapping.sourceType === "button" && mapping.sourceIndex < source.buttons.length) {
-      value = (source.buttons[mapping.sourceIndex] ?? 0) > 0.5 ? 1 : 0;
-    }
+  if (mapping.sourceType === "axis" && mapping.sourceIndex < source.axes.length) {
+    value = source.axes[mapping.sourceIndex] ?? 0;
+  } else if (mapping.sourceType === "button" && mapping.sourceIndex < source.buttons.length) {
+    value = (source.buttons[mapping.sourceIndex] ?? 0) > 0.5 ? 1 : 0;
   }
 
   // Apply scale and invert
@@ -45,10 +29,7 @@ function getInputValue(
 /**
  * Convert gamepad or joy input to a Twist message based on the mapping configuration
  */
-export function joyToTwist(
-  source: Gamepad | Joy,
-  twistMapping: TwistMapping,
-): Twist {
+export function joyToTwist(source: Joy, twistMapping: TwistMapping): Twist {
   const linearX = getInputValue(twistMapping.linearX, source);
   const linearY = getInputValue(twistMapping.linearY, source);
   const linearZ = getInputValue(twistMapping.linearZ, source);
@@ -85,10 +66,9 @@ export function isValidTwistMapping(twistMapping: TwistMapping): boolean {
 
   return mappings.every(
     (mapping) =>
-      mapping.sourceType &&
-      (typeof mapping.sourceIndex === "number") &&
-      (typeof mapping.scale === "number") &&
-      (typeof mapping.invert === "boolean"),
+      typeof mapping.sourceIndex === "number" &&
+      typeof mapping.scale === "number" &&
+      typeof mapping.invert === "boolean",
   );
 }
 
