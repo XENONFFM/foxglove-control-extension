@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { createMockPanelContext } from "./mockPanelContext";
 import { JoyPanel } from "../src/components/JoyPanel";
 import "./styles.css";
+import "../src/styles/globals.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

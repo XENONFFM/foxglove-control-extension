@@ -15,7 +15,7 @@ export function useJoyPanelCallbacks(
   handleKeyDown: (event: KeyboardEvent) => void;
   handleKeyUp: (event: KeyboardEvent) => void;
   interactiveCb: (interactiveJoy: Joy) => void;
-  handleKbSwitch: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleKbSwitch: (payload: { enabled: boolean }) => void;
   handleGamepadConnect: (gp: Gamepad) => void;
   handleGamepadDisconnect: (gp: Gamepad) => void;
   handleGamepadUpdate: (gp: Gamepad) => void;
@@ -74,8 +74,8 @@ export function useJoyPanelCallbacks(
   );
 
   const handleKbSwitch = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setKbEnabled(event.target.checked);
+    ({ enabled }: { enabled: boolean }) => {
+      setKbEnabled(enabled);
     },
     [setKbEnabled],
   );
