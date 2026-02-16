@@ -135,3 +135,5 @@ dev-dist
 *.foxe
 local-install
 run
+
+.pnpm-store
