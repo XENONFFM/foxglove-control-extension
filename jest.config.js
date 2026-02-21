@@ -9,5 +9,5 @@ module.exports = {
   moduleNameMapper: {
     "^lodash-es$": "lodash",
   },
-  setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
+  setupFilesAfterEnv: ["@testing-library/jest-dom"],
 };

@@ -1,46 +1,38 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker-compose
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-	"name": "Foxglove Joystick Extension Dev Container",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"name": "Node.js & TypeScript",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 
-	// Use this environment variable if you need to bind mount your local source code into a new container.
-	"remoteEnv": {
-		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
-	},
-    "customizations": {
-        "vscode": {
-            "extensions": [
-				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode",
-				"ms-typescript-eslint.vscode-typescript-eslint",
-				"foxglove.studio-extension-helpers",
-				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode",
-				"ms-vscode-remote.remote-containers",
-				"ms-azuretools.vscode-docker",
-				"streetsidesoftware.code-spell-checker",
-				"orta.vscode-jest",
-				"foxglove.vscode-foxglove-studio",
-				"SonarSource.sonarlint-vscode"
-			],
-            "settings": {
-                "git.useEditorAsCommitInput": false
-            }
-        }
-    },
-    "forwardPorts": [8080],
+	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/devcontainers-extra/features/jest:2": {},
-        "ghcr.io/devcontainers/features/git:1": {
-            "version": "latest"
-        }
+		"ghcr.io/devcontainers/features/common-utils:2": {}
 	},
-	"postCreateCommand": [
-		"echo 'Dev container is ready!'"
-	]
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "yarn install",
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+	"mounts": [
+    "source=/Users/schfin01/.foxglove-studio/extensions,target=/home/node/.foxglove-studio/extensions,type=bind"
+	],
+	"runArgs": [
+		"--network=host"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+				"bradlc.vscode-tailwindcss"
+			]
+		}
+	}
 }

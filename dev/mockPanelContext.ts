@@ -8,12 +8,18 @@ export function createMockPanelContext(
   const context: Partial<PanelExtensionContext> = {
     initialState: {
       dataSource: "gamepad",
-      displayMode: "custom",
-      publishMode: false,
+      publishJoy: false,
       pubJoyTopic: "/joy",
       subJoyTopic: "/joy",
-      publishFrameId: "",
-      debugGamepad: true,
+      showHeader: true,
+      showInfo: true,
+      showButtons: true,
+      showAxes: true,
+      showGamepad: true,
+      showKeyboard: true,
+      showJoystick: true,
+      keyboardLayout: "wasd",
+
     },
     updatePanelSettingsEditor: () => {
       return;

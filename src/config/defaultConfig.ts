@@ -6,19 +6,16 @@ import { KbMap } from "../types";
 
 export const createDefaultConfig = (context?: PanelExtensionContext): PanelConfig => {
   const partialConfig = (context?.initialState ?? {}) as Partial<PanelConfig>;
+  const normalizedDataSource =
+    partialConfig.dataSource === "interactive" ? "joystick" : partialConfig.dataSource;
 
   return {
-    subJoyTopic: partialConfig.subJoyTopic ?? "/joy",
     pubJoyTopic: partialConfig.pubJoyTopic ?? "/joy",
-    publishMode: partialConfig.publishMode ?? false,
+    publishJoy: partialConfig.publishJoy ?? false,
     publishTwistMode: partialConfig.publishTwistMode ?? false,
     pubTwistTopic: partialConfig.pubTwistTopic ?? "/cmd_vel",
-    publishFrameId: partialConfig.publishFrameId ?? "",
-    dataSource: partialConfig.dataSource ?? "sub-joy-topic",
-    displayMode: partialConfig.displayMode ?? "auto",
-    debugGamepad: partialConfig.debugGamepad ?? false,
-    layoutName: partialConfig.layoutName ?? "steamdeck",
-    gamepadJoyTransform: partialConfig.gamepadJoyTransform ?? "Default",
+    dataSource: normalizedDataSource ?? "gamepad",
+    gamepadJoyTransform: partialConfig.gamepadJoyTransform ?? "default",
     gamepadId: partialConfig.gamepadId ?? 0,
     twistMapping: partialConfig.twistMapping ?? {
       linearX: { sourceType: "axis", sourceIndex: 1, scale: 1, invert: true },
@@ -28,10 +25,22 @@ export const createDefaultConfig = (context?: PanelExtensionContext): PanelConfi
       angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
       angularZ: { sourceType: "axis", sourceIndex: 0, scale: 1, invert: false },
     },
+    showButtons: partialConfig.showButtons ?? true,
+    showAxes: partialConfig.showAxes ?? true,
+    axisVisualization: partialConfig.axisVisualization ?? "bars",
+    showGamepad: partialConfig.showGamepad ?? true,
+    showGamepadRightSide: partialConfig.showGamepadRightSide ?? true,
+    showKeyboard: partialConfig.showKeyboard ?? true,
+    showKeyboardRightSide: partialConfig.showKeyboardRightSide ?? true,
+    showJoystick: partialConfig.showJoystick ?? true,
+    showJoystickRightSide: partialConfig.showJoystickRightSide ?? true,
+    keyboardLayout: partialConfig.keyboardLayout ?? "wasd",
+    joystickAxis: partialConfig.joystickAxis ?? "both",
+    joystickSticky: partialConfig.joystickSticky ?? false,
     options: {
       availableControllers: [],
     },
-  } as PanelConfig;
+  };
 };
 
 export const createKeyboardMapping = (): Map<string, KbMap> => {

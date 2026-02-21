@@ -1,7 +1,8 @@
 import { GamepadJoyTransformKey } from "../mappings/gamepadJoyTransforms";
-import { GamepadLayoutMappingKey } from "../mappings/gamepadLayoutMappings";
 
 export type InputSourceType = "none" | "axis" | "button";
+export type AxisVisualizationMode = "plots" | "bars";
+export type JoystickAxisMode = "x" | "y" | "both";
 
 export type InputMapping = {
   sourceType: InputSourceType; // "none", "axis", "button"
@@ -20,17 +21,24 @@ export type TwistMapping = {
 };
 
 export type PanelConfig = {
+  showKeyboard: boolean;
+  showKeyboardRightSide: boolean;
+  showJoystick: boolean;
+  showJoystickRightSide: boolean;
   dataSource: string;
-  subJoyTopic: string;
   gamepadId: number;
-  publishMode: boolean;
+  publishJoy: boolean;
   pubJoyTopic: string;
   publishTwistMode: boolean;
   pubTwistTopic: string;
-  publishFrameId: string;
-  displayMode: string;
-  debugGamepad: boolean;
-  layoutName: GamepadLayoutMappingKey;
+  showButtons: boolean;
+  showAxes: boolean;
+  axisVisualization: AxisVisualizationMode;
+  showGamepad: boolean;
+  showGamepadRightSide: boolean;
+  keyboardLayout: "wasd" | "arrows";
+  joystickAxis: JoystickAxisMode;
+  joystickSticky: boolean;
   gamepadJoyTransform: GamepadJoyTransformKey;
   twistMapping: TwistMapping;
   options: PanelOptions;

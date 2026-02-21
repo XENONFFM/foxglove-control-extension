@@ -1,1 +1,1 @@
-export { JoyPanel, initJoyPanel } from "./JoyPanel";
+export { ControlPanel, initControlPanel, JoyPanel, initJoyPanel } from "./JoyPanel";

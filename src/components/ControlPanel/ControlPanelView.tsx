@@ -110,5 +110,3 @@ export function ControlPanelView({
     </div>
   );
 }
-
-export { ControlPanelView as JoyPanelView };

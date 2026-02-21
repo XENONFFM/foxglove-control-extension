@@ -2,10 +2,10 @@ import { PanelExtensionContext } from "@foxglove/extension";
 import { useEffect, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 
-import { ControlPanelView } from "./JoyPanelView";
-import { useJoyPanelCallbacks } from "./joyPanelCallbacks";
-import { useJoyPanelEffects } from "./useJoyPanelEffects";
-import { useJoyPanelState } from "./useJoyPanelState";
+import { ControlPanelView } from "./ControlPanelView";
+import { useControlPanelCallbacks } from "./controlPanelCallbacks";
+import { useControlPanelEffects } from "./useControlPanelEffects";
+import { useControlPanelState } from "./useControlPanelState";
 import { AxisVisualizationMode, JoystickAxisMode } from "../../config/types";
 import { useGamepad } from "../../hooks/useGamepad";
 import { GamepadJoyTransformKey } from "../../mappings/gamepadJoyTransforms";
@@ -30,9 +30,9 @@ export function ControlPanel({
     setTrackedKeys,
     renderDone,
     setRenderDone,
-  } = useJoyPanelState(context);
+  } = useControlPanelState(context);
 
-  const callbacks: ReturnType<typeof useJoyPanelCallbacks> = useJoyPanelCallbacks(
+  const callbacks: ReturnType<typeof useControlPanelCallbacks> = useControlPanelCallbacks(
     config,
     setConfig,
     setJoy,
@@ -149,7 +149,7 @@ export function ControlPanel({
   });
 
   // Apply all other effects
-  useJoyPanelEffects({
+  useControlPanelEffects({
     context,
     config,
     setConfig,
@@ -205,5 +205,3 @@ export function initControlPanel(context: PanelExtensionContext): () => void {
     root.unmount();
   };
 }
-
-export { ControlPanel as JoyPanel, initControlPanel as initJoyPanel };

@@ -6,17 +6,18 @@ describe("createDefaultConfig", () => {
   it("creates default config with initial state", () => {
     const mockContext = {
       initialState: {
-        subJoyTopic: "/custom_joy",
-        publishMode: true,
+        publishJoy: true,
       },
     } as unknown as PanelExtensionContext;
 
     const config = createDefaultConfig(mockContext);
 
-    expect(config.subJoyTopic).toBe("/custom_joy");
-    expect(config.publishMode).toBe(true);
+    expect(config.publishJoy).toBe(true);
     expect(config.pubJoyTopic).toBe("/joy");
-    expect(config.dataSource).toBe("sub-joy-topic");
+    expect(config.dataSource).toBe("gamepad");
+    expect(config.showGamepadRightSide).toBe(true);
+    expect(config.showKeyboardRightSide).toBe(true);
+    expect(config.showJoystickRightSide).toBe(true);
   });
 
   it("creates default config without initial state", () => {
@@ -26,10 +27,12 @@ describe("createDefaultConfig", () => {
 
     const config = createDefaultConfig(mockContext);
 
-    expect(config.subJoyTopic).toBe("/joy");
-    expect(config.publishMode).toBe(false);
+    expect(config.publishJoy).toBe(false);
     expect(config.pubJoyTopic).toBe("/joy");
-    expect(config.dataSource).toBe("sub-joy-topic");
+    expect(config.dataSource).toBe("gamepad");
+    expect(config.showGamepadRightSide).toBe(true);
+    expect(config.showKeyboardRightSide).toBe(true);
+    expect(config.showJoystickRightSide).toBe(true);
   });
 });
 

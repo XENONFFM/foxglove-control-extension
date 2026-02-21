@@ -1,1 +1,0 @@
-export { GamepadTester } from "./GamepadTester";

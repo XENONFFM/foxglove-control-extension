@@ -1,15 +1,9 @@
-import {
-  Topic,
-  SettingsTreeAction,
-  SettingsTreeFields,
-  SettingsTreeNodes,
-} from "@foxglove/extension";
+import { SettingsTreeAction, SettingsTreeFields, SettingsTreeNodes } from "@foxglove/extension";
 import { produce } from "immer";
 import * as _ from "lodash";
 
 import { PanelConfig, PanelOptions } from "./types";
 import { getGamepadJoyTransformOptions } from "../mappings/gamepadJoyTransforms";
-import { getGamepadOptions } from "../mappings/gamepadLayoutMappings";
 
 export function settingsActionReducer(
   prevConfig: PanelConfig,
@@ -18,11 +12,30 @@ export function settingsActionReducer(
   return produce(prevConfig, (draft) => {
     if (action.action === "update") {
       const { path, value } = action.payload;
-      const pathString = path.slice(1).join(".");
-      const lastKey = path[path.length - 1];
+      const rawPath = path.slice(1).join(".");
+      const pathSegments = rawPath.split(".").filter(Boolean);
+      const settingsNodeSegments = new Set([
+        "input",
+        "output",
+        "visiblePanels",
+        "dataSource",
+        "publish",
+        "gamepad",
+        "keyboard",
+        "joystick",
+        "twistMapping",
+      ]);
+
+      while (pathSegments.length > 0 && settingsNodeSegments.has(pathSegments[0]!)) {
+        pathSegments.shift();
+      }
+
+      const pathString = pathSegments.join(".") || rawPath;
       const shouldParseNumber =
         typeof value === "string" &&
-        (lastKey === "gamepadId" || lastKey === "sourceIndex" || lastKey === "scale");
+        (pathString.endsWith("gamepadId") ||
+          pathString.endsWith("sourceIndex") ||
+          pathString.endsWith("scale"));
       const normalizedValue = shouldParseNumber ? Number(value) : value;
       _.set(draft, pathString, normalizedValue);
     }
@@ -60,6 +73,7 @@ function buildTwistMappingFields(
       input: "select",
       value: mapping.sourceType,
       options: sourceTypeOptions,
+      help: `Select whether ${label} comes from a joystick axis, a button, or is disabled.`,
     };
 
     if (mapping.sourceType === "none") {
@@ -68,6 +82,7 @@ function buildTwistMappingFields(
         input: "number",
         value: mapping.sourceIndex,
         disabled: true,
+        help: `${label} is disabled because Source is set to None.`,
       };
     } else if (currentGamepad && mapping.sourceType === "axis") {
       fields[`${basePath}.sourceIndex`] = {
@@ -78,6 +93,7 @@ function buildTwistMappingFields(
           label: `Axis ${index}`,
           value: index.toString(),
         })),
+        help: `Choose which gamepad axis controls ${label}.`,
       };
     } else if (currentGamepad && mapping.sourceType === "button") {
       fields[`${basePath}.sourceIndex`] = {
@@ -88,12 +104,14 @@ function buildTwistMappingFields(
           label: `Button ${index}`,
           value: index.toString(),
         })),
+        help: `Choose which gamepad button controls ${label}.`,
       };
     } else {
       fields[`${basePath}.sourceIndex`] = {
         label: `${label} ${sourceIndexLabel}`,
         input: "number",
         value: mapping.sourceIndex,
+        help: `Set the ${sourceIndexLabel.toLowerCase()} index used for ${label}.`,
       };
     }
 
@@ -101,22 +119,21 @@ function buildTwistMappingFields(
       label: `${label} Scale`,
       input: "number",
       value: mapping.scale,
+      help: `Multiply ${label} input by this factor before publishing Twist.`,
     };
 
     fields[`${basePath}.invert`] = {
       label: `${label} Invert`,
       input: "boolean",
       value: mapping.invert,
+      help: `Invert the sign of ${label} input before publishing Twist.`,
     };
   });
 
   return fields;
 }
 
-export function buildSettingsTree(
-  config: PanelConfig,
-  topics?: readonly Topic[],
-): SettingsTreeNodes {
+export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
   const options: PanelOptions = config.options;
 
   const dataSourceFields: SettingsTreeFields = {
@@ -124,18 +141,15 @@ export function buildSettingsTree(
       label: "Data Source",
       input: "select",
       value: config.dataSource,
+      help: "Choose which control input drives the Joy data (Gamepad, Joystick, or Keyboard).",
       options: [
-        {
-          label: "Subscribed Joy Topic",
-          value: "sub-joy-topic",
-        },
         {
           label: "Gamepad",
           value: "gamepad",
         },
         {
-          label: "Interactive",
-          value: "interactive",
+          label: "Joystick",
+          value: "joystick",
         },
         {
           label: "Keyboard",
@@ -143,96 +157,159 @@ export function buildSettingsTree(
         },
       ],
     },
-    subJoyTopic: {
-      label: "Subscribe. Joy Topic",
-      input: "select",
-      value: config.subJoyTopic,
-      disabled: config.dataSource !== "sub-joy-topic",
-      options: (topics ?? [])
-        .filter((topic) => topic.schemaName === "sensor_msgs/msg/Joy")
-        .map((topic) => ({
-          label: topic.name,
-          value: topic.name,
-        })),
+  };
+
+  const publishFields: SettingsTreeFields = {
+    publishJoy: {
+      label: "Publish Joy",
+      input: "boolean",
+      value: config.publishJoy,
+      help: "Enable publishing sensor_msgs/Joy messages on the configured Joy topic.",
     },
+    pubJoyTopic: {
+      label: "Joy Topic Name",
+      input: "string",
+      value: config.pubJoyTopic,
+      help: "Topic name used when publishing sensor_msgs/Joy.",
+    },
+    publishTwistMode: {
+      label: "Publish Twist",
+      input: "boolean",
+      value: config.publishTwistMode,
+      help: "Enable publishing geometry_msgs/Twist converted from Joy inputs.",
+    },
+    pubTwistTopic: {
+      label: "Twist Topic Name",
+      input: "string",
+      value: config.pubTwistTopic,
+      help: "Topic name used when publishing geometry_msgs/Twist.",
+    },
+  };
+
+  const gamepadFields: SettingsTreeFields = {
     gamepadId: {
       label: "Gamepad ID",
       input: "select",
       value: config.gamepadId.toString(),
-      disabled: config.dataSource !== "gamepad",
+      help: "Select which connected gamepad is used when Data Source is set to Gamepad.",
       options: options.availableControllers.map((gp: Gamepad) => ({
         label: gp.id,
         value: gp.index.toString(),
       })),
     },
     gamepadJoyTransform: {
-      label: "GP->Joy Mapping",
+      label: "GP→Joy Mapping",
       input: "select",
       value: config.gamepadJoyTransform,
-      disabled: config.dataSource !== "gamepad",
       options: Object.entries(getGamepadJoyTransformOptions()).map(([key, { label }]) => ({
         label,
         value: key,
       })),
+      help: "Change how the gamepad axes and buttons are mapped to joy messages",
     },
   };
 
-  const publishFields: SettingsTreeFields = {
-    publishMode: {
-      label: "Publish Mode",
-      input: "boolean",
-      value: config.publishMode,
-      disabled: config.dataSource === "sub-joy-topic",
-    },
-    pubJoyTopic: {
-      label: "Pub Joy Topic",
-      input: "string",
-      value: config.pubJoyTopic,
-    },
-    publishTwistMode: {
-      label: "Publish Twist",
-      input: "boolean",
-      value: config.publishTwistMode,
-    },
-    pubTwistTopic: {
-      label: "Pub Twist Topic",
-      input: "string",
-      value: config.pubTwistTopic,
-    },
-    publishFrameId: {
-      label: "Joy Frame ID",
-      input: "string",
-      value: config.publishFrameId,
-    },
-  };
-
-  const displayFields: SettingsTreeFields = {
-    displayMode: {
-      label: "Display Mode",
+  const keyboardFields: SettingsTreeFields = {
+    keyboardLayout: {
+      label: "Keyboard Layout",
       input: "select",
-      value: config.displayMode,
+      value: config.keyboardLayout,
+      help: "Choose which keyboard key layout is used for keyboard control.",
       options: [
-        {
-          label: "Auto-Generated",
-          value: "auto",
-        },
-        {
-          label: "Custom Display",
-          value: "custom",
-        },
+        { label: "WASD", value: "wasd" },
+        { label: "Arrow Keys", value: "arrows" },
       ],
     },
-    layoutName: {
-      label: "Layout",
+  };
+
+  const joystickFields: SettingsTreeFields = {
+    joystickAxis: {
+      label: "Enabled Axis",
       input: "select",
-      disabled: config.displayMode === "auto",
-      value: config.layoutName,
-      options: getGamepadOptions(),
+      value: config.joystickAxis,
+      options: [
+        { label: "Both", value: "both" },
+        { label: "X", value: "x" },
+        { label: "Y", value: "y" },
+      ],
+      help: "Limit joystick movement to the X axis, Y axis, or allow both.",
     },
-    debugGamepad: {
-      label: "Debug Gamepad",
+    joystickSticky: {
+      label: "Sticky Mode",
       input: "boolean",
-      value: config.debugGamepad,
+      value: config.joystickSticky,
+      help: "Keep the joystick position when released instead of snapping back to center.",
+    },
+  };
+
+  const visiblePanelsFields: SettingsTreeFields = {
+    showGamepad: {
+      label: "Show Gamepad",
+      input: "boolean",
+      value: config.showGamepad,
+      help: "Show or hide the Gamepad control panel in the UI.",
+    },
+    showKeyboard: {
+      label: "Show Keyboard",
+      input: "boolean",
+      value: config.showKeyboard,
+      help: "Show or hide the Keyboard control panel in the UI.",
+    },
+    showJoystick: {
+      label: "Show Joystick",
+      input: "boolean",
+      value: config.showJoystick,
+      help: "Show or hide the Joystick control panel in the UI.",
+    },
+  };
+
+  const gamepadVisibleFields: SettingsTreeFields = {
+    showGamepadRightSide: {
+      label: "Show Right Side",
+      input: "boolean",
+      value: config.showGamepadRightSide,
+      help: "Show or hide the right side of the Gamepad panel.",
+    },
+    showButtons: {
+      label: "Show Buttons",
+      input: "boolean",
+      value: config.showButtons,
+      help: "Show or hide button values in the Gamepad side panel.",
+    },
+    showAxes: {
+      label: "Show Axes",
+      input: "boolean",
+      value: config.showAxes,
+      help: "Show or hide axis visualization in the Gamepad side panel.",
+    },
+    axisVisualization: {
+      label: "Axis Visualization",
+      input: "select",
+      value: config.axisVisualization,
+      options: [
+        { label: "Plots", value: "plots" },
+        { label: "Bars", value: "bars" },
+      ],
+      disabled: !config.showAxes,
+      help: "Choose whether axes are shown as stick pads or bars.",
+    },
+  };
+
+  const keyboardVisibleFields: SettingsTreeFields = {
+    showKeyboardRightSide: {
+      label: "Show Right Side",
+      input: "boolean",
+      value: config.showKeyboardRightSide,
+      help: "Show or hide the right side of the Keyboard panel.",
+    },
+  };
+
+  const joystickVisibleFields: SettingsTreeFields = {
+    showJoystickRightSide: {
+      label: "Show Right Side",
+      input: "boolean",
+      value: config.showJoystickRightSide,
+      help: "Show or hide the right side of the Joystick panel.",
     },
   };
 
@@ -241,23 +318,62 @@ export function buildSettingsTree(
       ? options.availableControllers.find((gp) => gp.index === config.gamepadId)
       : undefined;
   const twistMappingFields = buildTwistMappingFields(config, currentGamepad);
+  const twistMappingFieldsWithPublishState: SettingsTreeFields = {};
+  Object.entries(twistMappingFields).forEach(([key, field]) => {
+    if (field) {
+      twistMappingFieldsWithPublishState[key] = {
+        ...field,
+        disabled: config.publishTwistMode ? field.disabled : true,
+      };
+    }
+  });
 
   const settings: SettingsTreeNodes = {
-    dataSource: {
-      label: "Data Source",
+    visiblePanels: {
+      label: "Visible Panels",
+      fields: visiblePanelsFields,
+      children: {
+        gamepad: {
+          label: "Gamepad",
+          fields: gamepadVisibleFields,
+        },
+        keyboard: {
+          label: "Keyboard",
+          fields: keyboardVisibleFields,
+        },
+        joystick: {
+          label: "Joystick",
+          fields: joystickVisibleFields,
+        },
+      },
+    },
+    input: {
+      label: "Input",
       fields: dataSourceFields,
+      children: {
+        gamepad: {
+          label: "Gamepad",
+          fields: gamepadFields,
+        },
+        keyboard: {
+          label: "Keyboard",
+          fields: keyboardFields,
+        },
+        joystick: {
+          label: "Joystick",
+          fields: joystickFields,
+        },
+      },
     },
-    publish: {
-      label: "Publish",
+    output: {
+      label: "Output",
       fields: publishFields,
-    },
-    display: {
-      label: "Display",
-      fields: displayFields,
-    },
-    twistMapping: {
-      label: "Twist Mapping",
-      fields: twistMappingFields,
+      children: {
+        twistMapping: {
+          label: "Twist Mapping",
+          fields: twistMappingFieldsWithPublishState,
+        },
+      },
     },
   };
 

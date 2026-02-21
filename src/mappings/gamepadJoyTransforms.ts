@@ -2,9 +2,9 @@ import { fromDate } from "@foxglove/rostime";
 
 import { Header, Joy } from "../types";
 
-type GameToJoyTransformFunction = (publishFrameId: string, gp: Gamepad) => Joy;
+type GameToJoyTransformFunction = (gp: Gamepad) => Joy;
 
-export type GamepadJoyTransformKey = "default" | "xbox" | "xbox_reverse";
+export type GamepadJoyTransformKey = "default" | "xbox" | "xbox_reverse" | "ps5";
 
 function mapTrigger(
   value: number,
@@ -30,10 +30,10 @@ function reverseAllAxis(joy: Joy): Joy {
   return joy;
 }
 
-const defaultGameToJoyTransform = (publishFrameId: string, gp: Gamepad): Joy => {
+const defaultGameToJoyTransform = (gp: Gamepad): Joy => {
   return {
     header: {
-      frame_id: publishFrameId,
+      frame_id: "",
       stamp: fromDate(new Date()),
     } as Header,
     axes: gp.axes.map((axis) => -axis),
@@ -41,13 +41,13 @@ const defaultGameToJoyTransform = (publishFrameId: string, gp: Gamepad): Joy => 
   } as Joy;
 };
 
-function xboxPadToJoyTransform(publishFrameId: string, gp: Gamepad): Joy {
+function xboxPadToJoyTransform(gp: Gamepad): Joy {
   const leftTriggerButtonIndex = 6;
   const rightTriggerButtonIndex = 7;
 
   const tmpJoy = {
     header: {
-      frame_id: publishFrameId,
+      frame_id: "",
       stamp: fromDate(new Date()),
     } as Header,
     axes: gp.axes.map((axis) => -axis),
@@ -75,6 +75,40 @@ function xboxPadToJoyTransform(publishFrameId: string, gp: Gamepad): Joy {
   return reverseAllAxis(tmpJoy);
 }
 
+function ps5PadToJoyTransform(gp: Gamepad): Joy {
+  const leftTriggerButtonIndex = 6;
+  const rightTriggerButtonIndex = 7;
+
+  const tmpJoy = {
+    header: {
+      frame_id: "",
+      stamp: fromDate(new Date()),
+    } as Header,
+    axes: gp.axes.map((axis) => -axis),
+    buttons: gp.buttons.map((button) => button.value),
+  } as Joy;
+
+  // PS5 triggers (B6/B7) are analog buttons with values in range [0, 1]
+  const leftTriggerButton = gp.buttons[leftTriggerButtonIndex];
+  if (leftTriggerButton != undefined) {
+    tmpJoy.axes.push(mapTrigger(leftTriggerButton.value, 0, 1, 0, 1));
+  }
+  const rightTriggerButton = gp.buttons[rightTriggerButtonIndex];
+  if (rightTriggerButton != undefined) {
+    tmpJoy.axes.push(mapTrigger(rightTriggerButton.value, 0, 1, 0, 1));
+  }
+
+  const ps5Buttons = gp.buttons.map((button, index) => {
+    if (index === leftTriggerButtonIndex || index === rightTriggerButtonIndex) {
+      return button.pressed ? 1 : 0;
+    }
+    return button.pressed ? 1 : 0;
+  });
+
+  tmpJoy.buttons = ps5Buttons;
+  return tmpJoy;
+}
+
 interface GamepadMappingEntry {
   label: string;
   transformFunction: GameToJoyTransformFunction;
@@ -93,14 +127,14 @@ const gamepadJoyMappings: GamepadJoyTransforms = {
     label: "Xbox",
     transformFunction: xboxPadToJoyTransform,
   },
+  ps5: {
+    label: "PlayStation 5",
+    transformFunction: ps5PadToJoyTransform,
+  },
 };
 
-export function transformGamepadToJoy(
-  transformName: GamepadJoyTransformKey,
-  publishFrameId: string,
-  gp: Gamepad,
-): Joy {
-  return gamepadJoyMappings[transformName]!.transformFunction(publishFrameId, gp);
+export function transformGamepadToJoy(transformName: GamepadJoyTransformKey, gp: Gamepad): Joy {
+  return gamepadJoyMappings[transformName]!.transformFunction(gp);
 }
 
 export function getGamepadJoyTransformOptions(): GamepadJoyTransforms {

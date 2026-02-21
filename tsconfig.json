@@ -2,13 +2,23 @@
   "extends": "create-foxglove-extension/tsconfig/tsconfig.json",
 
   "include": ["./src/**/*"],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**"
+  ],
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
     "rootDir": "./src",
     "outDir": "./dist",
-    "lib": ["dom"],
-
+    "lib": ["dom", "es2020"],
+    "types": ["react", "react-dom"],
+  
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     },
 
     // These two settings prevent typescript from emitting .d.ts files we don't need in
@@ -20,11 +30,11 @@
     // Enable/disable these checks as necessary to suit your coding preferences or work with
     // existing code
     "noFallthroughCasesInSwitch": true,
-    // "noImplicitAny": true,
+    "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true
   }
 }

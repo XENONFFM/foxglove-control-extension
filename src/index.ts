@@ -1,13 +1,9 @@
 import { ExtensionContext } from "@foxglove/extension";
 
-import { initGamepadTesterPanel } from "./components/GamepadTester/initGamepadTesterPanel";
-import { initJoyPanel } from "./components/JoyPanel";
+import { initControlPanel } from "./components/ControlPanel/ControlPanel";
 import "./styles/globals.css";
+import "./styles/output.css";
 
 export function activate(extensionContext: ExtensionContext): void {
-  extensionContext.registerPanel({ name: "ASLZ Joystick", initPanel: initJoyPanel });
-  extensionContext.registerPanel({
-    name: "ASLZ Gamepad",
-    initPanel: initGamepadTesterPanel,
-  });
+  extensionContext.registerPanel({ name: "ASLZ Control", initPanel: initControlPanel });
 }
