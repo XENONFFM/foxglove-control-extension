@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 
 import { GamepadSVG } from "./GamepadSVG";
-import { AxisVisualizationMode } from "../../config/types";
-import { cn } from "../../lib/utils";
+import { AxisVisualizationMode } from "@/config/types";
+import { cn } from "@/lib/utils";
 import {
   GamepadJoyTransformKey,
   getGamepadJoyTransformOptions,
-} from "../../mappings/gamepadJoyTransforms";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { ControlCard } from "../ui/control-card";
-import { Progress } from "../ui/progress";
-import { SettingsSection, SettingsItem, SettingsValue } from "../ui/settings-section";
-import { Skeleton } from "../ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+} from "@/mappings/gamepadJoyTransforms";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ControlCard } from "@/components/control-card";
+import { Progress } from "@/components/ui/progress";
+import { SettingsSection, SettingsItem, SettingsValue } from "@/components/settings-section";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface GamepadState {
   id: string;

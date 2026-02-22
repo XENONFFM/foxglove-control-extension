@@ -10,6 +10,7 @@
         "nsec",
         "rostime",
         "steamdeck",
-        "unadvertise"
+        "unadvertise",
+        "wasd"
     ]
 }

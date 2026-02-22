@@ -2,10 +2,10 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 
 import { createMockPanelContext } from "./mockPanelContext";
-import { ControlPanel } from "../src/components/ControlPanel";
-import { ThemeProvider } from "../src/components/theme-provider";
-import "../src/styles/globals.css";
-import "../src/styles/output.css";
+import { ControlPanel } from "@/ControlPanel";
+import { ThemeProvider } from "@/components/theme-provider";
+import "@/styles/globals.css";
+import "@/styles/output.css";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

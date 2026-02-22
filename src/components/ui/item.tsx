@@ -1,8 +1,9 @@
 import * as React from "react"
+import { mergeProps } from "@base-ui/react/merge-props"
+import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Slot } from "radix-ui"
 
-import { cn } from "../../lib/utils"
+import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
 
 function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
@@ -55,35 +56,29 @@ const itemVariants = cva(
   }
 )
 
-const Item = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> &
-    VariantProps<typeof itemVariants> & { asChild?: boolean }
->(
-  (
-    {
-      className,
-      variant = "default",
-      size = "default",
-      asChild = false,
-      ...props
+function Item({
+  className,
+  variant = "default",
+  size = "default",
+  render,
+  ...props
+}: useRender.ComponentProps<"div"> & VariantProps<typeof itemVariants>) {
+  return useRender({
+    defaultTagName: "div",
+    props: mergeProps<"div">(
+      {
+        className: cn(itemVariants({ variant, size, className })),
+      },
+      props
+    ),
+    render,
+    state: {
+      slot: "item",
+      variant,
+      size,
     },
-    ref
-  ) => {
-    const Comp = asChild ? Slot.Root : "div"
-    return (
-      <Comp
-        ref={ref}
-        data-slot="item"
-        data-variant={variant}
-        data-size={size}
-        className={cn(itemVariants({ variant, size, className }))}
-        {...props}
-      />
-    )
-  }
-)
-Item.displayName = "Item"
+  })
+}
 
 const itemMediaVariants = cva(
   "gap-2 group-has-data-[slot=item-description]/item:translate-y-0.5 group-has-data-[slot=item-description]/item:self-start flex shrink-0 items-center justify-center [&_svg]:pointer-events-none",

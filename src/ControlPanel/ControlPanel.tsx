@@ -6,9 +6,9 @@ import { ControlPanelView } from "./ControlPanelView";
 import { useControlPanelCallbacks } from "./controlPanelCallbacks";
 import { useControlPanelEffects } from "./useControlPanelEffects";
 import { useControlPanelState } from "./useControlPanelState";
-import { AxisVisualizationMode, JoystickAxisMode } from "../../config/types";
-import { useGamepad } from "../../hooks/useGamepad";
-import { GamepadJoyTransformKey } from "../../mappings/gamepadJoyTransforms";
+import { AxisVisualizationMode, JoystickAxisMode } from "@/config/types";
+import { useGamepad } from "@/hooks/useGamepad";
+import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
 
 export function ControlPanel({
   context,

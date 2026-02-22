@@ -1,4 +1,4 @@
-import { GamepadJoyTransformKey } from "../mappings/gamepadJoyTransforms";
+import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
 
 export type InputSourceType = "none" | "axis" | "button";
 export type AxisVisualizationMode = "plots" | "bars";

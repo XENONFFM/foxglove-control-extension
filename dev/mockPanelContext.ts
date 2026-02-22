@@ -1,9 +1,26 @@
 import { PanelExtensionContext } from "@foxglove/extension";
 
+export type MockSettingsEditor = NonNullable<
+  Parameters<PanelExtensionContext["updatePanelSettingsEditor"]>[0]
+>;
+
+export type MockPanelContext = PanelExtensionContext & {
+  getSettingsEditor: () => MockSettingsEditor | undefined;
+  subscribeSettingsEditor: (cb: (editor: MockSettingsEditor | undefined) => void) => () => void;
+};
+
 export function createMockPanelContext(
   overrides: Partial<PanelExtensionContext> = {},
-): PanelExtensionContext {
+): MockPanelContext {
   let onRender: PanelExtensionContext["onRender"] | undefined;
+  let settingsEditor: MockSettingsEditor | undefined;
+  const settingsEditorSubscribers = new Set<(editor: MockSettingsEditor | undefined) => void>();
+
+  const notifySettingsEditorSubscribers = (): void => {
+    settingsEditorSubscribers.forEach((subscriber) => {
+      subscriber(settingsEditor);
+    });
+  };
 
   const context: Partial<PanelExtensionContext> = {
     initialState: {
@@ -19,10 +36,10 @@ export function createMockPanelContext(
       showKeyboard: true,
       showJoystick: true,
       keyboardLayout: "wasd",
-
     },
-    updatePanelSettingsEditor: () => {
-      return;
+    updatePanelSettingsEditor: (editor) => {
+      settingsEditor = editor;
+      notifySettingsEditorSubscribers();
     },
     watch: () => {
       return;
@@ -55,5 +72,21 @@ export function createMockPanelContext(
     enumerable: true,
   });
 
-  return { ...context, ...overrides } as PanelExtensionContext;
+  const mergedContext = {
+    ...context,
+    ...overrides,
+  } as PanelExtensionContext;
+
+  const mockContext: MockPanelContext = Object.assign(mergedContext, {
+    getSettingsEditor: () => settingsEditor,
+    subscribeSettingsEditor: (cb: (editor: MockSettingsEditor | undefined) => void) => {
+      settingsEditorSubscribers.add(cb);
+      cb(settingsEditor);
+      return () => {
+        settingsEditorSubscribers.delete(cb);
+      };
+    },
+  });
+
+  return mockContext;
 }

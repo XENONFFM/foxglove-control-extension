@@ -1,9 +1,9 @@
 import { fromDate } from "@foxglove/rostime";
 import React, { useCallback } from "react";
 
-import { PanelConfig } from "../../config";
-import { transformGamepadToJoy } from "../../mappings/gamepadJoyTransforms";
-import { Joy, KbMap } from "../../types";
+import { PanelConfig } from "@/config";
+import { transformGamepadToJoy } from "@/mappings/gamepadJoyTransforms";
+import { Joy, KbMap } from "@/types";
 
 export function useControlPanelCallbacks(
   config: PanelConfig,

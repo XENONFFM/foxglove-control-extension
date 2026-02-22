@@ -3,31 +3,31 @@
 import * as React from "react";
 
 import { Joystick, type JoystickPosition } from "./Joystick";
-import { JoystickAxisMode } from "../../config/types";
-import { Joy } from "../../types";
-import { ControlCard } from "../ui/control-card";
-import { SettingsSection, SettingsItem } from "../ui/settings-section";
-import { Switch } from "../ui/switch";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { JoystickAxisMode } from "@/config/types";
+import { Joy } from "@/types";
+import { ControlCard } from "@/components/control-card";
+import { SettingsSection, SettingsItem } from "@/components/settings-section";
+import { Switch } from "@/components/ui/switch";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 function LiveOutput({ position }: { position: JoystickPosition }) {
   return (
     <div className="grid grid-cols-2 gap-3 text-sm font-mono">
-      <div className="flex items-center justify-between rounded-md bg-background dark:bg-muted/30 px-3 py-2">
+      <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
         <span className="text-muted-foreground">x</span>
         <span className="font-semibold text-foreground tabular-nums">{position.x.toFixed(2)}</span>
       </div>
-      <div className="flex items-center justify-between rounded-md bg-background dark:bg-muted/30 *:px-3 py-2">
+      <div className="flex items-center justify-between rounded-md bg-muted/30 *:px-3 py-2">
         <span className="text-muted-foreground">y</span>
         <span className="font-semibold text-foreground tabular-nums">{position.y.toFixed(2)}</span>
       </div>
-      <div className="flex items-center justify-between rounded-md bg-background dark:bg-muted/30 px-3 py-2">
+      <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
         <span className="text-muted-foreground">dist</span>
         <span className="font-semibold text-foreground tabular-nums">
           {position.distance.toFixed(2)}
         </span>
       </div>
-      <div className="flex items-center justify-between rounded-md bg-background dark:bg-muted/30 px-3 py-2">
+      <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
         <span className="text-muted-foreground">angle</span>
         <span className="font-semibold text-foreground tabular-nums">
           {((position.angle * 180) / Math.PI).toFixed(0)}

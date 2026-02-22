@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 
 import { useControlPanelCallbacks } from "./controlPanelCallbacks";
-import { PanelConfig, createDefaultConfig } from "../../config";
+import { PanelConfig, createDefaultConfig } from "@/config";
 
 describe("useControlPanelCallbacks", () => {
   const mockSetConfig = jest.fn();

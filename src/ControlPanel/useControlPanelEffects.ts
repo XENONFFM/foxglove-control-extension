@@ -3,9 +3,9 @@ import { useEffect } from "react";
 
 import { useControlPanelCallbacks } from "./controlPanelCallbacks";
 import { useControlPanelState } from "./useControlPanelState";
-import { buildSettingsTree, settingsActionReducer } from "../../config/panelSettings";
-import { Joy, KbMap } from "../../types";
-import { joyToTwist } from "../../utils/twistMapping";
+import { buildSettingsTree, settingsActionReducer } from "@/config/panelSettings";
+import { Joy, KbMap } from "@/types";
+import { joyToTwist } from "@/utils/twistMapping";
 
 export type ControlPanelEffectsProps = {
   context: PanelExtensionContext;

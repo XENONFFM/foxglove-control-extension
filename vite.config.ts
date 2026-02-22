@@ -1,21 +1,14 @@
-import react from "@vitejs/plugin-react";
 import path from "path";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: "dev",
-  plugins: [react()],
-  server: {
-    port: 5173,
-  },
-  build: {
-    outDir: "../dev-dist",
-    emptyOutDir: true,
-  },
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@src": path.resolve(__dirname, "src"),
+      "@": path.resolve(__dirname, "./src"),
+      "@dev": path.resolve(__dirname, "./dev"),
     },
   },
 });

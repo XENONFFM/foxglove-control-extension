@@ -3,7 +3,7 @@ import { produce } from "immer";
 import * as _ from "lodash";
 
 import { PanelConfig, PanelOptions } from "./types";
-import { getGamepadJoyTransformOptions } from "../mappings/gamepadJoyTransforms";
+import { getGamepadJoyTransformOptions } from "@/mappings/gamepadJoyTransforms";
 
 export function settingsActionReducer(
   prevConfig: PanelConfig,

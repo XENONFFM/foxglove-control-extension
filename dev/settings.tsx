@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Label } from "./label";
-import { Separator } from "./separator";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export function SettingsSection({
   title,
@@ -9,7 +9,7 @@ export function SettingsSection({
 }: {
   title?: string;
   children: React.ReactNode;
-}): JSX.Element {
+}): React.JSX.Element {
   const childrenArray = React.Children.toArray(children);
 
   return (

@@ -1,11 +1,11 @@
-import { PanelConfig } from "../../config";
-import { AxisVisualizationMode, JoystickAxisMode } from "../../config/types";
-import { GamepadJoyTransformKey } from "../../mappings/gamepadJoyTransforms";
-import { Joy } from "../../types";
-import GamepadControl, { useGamepadPolling } from "../Gamepad/GamepadControl";
-import JoystickControl from "../Joystick/JoystickControl";
-import KeyboardControl from "../Keyboard";
-import useKeyboard from "../Keyboard/useKeyboard";
+import GamepadControl, { useGamepadPolling } from "@/components/Gamepad/GamepadControl";
+import JoystickControl from "@/components/Joystick/JoystickControl";
+import KeyboardControl from "@/components/Keyboard";
+import useKeyboard from "@/components/Keyboard/useKeyboard";
+import { PanelConfig } from "@/config";
+import { AxisVisualizationMode, JoystickAxisMode } from "@/config/types";
+import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
+import { Joy } from "@/types";
 
 export function ControlPanelView({
   config,

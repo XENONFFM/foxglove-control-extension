@@ -1,1 +1,0 @@
-export { SimpleButtonView } from "./SimpleButtonView";

@@ -1,12 +1,9 @@
-import {
-  SettingsTreeAction,
-  PanelExtensionContext,
-} from "@foxglove/extension";
+import { SettingsTreeAction, PanelExtensionContext } from "@foxglove/extension";
 import { useState, useCallback } from "react";
 
-import { PanelConfig, createDefaultConfig, createKeyboardMapping } from "../../config";
-import { settingsActionReducer } from "../../config/panelSettings";
-import { Joy, KbMap } from "../../types";
+import { PanelConfig, createDefaultConfig, createKeyboardMapping } from "@/config";
+import { settingsActionReducer } from "@/config/panelSettings";
+import { Joy, KbMap } from "@/types";
 
 export interface UseControlPanelStateResult {
   joy: Joy | undefined;

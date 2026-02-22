@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-import * as types from "../types";
+import * as types from "@/types";
 
 export function useGamepadInteractions(
   displayMapping: types.DisplayMapping,

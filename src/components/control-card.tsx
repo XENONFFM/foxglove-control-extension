@@ -4,8 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Power, PanelRightOpen, PanelRightClose, Settings, X } from "lucide-react";
 import * as React from "react";
 
-import { Button } from "./button";
-import { Card } from "./card";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export interface ControlCardProps {
   children: React.ReactNode;

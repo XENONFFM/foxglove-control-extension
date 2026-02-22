@@ -1,6 +1,6 @@
 import { fromDate } from "@foxglove/rostime";
 
-import { Header, Joy } from "../types";
+import { Header, Joy } from "@/types";
 
 type GameToJoyTransformFunction = (gp: Gamepad) => Joy;
 

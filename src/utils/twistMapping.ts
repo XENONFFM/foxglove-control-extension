@@ -1,5 +1,5 @@
-import { InputMapping, TwistMapping } from "../config/types";
-import { Joy, Twist } from "../types";
+import { InputMapping, TwistMapping } from "@/config/types";
+import { Joy, Twist } from "@/types";
 
 /**
  * Get the value of an input source (axis or button) from a gamepad or joy message
