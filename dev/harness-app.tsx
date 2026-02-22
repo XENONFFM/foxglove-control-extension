@@ -138,9 +138,9 @@ function renderSettingsNode(
       <CollapsibleTrigger
         render={
           <Button
-            variant="primary"
+            variant="ghost"
             size="sm"
-            className="group h-8 w-full justify-start px-2 text-sm font-medium"
+            className="group h-8 w-full justify-start px-2 text-sm font-medium hover:bg-transparent hover:text-inherit dark:hover:bg-transparent active:bg-transparent aria-expanded:bg-transparent aria-expanded:text-inherit"
           >
             <ChevronRightIcon className="size-4 transition-transform group-data-panel-open:rotate-90" />
             {title}
@@ -148,7 +148,7 @@ function renderSettingsNode(
         }
       />
 
-      <CollapsibleContent className="ml-4 mt-1 border-l pl-3">
+      <CollapsibleContent className="mt-1 pl-3">
         <div className="space-y-2">
           {fieldEntries.length > 0 && (
             <SettingsSection>
@@ -170,14 +170,16 @@ function renderSettingsNode(
 
           {childEntries.length > 0 && (
             <div className="space-y-1">
-              {childEntries.map(([childKey, childNode]) =>
-                renderSettingsNode(
-                  childKey,
-                  childNode as unknown as SettingsTreeNode | undefined,
-                  [...nodePath, childKey],
-                  actionHandler,
-                ),
-              )}
+              {childEntries.map(([childKey, childNode]) => (
+                <div key={`child-${[...nodePath, childKey].join(".")}`}>
+                  {renderSettingsNode(
+                    childKey,
+                    childNode as unknown as SettingsTreeNode | undefined,
+                    [...nodePath, childKey],
+                    actionHandler,
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>

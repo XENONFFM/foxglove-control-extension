@@ -23,7 +23,7 @@ export function SettingsSection({
         {childrenArray.map((child, index) => (
           <React.Fragment key={index}>
             {child}
-            {index < childrenArray.length - 1 && <Separator className="mx-4" />}
+            {index < childrenArray.length - 1 && <Separator className="mx-4 h-px bg-border" />}
           </React.Fragment>
         ))}
       </div>
@@ -39,11 +39,11 @@ export function SettingsItem({
   label: string;
   description?: string;
   children: React.ReactNode;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <div className="px-4 py-3 first:pt-3 last:pb-3">
       <div className="flex items-center justify-between gap-4 mb-2">
-        <Label className="text-sm font-medium">{label}</Label>
+        <Label className="text-sm font-extralight">{label}</Label>
         {children}
       </div>
       {description && <p className="text-xs text-muted-foreground">{description}</p>}
