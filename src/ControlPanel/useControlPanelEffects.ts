@@ -17,7 +17,6 @@ export type ControlPanelEffectsProps = {
   setPubTopic: (topic: string | undefined) => void;
   pubTwistTopic: string | undefined;
   setPubTwistTopic: (topic: string | undefined) => void;
-  kbEnabled: boolean;
   trackedKeys: Map<string, KbMap> | undefined;
   callbacks: ReturnType<typeof useControlPanelCallbacks>;
 };
@@ -32,10 +31,14 @@ export function useControlPanelEffects({
   setPubTopic,
   pubTwistTopic,
   setPubTwistTopic,
-  kbEnabled,
   trackedKeys,
   callbacks,
 }: ControlPanelEffectsProps): void {
+  // Reset Joy when input source changes to prevent stale output from the previous source.
+  useEffect(() => {
+    setJoy(undefined);
+  }, [config.dataSource, setJoy]);
+
   // Register the settings tree
   useEffect(() => {
     context.updatePanelSettingsEditor({
@@ -48,7 +51,7 @@ export function useControlPanelEffects({
 
   // Keyboard event listeners
   useEffect(() => {
-    if (config.dataSource === "keyboard" && kbEnabled) {
+    if (config.dataSource === "keyboard") {
       document.addEventListener("keydown", callbacks.handleKeyDown);
       document.addEventListener("keyup", callbacks.handleKeyUp);
       return () => {
@@ -57,11 +60,11 @@ export function useControlPanelEffects({
       };
     }
     return undefined;
-  }, [config.dataSource, kbEnabled, callbacks.handleKeyDown, callbacks.handleKeyUp]);
+  }, [config.dataSource, callbacks.handleKeyDown, callbacks.handleKeyUp]);
 
   // Generate Joy from Keyboard keystrokes Keys
   useEffect(() => {
-    if (config.dataSource !== "keyboard" || !kbEnabled) {
+    if (config.dataSource !== "keyboard") {
       return;
     }
 
@@ -92,7 +95,7 @@ export function useControlPanelEffects({
       axes,
       buttons,
     });
-  }, [config.dataSource, kbEnabled, trackedKeys, setJoy]);
+  }, [config.dataSource, trackedKeys, setJoy]);
 
   // Advertise the topic to publish
   useEffect(() => {

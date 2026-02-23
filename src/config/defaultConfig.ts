@@ -34,8 +34,10 @@ export const createDefaultConfig = (context?: PanelExtensionContext): PanelConfi
     showKeyboardRightSide: partialConfig.showKeyboardRightSide ?? true,
     showJoystick: partialConfig.showJoystick ?? true,
     showJoystickRightSide: partialConfig.showJoystickRightSide ?? true,
+    showControlButtons: partialConfig.showControlButtons ?? true,
     keyboardLayout: partialConfig.keyboardLayout ?? "wasd",
     joystickAxis: partialConfig.joystickAxis ?? "both",
+    joystickSize: partialConfig.joystickSize ?? "md",
     joystickSticky: partialConfig.joystickSticky ?? false,
     options: {
       availableControllers: [],

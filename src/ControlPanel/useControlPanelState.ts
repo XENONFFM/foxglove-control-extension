@@ -12,8 +12,6 @@ export interface UseControlPanelStateResult {
   setPubTopic: React.Dispatch<React.SetStateAction<string | undefined>>;
   pubTwistTopic: string | undefined;
   setPubTwistTopic: React.Dispatch<React.SetStateAction<string | undefined>>;
-  kbEnabled: boolean;
-  setKbEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   trackedKeys: Map<string, KbMap> | undefined;
   setTrackedKeys: React.Dispatch<React.SetStateAction<Map<string, KbMap> | undefined>>;
   renderDone: (() => void) | undefined;
@@ -27,7 +25,6 @@ export function useControlPanelState(context?: PanelExtensionContext): UseContro
   const [joy, setJoy] = useState<Joy | undefined>();
   const [pubTopic, setPubTopic] = useState<string | undefined>();
   const [pubTwistTopic, setPubTwistTopic] = useState<string | undefined>();
-  const [kbEnabled, setKbEnabled] = useState<boolean>(true);
   const [trackedKeys, setTrackedKeys] = useState<Map<string, KbMap> | undefined>(() =>
     createKeyboardMapping(),
   );
@@ -48,8 +45,6 @@ export function useControlPanelState(context?: PanelExtensionContext): UseContro
     setPubTopic,
     pubTwistTopic,
     setPubTwistTopic,
-    kbEnabled,
-    setKbEnabled,
     trackedKeys,
     setTrackedKeys,
     renderDone,

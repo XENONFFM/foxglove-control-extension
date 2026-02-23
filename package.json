@@ -1,5 +1,5 @@
 {
-  "name": "aslz-control-extension",
+  "name": "control-extension",
   "displayName": "Control Extension",
   "description": "Foxglove panel for remote control.",
   "publisher": "ASLZ",
@@ -9,17 +9,16 @@
   "license": "MIT",
   "main": "./dist/extension.js",
   "keywords": [],
-  "scripts": {
+"scripts": {
     "build": "foxglove-extension build",
     "dev": "vite",
-    "dev:build": "vite build",
-    "dev:preview": "vite preview",
     "foxglove:prepublish": "foxglove-extension build --mode production",
+    "lint": "eslint .",
     "lint:ci": "eslint .",
-    "lint": "eslint --fix .",
+    "lint:fix": "eslint --fix .",
     "local-install": "foxglove-extension install",
     "package": "foxglove-extension package",
-    "prepackage": "foxglove-extension pretest",
+    "pretest": "foxglove-extension pretest",
     "test": "jest"
   },
   "devDependencies": {
@@ -56,6 +55,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
+    "@emotion/is-prop-valid": "^1.4.0",
     "@tailwindcss/cli": "^4.2.0",
     "@tailwindcss/vite": "^4.2.0",
     "class-variance-authority": "^0.7.1",

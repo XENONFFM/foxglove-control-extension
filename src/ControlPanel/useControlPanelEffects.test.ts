@@ -25,7 +25,7 @@ describe("useControlPanelEffects", () => {
       pubTwistTopic: "/cmd_vel",
       showButtons: true,
       showAxes: true,
-      axisVisualization: "sticks",
+      axisVisualization: "bars",
       showGamepad: true,
       showKeyboard: true,
       showJoystick: true,
@@ -48,7 +48,6 @@ describe("useControlPanelEffects", () => {
     setPubTopic: jest.fn(),
     pubTwistTopic: undefined,
     setPubTwistTopic: jest.fn(),
-    kbEnabled: true,
     trackedKeys: new Map(),
     callbacks: {
       handleKeyDown: (): void => {
@@ -57,6 +56,8 @@ describe("useControlPanelEffects", () => {
       handleKeyUp: jest.fn(),
       interactiveCb: jest.fn(),
       handleKbSwitch: jest.fn(),
+      handleGamepadSwitch: jest.fn(),
+      handleJoystickSwitch: jest.fn(),
       handleGamepadConnect: jest.fn(),
       handleGamepadDisconnect: jest.fn(),
       handleGamepadUpdate: jest.fn(),

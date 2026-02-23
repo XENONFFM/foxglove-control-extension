@@ -13,6 +13,7 @@ export interface ControlCardProps {
   onEnabledChange?: (options: { enabled: boolean }) => void;
   showPowerButton?: boolean;
   showSettingsButton?: boolean;
+  showRightPaneToggleButton?: boolean;
   showRightPane?: boolean;
   onRightPaneChange?: (options: { show: boolean }) => void;
   settingsContent?: React.ReactNode;
@@ -26,6 +27,7 @@ export function ControlCard({
   onEnabledChange,
   showPowerButton = true,
   showSettingsButton = true,
+  showRightPaneToggleButton = true,
   showRightPane: controlledShowRightPane,
   onRightPaneChange,
   settingsContent,
@@ -35,6 +37,12 @@ export function ControlCard({
   const rightPaneFadeMs = 380;
   const [internalShowRightPane, setInternalShowRightPane] = React.useState(true);
   const [showSettings, setShowSettings] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!showSettingsButton) {
+      setShowSettings(false);
+    }
+  }, [showSettingsButton]);
 
   const showRightPane = controlledShowRightPane ?? internalShowRightPane;
   const hasRightPaneContent = Boolean(rightPaneContent);
@@ -99,7 +107,7 @@ export function ControlCard({
           )}
 
           {/* Right Pane Toggle - Bottom Right */}
-          {hasRightPaneContent && (
+          {hasRightPaneContent && showRightPaneToggleButton && (
             <div className="absolute bottom-0 right-2">
               <Button
                 variant="ghost"

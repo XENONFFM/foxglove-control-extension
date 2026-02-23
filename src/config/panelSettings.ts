@@ -141,7 +141,7 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
       label: "Data Source",
       input: "select",
       value: config.dataSource,
-      help: "Choose which control input drives the Joy data (Gamepad, Joystick, or Keyboard).",
+      help: "Choose which control input drives the output.",
       options: [
         {
           label: "Gamepad",
@@ -261,6 +261,12 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
       value: config.showJoystick,
       help: "Show or hide the Joystick control panel in the UI.",
     },
+    showControlButtons: {
+      label: "Show Panel Buttons",
+      input: "boolean",
+      value: config.showControlButtons,
+      help: "Show or hide control buttons (power, settings, and side toggle) on all control panels.",
+    },
   };
 
   const gamepadVisibleFields: SettingsTreeFields = {
@@ -311,6 +317,19 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
       value: config.showJoystickRightSide,
       help: "Show or hide the right side of the Joystick panel.",
     },
+    joystickSize: {
+      label: "Size",
+      input: "select",
+      value: config.joystickSize,
+      options: [
+        { label: "xs", value: "xs" },
+        { label: "sm", value: "sm" },
+        { label: "md", value: "md" },
+        { label: "lg", value: "lg" },
+        { label: "xl", value: "xl" },
+      ],
+      help: "Choose the joystick display size.",
+    },
   };
 
   const currentGamepad =
@@ -330,7 +349,7 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
 
   const settings: SettingsTreeNodes = {
     visiblePanels: {
-      label: "Visible Panels",
+      label: "Display",
       fields: visiblePanelsFields,
       children: {
         gamepad: {

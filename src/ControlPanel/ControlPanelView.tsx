@@ -3,14 +3,15 @@ import JoystickControl from "@/components/Joystick/JoystickControl";
 import KeyboardControl from "@/components/Keyboard";
 import useKeyboard from "@/components/Keyboard/useKeyboard";
 import { PanelConfig } from "@/config";
-import { AxisVisualizationMode, JoystickAxisMode } from "@/config/types";
+import { AxisVisualizationMode, JoystickAxisMode, JoystickSize } from "@/config/types";
 import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
 import { Joy } from "@/types";
 
 export function ControlPanelView({
   config,
-  kbEnabled: _kbEnabled,
   handleKbSwitch,
+  handleGamepadSwitch,
+  handleJoystickSwitch,
   handleInteractiveJoy,
   handleGamepadIdChange,
   handleGamepadJoyTransformChange,
@@ -21,13 +22,15 @@ export function ControlPanelView({
   handleShowKeyboardRightSideChange,
   handleKeyboardLayoutChange,
   handleJoystickAxisChange,
+  handleJoystickSizeChange,
   handleJoystickStickyChange,
   handleShowJoystickRightSideChange,
   handleDataSourceChange,
 }: {
   readonly config: PanelConfig;
-  readonly kbEnabled: boolean;
   readonly handleKbSwitch: (payload: { enabled: boolean }) => void;
+  readonly handleGamepadSwitch: (payload: { enabled: boolean }) => void;
+  readonly handleJoystickSwitch: (payload: { enabled: boolean }) => void;
   readonly handleInteractiveJoy: (interactiveJoy: Joy) => void;
   readonly handleGamepadIdChange?: (gamepadId: number) => void;
   readonly handleGamepadJoyTransformChange?: (mapping: GamepadJoyTransformKey) => void;
@@ -38,6 +41,7 @@ export function ControlPanelView({
   readonly handleShowKeyboardRightSideChange?: (payload: { showRightSide: boolean }) => void;
   readonly handleKeyboardLayoutChange?: (layout: "wasd" | "arrows") => void;
   readonly handleJoystickAxisChange?: (axis: JoystickAxisMode) => void;
+  readonly handleJoystickSizeChange?: (size: JoystickSize) => void;
   readonly handleJoystickStickyChange?: (payload: { sticky: boolean }) => void;
   readonly handleShowJoystickRightSideChange?: (payload: { showRightSide: boolean }) => void;
   readonly handleDataSourceChange?: (payload: { dataSource: string; enabled: boolean }) => void;
@@ -58,9 +62,11 @@ export function ControlPanelView({
             <GamepadControl
               gamepad={gamepad}
               enabled={isGamepadEnabled}
+              showControlButtons={config.showControlButtons}
               showRightSide={config.showGamepadRightSide}
               onEnabledChange={({ enabled }) => {
                 handleDataSourceChange?.({ dataSource: "gamepad", enabled });
+                handleGamepadSwitch({ enabled });
               }}
               selectedControllerIndex={selectedControllerIndex}
               onSelectedControllerIndexChange={handleGamepadIdChange}
@@ -80,14 +86,18 @@ export function ControlPanelView({
             <JoystickControl
               onInteractiveJoy={handleInteractiveJoy}
               axis={config.joystickAxis}
+              size={config.joystickSize}
               sticky={config.joystickSticky}
+              showControlButtons={config.showControlButtons}
               showRightSide={config.showJoystickRightSide}
               onAxisChange={handleJoystickAxisChange}
+              onSizeChange={handleJoystickSizeChange}
               onStickyChange={handleJoystickStickyChange}
               onShowRightSideChange={handleShowJoystickRightSideChange}
               enabled={isJoystickEnabled}
               onEnabledChange={({ enabled }) => {
                 handleDataSourceChange?.({ dataSource: "joystick", enabled });
+                handleJoystickSwitch({ enabled });
               }}
             />
           )}
@@ -95,6 +105,7 @@ export function ControlPanelView({
             <KeyboardControl
               keyState={keyState}
               layout={config.keyboardLayout}
+              showControlButtons={config.showControlButtons}
               showRightSide={config.showKeyboardRightSide}
               onShowRightSideChange={handleShowKeyboardRightSideChange}
               enabled={isKeyboardEnabled}

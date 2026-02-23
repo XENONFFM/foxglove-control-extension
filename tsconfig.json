@@ -1,6 +1,13 @@
 {
   "extends": "create-foxglove-extension/tsconfig/tsconfig.json",
   "include": ["./src/**/*", "dev"],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": ".",

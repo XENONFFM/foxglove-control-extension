@@ -10,12 +10,13 @@ export function useControlPanelCallbacks(
   setConfig: React.Dispatch<React.SetStateAction<PanelConfig>>,
   setJoy: React.Dispatch<React.SetStateAction<Joy | undefined>>,
   setTrackedKeys: React.Dispatch<React.SetStateAction<Map<string, KbMap> | undefined>>,
-  setKbEnabled: React.Dispatch<React.SetStateAction<boolean>>,
 ): {
   handleKeyDown: (event: KeyboardEvent) => void;
   handleKeyUp: (event: KeyboardEvent) => void;
   interactiveCb: (interactiveJoy: Joy) => void;
   handleKbSwitch: (payload: { enabled: boolean }) => void;
+  handleGamepadSwitch: (payload: { enabled: boolean }) => void;
+  handleJoystickSwitch: (payload: { enabled: boolean }) => void;
   handleGamepadConnect: (gp: Gamepad) => void;
   handleGamepadDisconnect: (gp: Gamepad) => void;
   handleGamepadUpdate: (gp: Gamepad) => void;
@@ -23,7 +24,7 @@ export function useControlPanelCallbacks(
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       setTrackedKeys((oldTrackedKeys) => {
-        if (oldTrackedKeys?.has(event.key) === false) {
+        if (oldTrackedKeys?.has(event.key) === true) {
           const newKeys = new Map(oldTrackedKeys);
           const k = newKeys.get(event.key);
           if (k != undefined) {
@@ -75,9 +76,32 @@ export function useControlPanelCallbacks(
 
   const handleKbSwitch = useCallback(
     ({ enabled }: { enabled: boolean }) => {
-      setKbEnabled(enabled);
+      if (!enabled) {
+        return;
+      }
+      setConfig((prevConfig) => ({ ...prevConfig, dataSource: "keyboard" }));
     },
-    [setKbEnabled],
+    [setConfig],
+  );
+
+  const handleGamepadSwitch = useCallback(
+    ({ enabled }: { enabled: boolean }) => {
+      if (!enabled) {
+        return;
+      }
+      setConfig((prevConfig) => ({ ...prevConfig, dataSource: "gamepad" }));
+    },
+    [setConfig],
+  );
+
+  const handleJoystickSwitch = useCallback(
+    ({ enabled }: { enabled: boolean }) => {
+      if (!enabled) {
+        return;
+      }
+      setConfig((prevConfig) => ({ ...prevConfig, dataSource: "joystick" }));
+    },
+    [setConfig],
   );
 
   const handleGamepadConnect = useCallback(
@@ -132,6 +156,8 @@ export function useControlPanelCallbacks(
     handleKeyUp,
     interactiveCb,
     handleKbSwitch,
+    handleGamepadSwitch,
+    handleJoystickSwitch,
     handleGamepadConnect,
     handleGamepadDisconnect,
     handleGamepadUpdate,

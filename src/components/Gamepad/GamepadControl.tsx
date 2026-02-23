@@ -155,6 +155,7 @@ export default function GamepadControl({
   showAxes = true,
   gamepadJoyTransform = "default",
   axisVisualization = "bars",
+  showControlButtons = true,
   onSelectedControllerIndexConfigChange,
   onGamepadJoyTransformChange,
   onShowButtonsChange,
@@ -172,6 +173,7 @@ export default function GamepadControl({
   showAxes?: boolean;
   gamepadJoyTransform?: GamepadJoyTransformKey;
   axisVisualization?: AxisVisualizationMode;
+  showControlButtons?: boolean;
   onSelectedControllerIndexConfigChange?: (index: number) => void;
   onGamepadJoyTransformChange?: (mapping: GamepadJoyTransformKey) => void;
   onShowButtonsChange?: (payload: { showButtons: boolean }) => void;
@@ -207,11 +209,11 @@ export default function GamepadControl({
         <SettingsItem label="Active Controller ID">
           {gamepad != null && gamepad.connectedControllers.length > 0 ? (
             <ToggleGroup
-              type="single"
               variant="outline"
               size="sm"
-              value={String(selectedControllerIndex ?? gamepad.selectedControllerIndex)}
-              onValueChange={(value) => {
+              value={[String(selectedControllerIndex ?? gamepad.selectedControllerIndex)]}
+              onValueChange={(values) => {
+                const value = values[0] ?? "";
                 if (value !== "") {
                   const parsedIndex = Number(value);
                   onSelectedControllerIndexChange?.(parsedIndex);
@@ -227,7 +229,7 @@ export default function GamepadControl({
               ))}
             </ToggleGroup>
           ) : (
-            <ToggleGroup type="single" variant="outline" size="sm" value="none" disabled>
+            <ToggleGroup variant="outline" size="sm" value={["none"]} disabled>
               <ToggleGroupItem value="none">No controller</ToggleGroupItem>
             </ToggleGroup>
           )}
@@ -241,11 +243,11 @@ export default function GamepadControl({
         )}
         <SettingsItem label="Mapping">
           <ToggleGroup
-            type="single"
             variant="outline"
             size="sm"
-            value={gamepadJoyTransform}
-            onValueChange={(value) => {
+            value={[gamepadJoyTransform]}
+            onValueChange={(values) => {
+              const value = values[0] ?? "";
               if (value in gamepadTransformOptions) {
                 onGamepadJoyTransformChange?.(value as GamepadJoyTransformKey);
               }
@@ -260,11 +262,11 @@ export default function GamepadControl({
         </SettingsItem>
         <SettingsItem label="Show Buttons">
           <ToggleGroup
-            type="single"
             variant="outline"
             size="sm"
-            value={showButtons ? "on" : "off"}
-            onValueChange={(value) => {
+            value={[showButtons ? "on" : "off"]}
+            onValueChange={(values) => {
+              const value = values[0] ?? "";
               if (value === "on" || value === "off") {
                 onShowButtonsChange?.({ showButtons: value === "on" });
               }
@@ -276,11 +278,11 @@ export default function GamepadControl({
         </SettingsItem>
         <SettingsItem label="Show Axes">
           <ToggleGroup
-            type="single"
             variant="outline"
             size="sm"
-            value={showAxes ? "on" : "off"}
-            onValueChange={(value) => {
+            value={[showAxes ? "on" : "off"]}
+            onValueChange={(values) => {
+              const value = values[0] ?? "";
               if (value === "on" || value === "off") {
                 onShowAxesChange?.({ showAxes: value === "on" });
               }
@@ -292,11 +294,11 @@ export default function GamepadControl({
         </SettingsItem>
         <SettingsItem label="Axis Visualization">
           <ToggleGroup
-            type="single"
             variant="outline"
             size="sm"
-            value={axisVisualization}
-            onValueChange={(value) => {
+            value={[axisVisualization]}
+            onValueChange={(values) => {
+              const value = values[0] ?? "";
               if (value === "plots" || value === "bars") {
                 onAxisVisualizationChange?.(value);
               }
@@ -469,8 +471,9 @@ export default function GamepadControl({
       onRightPaneChange={({ show }) => {
         onShowRightSideChange?.({ showRightSide: show });
       }}
-      showPowerButton={true}
-      showSettingsButton={true}
+      showPowerButton={showControlButtons}
+      showSettingsButton={showControlButtons}
+      showRightPaneToggleButton={showControlButtons}
       settingsContent={settingsContent}
       rightPaneContent={rightPaneContent}
     >

@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { Joystick, type JoystickPosition } from "./Joystick";
-import { JoystickAxisMode } from "@/config/types";
+import { JoystickAxisMode, JoystickSize } from "@/config/types";
 import { Joy } from "@/types";
 import { ControlCard } from "@/components/control-card";
 import { SettingsSection, SettingsItem } from "@/components/settings-section";
@@ -41,22 +41,28 @@ function LiveOutput({ position }: { position: JoystickPosition }) {
 export default function JoystickControl({
   onInteractiveJoy,
   axis,
+  size,
   sticky,
   onAxisChange,
+  onSizeChange,
   onStickyChange,
   showRightSide = true,
   onShowRightSideChange,
   enabled = true,
+  showControlButtons = true,
   onEnabledChange,
 }: {
   onInteractiveJoy?: (interactiveJoy: Joy) => void;
   axis?: JoystickAxisMode;
+  size?: JoystickSize;
   sticky?: boolean;
   onAxisChange?: (axis: JoystickAxisMode) => void;
+  onSizeChange?: (size: JoystickSize) => void;
   onStickyChange?: (payload: { sticky: boolean }) => void;
   showRightSide?: boolean;
   onShowRightSideChange?: (payload: { showRightSide: boolean }) => void;
   enabled?: boolean;
+  showControlButtons?: boolean;
   onEnabledChange?: (payload: { enabled: boolean }) => void;
 }): JSX.Element {
   const [mainPos, setMainPos] = React.useState<JoystickPosition>({
@@ -67,9 +73,13 @@ export default function JoystickControl({
   });
 
   const [_isDragging, setIsDragging] = React.useState(false);
-  const [size, setSize] = React.useState<"xs" | "sm" | "md" | "lg" | "xl">("md");
+  const [sizeState, setSizeState] = React.useState<JoystickSize>(size ?? "md");
   const [axisState, setAxisState] = React.useState<JoystickAxisMode>(axis ?? "both");
   const [stickyState, setStickyState] = React.useState(sticky ?? false);
+
+  React.useEffect(() => {
+    setSizeState(size ?? "md");
+  }, [size]);
 
   React.useEffect(() => {
     setAxisState(axis ?? "both");
@@ -93,13 +103,15 @@ export default function JoystickControl({
   const settingsContent = (
     <SettingsSection>
       <SettingsItem label="Size">
-        <ToggleGroup type="single" variant="outline" size="sm" value={size}>
+        <ToggleGroup variant="outline" size="sm" value={[sizeState]}>
           {["xs", "sm", "md", "lg", "xl"].map((s) => (
             <ToggleGroupItem
               key={s}
               value={s}
               onClick={() => {
-                setSize(s as "xs" | "sm" | "md" | "lg" | "xl");
+                const nextSize = s as JoystickSize;
+                setSizeState(nextSize);
+                onSizeChange?.(nextSize);
               }}
             >
               {s}
@@ -109,7 +121,7 @@ export default function JoystickControl({
       </SettingsItem>
 
       <SettingsItem label="Enabled Axis">
-        <ToggleGroup type="single" variant="outline" size="sm" value={axisState}>
+        <ToggleGroup variant="outline" size="sm" value={[axisState]}>
           {["both", "x", "y"].map((a) => (
             <ToggleGroupItem
               key={a}
@@ -151,6 +163,9 @@ export default function JoystickControl({
       <ControlCard
         enabled={enabled}
         onEnabledChange={onEnabledChange}
+        showPowerButton={showControlButtons}
+        showSettingsButton={showControlButtons}
+        showRightPaneToggleButton={showControlButtons}
         showRightPane={showRightSide}
         onRightPaneChange={({ show }) => {
           onShowRightSideChange?.({ showRightSide: show });
@@ -159,7 +174,7 @@ export default function JoystickControl({
         rightPaneContent={rightPaneContent}
       >
         <Joystick
-          size={size}
+          size={sizeState}
           axis={axisState}
           snapToCenter={!stickyState}
           disabled={!enabled}

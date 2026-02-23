@@ -7,7 +7,6 @@ describe("useControlPanelCallbacks", () => {
   const mockSetConfig = jest.fn();
   const mockSetJoy = jest.fn();
   const mockSetTrackedKeys = jest.fn();
-  const mockSetKbEnabled = jest.fn();
 
   const mockConfig: PanelConfig = {
     ...createDefaultConfig(),
@@ -25,7 +24,6 @@ describe("useControlPanelCallbacks", () => {
         mockSetConfig,
         mockSetJoy,
         mockSetTrackedKeys,
-        mockSetKbEnabled,
       ),
     );
 
@@ -43,7 +41,6 @@ describe("useControlPanelCallbacks", () => {
         mockSetConfig,
         mockSetJoy,
         mockSetTrackedKeys,
-        mockSetKbEnabled,
       ),
     );
 
@@ -54,5 +51,55 @@ describe("useControlPanelCallbacks", () => {
     });
 
     expect(mockSetConfig).toHaveBeenCalled();
+  });
+
+  it("ignores gamepad updates when data source is not gamepad", () => {
+    const nonGamepadConfig: PanelConfig = {
+      ...mockConfig,
+      dataSource: "keyboard",
+    };
+
+    const { result } = renderHook(() =>
+      useControlPanelCallbacks(
+        nonGamepadConfig,
+        mockSetConfig,
+        mockSetJoy,
+        mockSetTrackedKeys,
+      ),
+    );
+
+    const mockGamepad = { index: 0, axes: [0.5], buttons: [{ value: 1 }] } as unknown as Gamepad;
+
+    act(() => {
+      result.current.handleGamepadUpdate(mockGamepad);
+    });
+
+    expect(mockSetJoy).not.toHaveBeenCalled();
+  });
+
+  it("ignores joystick interactive updates when data source is not joystick", () => {
+    const joystickConfig: PanelConfig = {
+      ...mockConfig,
+      dataSource: "keyboard",
+    };
+
+    const { result } = renderHook(() =>
+      useControlPanelCallbacks(
+        joystickConfig,
+        mockSetConfig,
+        mockSetJoy,
+        mockSetTrackedKeys,
+      ),
+    );
+
+    act(() => {
+      result.current.interactiveCb({
+        header: { stamp: { sec: 0, nsec: 0 }, frame_id: "" },
+        axes: [0.25, -0.25],
+        buttons: [],
+      });
+    });
+
+    expect(mockSetJoy).not.toHaveBeenCalled();
   });
 });

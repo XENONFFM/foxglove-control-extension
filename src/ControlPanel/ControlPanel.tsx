@@ -6,7 +6,7 @@ import { ControlPanelView } from "./ControlPanelView";
 import { useControlPanelCallbacks } from "./controlPanelCallbacks";
 import { useControlPanelEffects } from "./useControlPanelEffects";
 import { useControlPanelState } from "./useControlPanelState";
-import { AxisVisualizationMode, JoystickAxisMode } from "@/config/types";
+import { AxisVisualizationMode, JoystickAxisMode, JoystickSize } from "@/config/types";
 import { useGamepad } from "@/hooks/useGamepad";
 import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
 
@@ -24,8 +24,6 @@ export function ControlPanel({
     setPubTopic,
     pubTwistTopic,
     setPubTwistTopic,
-    kbEnabled,
-    setKbEnabled,
     trackedKeys,
     setTrackedKeys,
     renderDone,
@@ -37,7 +35,6 @@ export function ControlPanel({
     setConfig,
     setJoy,
     setTrackedKeys,
-    setKbEnabled,
   );
 
   const handleAxisVisualizationChange = (mode: AxisVisualizationMode) => {
@@ -103,6 +100,13 @@ export function ControlPanel({
     }));
   };
 
+  const handleJoystickSizeChange = (joystickSize: JoystickSize) => {
+    setConfig((prevConfig) => ({
+      ...prevConfig,
+      joystickSize,
+    }));
+  };
+
   const handleJoystickStickyChange = ({ sticky }: { sticky: boolean }) => {
     setConfig((prevConfig) => ({
       ...prevConfig,
@@ -159,7 +163,6 @@ export function ControlPanel({
     setPubTopic,
     pubTwistTopic,
     setPubTwistTopic,
-    kbEnabled,
     trackedKeys,
     callbacks,
   });
@@ -172,8 +175,9 @@ export function ControlPanel({
   return (
     <ControlPanelView
       config={config}
-      kbEnabled={kbEnabled}
       handleKbSwitch={callbacks.handleKbSwitch}
+      handleGamepadSwitch={callbacks.handleGamepadSwitch}
+      handleJoystickSwitch={callbacks.handleJoystickSwitch}
       handleInteractiveJoy={callbacks.interactiveCb}
       handleGamepadIdChange={handleGamepadIdChange}
       handleGamepadJoyTransformChange={handleGamepadJoyTransformChange}
@@ -184,6 +188,7 @@ export function ControlPanel({
       handleShowKeyboardRightSideChange={handleShowKeyboardRightSideChange}
       handleKeyboardLayoutChange={handleKeyboardLayoutChange}
       handleJoystickAxisChange={handleJoystickAxisChange}
+      handleJoystickSizeChange={handleJoystickSizeChange}
       handleJoystickStickyChange={handleJoystickStickyChange}
       handleShowJoystickRightSideChange={handleShowJoystickRightSideChange}
       handleDataSourceChange={handleDataSourceChange}

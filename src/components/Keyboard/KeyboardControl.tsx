@@ -20,6 +20,7 @@ export interface KeyboardControlProps {
   showRightSide?: boolean;
   onShowRightSideChange?: (payload: { showRightSide: boolean }) => void;
   enabled?: boolean;
+  showControlButtons?: boolean;
   onEnabledChange?: (payload: { enabled: boolean }) => void;
   onLayoutChange?: (layout: "wasd" | "arrows") => void;
 }
@@ -30,6 +31,7 @@ export default function KeyboardControl({
   showRightSide = true,
   onShowRightSideChange,
   enabled = true,
+  showControlButtons = true,
   onEnabledChange,
   onLayoutChange,
 }: KeyboardControlProps): JSX.Element {
@@ -45,11 +47,11 @@ export default function KeyboardControl({
     <SettingsSection>
       <SettingsItem label="Keyboard Layout">
         <ToggleGroup
-          type="single"
           variant="outline"
           size="sm"
-          value={layout}
-          onValueChange={(value) => {
+          value={[layout]}
+          onValueChange={(values) => {
+            const value = values[0] ?? "";
             if (value === "wasd" || value === "arrows") {
               onLayoutChange?.(value);
             }
@@ -64,15 +66,15 @@ export default function KeyboardControl({
 
   const rightPaneContent = (
     <div>
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground">Output</h3>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between rounded-md px-3 py-2 text-sm bg-muted/30">
-          <span className="text-muted-foreground">linear.x</span>
-          <span className="font-mono text-foreground">{linearX}</span>
+      <h3 className="text-sm font-medium text-muted-foreground mb-3">Output</h3>
+      <div className="grid grid-cols-2 gap-3 text-sm font-mono">
+        <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
+          <span className="text-muted-foreground">x</span>
+          <span className="font-semibold text-foreground tabular-nums">{linearX}</span>
         </div>
-        <div className="flex items-center justify-between rounded-md px-3 py-2 text-sm bg-muted/30">
-          <span className="text-muted-foreground">angular.z</span>
-          <span className="font-mono text-foreground">{angularZ}</span>
+        <div className="flex items-center justify-between rounded-md bg-muted/30 px-3 py-2">
+          <span className="text-muted-foreground">y</span>
+          <span className="font-semibold text-foreground tabular-nums">{angularZ}</span>
         </div>
       </div>
     </div>
@@ -92,8 +94,9 @@ export default function KeyboardControl({
       onRightPaneChange={({ show }) => {
         onShowRightSideChange?.({ showRightSide: show });
       }}
-      showPowerButton={!!onEnabledChange}
-      showSettingsButton={true}
+      showPowerButton={showControlButtons && !!onEnabledChange}
+      showSettingsButton={showControlButtons}
+      showRightPaneToggleButton={showControlButtons}
       settingsContent={settingsContent}
       rightPaneContent={rightPaneContent}
     >

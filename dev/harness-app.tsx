@@ -154,7 +154,7 @@ function renderSettingsNode(
             <SettingsSection>
               {fieldEntries.map(([fieldKey, field]) => {
                 const definedField = field as SettingsTreeField;
-                const path = ["settings", ...nodePath, fieldKey];
+                const path = [...nodePath, fieldKey];
                 return (
                   <SettingsItem
                     key={`field-${path.join(".")}`}
@@ -237,7 +237,7 @@ export function HarnessApp({ context }: { context: PanelExtensionContext }): Rea
             <SheetHeader className="pb-2">
               <SheetTitle>Panel Settings</SheetTitle>
             </SheetHeader>
-            <div className="space-y-3 overflow-y-auto px-4 pb-4">
+            <div className="space-y-3 overflow-y-auto px-4 pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {hasSettings ? (
                 settingsTree
               ) : (
