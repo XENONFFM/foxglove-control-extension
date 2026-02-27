@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ControlCard } from "@/components/control-card";
 import { Progress } from "@/components/ui/progress";
-import { SettingsSection, SettingsItem, SettingsValue } from "@/components/settings-section";
+import { SettingsSection, SettingsItem, SettingsValue } from "@/components/settings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 

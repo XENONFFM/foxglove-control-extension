@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ControlCard } from "@/components/control-card";
-import { SettingsSection, SettingsItem } from "@/components/settings-section";
+import { SettingsSection, SettingsItem } from "@/components/settings";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export interface KeyState {

@@ -1,15 +1,13 @@
 import { type ReactElement, useEffect, useMemo, useState } from "react";
 import { LuSettings } from "react-icons/lu";
 
-import { SettingsItem, SettingsSection } from "@dev/settings";
-import { ThemeProvider } from "@/components/theme-provider";
+import { SettingsItem, SettingsSection } from "@/components/settings";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import { ControlPanel } from "@/ControlPanel";
 import {
   PanelExtensionContext,
   SettingsTreeAction,
@@ -188,7 +186,7 @@ function renderSettingsNode(
   );
 }
 
-export function HarnessApp({ context }: { context: PanelExtensionContext }): ReactElement {
+export function SettingsMenu({ context }: { context: PanelExtensionContext }): ReactElement {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [settingsEditor, setSettingsEditor] = useState<MockSettingsEditor | undefined>(undefined);
 
@@ -219,34 +217,28 @@ export function HarnessApp({ context }: { context: PanelExtensionContext }): Rea
   const hasSettings = settingsTree.length > 0;
 
   return (
-    <ThemeProvider defaultTheme="system" storageKey="nina-harness-theme">
-      <div className="relative mx-auto flex h-full w-full bg-background">
-        <ControlPanel context={context} />
-
-        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-          <div className="absolute top-3 right-3 z-20">
-            <SheetTrigger render={<Button variant="outline" className="whitespace-nowrap" />}>
-              <LuSettings />
-            </SheetTrigger>
-          </div>
-
-          <SheetContent
-            side="right"
-             className="inset-y-0 right-0 h-full bg-background backdrop-blur data-[side=right]:w-md data-[side=right]:max-w-none sm:data-[side=right]:max-w-none"
-          >
-            <SheetHeader className="pb-2">
-              <SheetTitle>Panel Settings</SheetTitle>
-            </SheetHeader>
-            <div className="space-y-3 overflow-y-auto px-4 pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {hasSettings ? (
-                settingsTree
-              ) : (
-                <p className="px-2 text-sm text-muted-foreground">No settings available yet.</p>
-              )}
-            </div>
-          </SheetContent>
-        </Sheet>
+    <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+      <div className="absolute top-3 right-3 z-20">
+        <SheetTrigger render={<Button variant="outline" className="whitespace-nowrap" />}>
+          <LuSettings />
+        </SheetTrigger>
       </div>
-    </ThemeProvider>
+
+      <SheetContent
+        side="right"
+        className="inset-y-0 right-0 h-full bg-background backdrop-blur data-[side=right]:w-md data-[side=right]:max-w-none sm:data-[side=right]:max-w-none"
+      >
+        <SheetHeader className="pb-2">
+          <SheetTitle>Panel Settings</SheetTitle>
+        </SheetHeader>
+        <div className="space-y-3 overflow-y-auto px-4 pb-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {hasSettings ? (
+            settingsTree
+          ) : (
+            <p className="px-2 text-sm text-muted-foreground">No settings available yet.</p>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

@@ -6,7 +6,7 @@ import { Joystick, type JoystickPosition } from "./Joystick";
 import { JoystickAxisMode, JoystickSize } from "@/config/types";
 import { Joy } from "@/types";
 import { ControlCard } from "@/components/control-card";
-import { SettingsSection, SettingsItem } from "@/components/settings-section";
+import { SettingsSection, SettingsItem } from "@/components/settings";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 

@@ -1,16 +1,17 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { type ReactElement } from "react";
 
-import { HarnessApp } from "@dev/harness-app";
-import { createMockPanelContext } from "./mockPanelContext";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ControlPanel } from "@/ControlPanel";
+import { PanelExtensionContext } from "@foxglove/extension";
+import { SettingsMenu } from "./settings-menu";
 
-import "@/styles/globals.css";
-
-const context = createMockPanelContext();
-
-const root = createRoot(document.getElementById("root")!);
-root.render(
-  <StrictMode>
-    <HarnessApp context={context} />
-  </StrictMode>,
-);
+export function Harness({ context }: { context: PanelExtensionContext }): ReactElement {
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="nina-harness-theme">
+      <div className="relative mx-auto flex h-full w-full bg-background">
+        <ControlPanel context={context} />
+        <SettingsMenu context={context} />
+      </div>
+    </ThemeProvider>
+  );
+}
