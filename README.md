@@ -1,91 +1,135 @@
-# foxglove-joystick
+# Control Extension
 
-This is an extension for [Foxglove Studio](https://github.com/foxglove/studio) that adds functionality for working with joysticks. It receives joystick data from a variety of inputs, and offers various ways to display it.
+A [Foxglove Studio](https://github.com/foxglove/studio) panel extension for teleoperating robots. It accepts input from a gamepad, keyboard, or on-screen joystick, and publishes `sensor_msgs/Joy` and/or `geometry_msgs/Twist` messages over a Foxglove WebSocket connection.
 
-## Overview
+![Control Extension screenshot](docs/preview.png)
 
-There are four main operating modes/input sources/use cases:
+---
 
-| Mode | Functionality | Intended use case |
-| ----- | ------ | ------ |
-| Subscribe Mode | Subscribes to an existing ROS `Joy` topic | Monitoring a robot that is being teleoperated, or replaying a log and reviewing operator actions |
-| Gamepad Mode | Receives input from a locally-connected gamepad (and publishes it to a ROS `Joy` topic) | Live control of a robot using a gamepad connected to any Foxglove-supported device |
-| Keyboard Mode | Converts local keystrokes into `Joy` messages (for publishing) | Bench-testing a configuration that is primarily designed to use a gamepad but does not currently have one connected |
-| Interactive Display Mode | Makes the displayed indicators clickable/touchable (for publishing) | Controlling a robot from a touchscreen device |
+## Input Sources
 
-![Panel Overview Screenshot](https://github.com/joshnewans/foxglove-joystick/blob/main/docs/screenshot1.png?raw=true)
+Exactly one input source is active at a time. The active source is selected via the power button on each control panel or through the panel settings. Switching source automatically clears any stale output so no unintended commands are sent.
+
+| Source | Description | Typical use |
+|--------|-------------|-------------|
+| **Gamepad** | Reads a locally-connected USB/Bluetooth gamepad via the browser Gamepad API | Primary teleoperation with a standard controller |
+| **Keyboard** | Maps keyboard keys to axes and buttons | Quick bench-testing when no gamepad is available |
+| **Joystick** | On-screen draggable joystick (touch-friendly) | Touchscreen devices or mouse-based control |
+| **Subscribe** | Subscribes to an existing `Joy` topic and visualises it | Monitoring/replay of recorded operator input |
+
+---
+
+## Features
+
+### Output
+- Publishes `sensor_msgs/Joy` to a configurable topic.
+- Optionally publishes `geometry_msgs/Twist` with a fully configurable axis-to-field mapping (scale, inversion, source index per field).
+- Output is gated to the active input source — only one source publishes at a time.
+
+### Gamepad
+- Auto-detects connected gamepads.
+- Selectable controller-to-Joy transformation mapping (Xbox, PS5, Steam Deck, and generic profiles included).
+- Axes and button visualisation with bar or plot display modes.
+- Configurable gamepad layout overlay.
+
+### Keyboard
+- WASD or arrow-key layouts.
+- Live key-press visualisation.
+- Outputs non-zero Joy values while keys are held and resets on release.
+
+### Joystick
+- Draggable on-screen joystick.
+- Configurable axis mode: X only, Y only, or both axes.
+- Five size presets (xs → xl) configurable from Display settings.
+- Optional sticky mode (holds last position after release).
+
+### Display / UI
+- Each control panel (Gamepad, Keyboard, Joystick) can be shown or hidden independently.
+- Settings pane per panel slides in from the right side of that panel.
+- Global option to hide all in-panel control buttons (useful for a clean deployment).
+- Dark/light/system theme support.
+
+### Settings
+All panel options are exposed in the Foxglove settings tree so they persist across sessions and can be managed from the Foxglove settings sidebar.
+
+---
 
 ## Installation
 
-### Foxglove Studio Extension Marketplace
+### Release `.foxe` file
 
-In the Foxglove Studio Desktop app, use the Extension Marketplace (Profile menu in top-right -> Extensions) to find and install the Joystick panel.
+Download the latest `.foxe` from the [Releases](../../releases/latest) page and drag-and-drop it onto Foxglove Studio (desktop or web).
 
-### Releases
+### Build from source
 
-Download the latest `.foxe` release [here](https://github.com/joshnewans/foxglove-joystick/releases/latest) and drag-and-drop it onto the window of Foxglove Studio (Desktop or Web).
+```bash
+pnpm install
+pnpm run package   # produces a .foxe file
+pnpm run local-install  # build + install into local Foxglove desktop
+```
 
-### Compile from source
+### Dev harness (no Foxglove required)
 
-With Node and Foxglove installed
+Iterate on the UI in a browser without launching Foxglove:
 
-- `npm install` to install dependencies
-- `npm run local-install` to build and install for a local copy of the Foxglove Studio Desktop App
-- `npm run package` to package it up into a `.foxe` file
+```bash
+pnpm install
+pnpm run dev       # starts Vite at http://localhost:5173
+```
 
-### Browser dev harness (no Foxglove required)
+The harness renders the panel with a mocked Foxglove context. Adjust the initial state in [dev/mockPanelContext.ts](dev/mockPanelContext.ts). Panel settings are accessible via the gear icon in the top-right corner.
 
-If you want to iterate on the panel UI without launching Foxglove, run the local Vite dev harness:
+---
 
-- `npm install`
-- `npm run dev`
+## Controller Mappings
 
-This starts a browser app that renders the Joystick panel with a mocked Foxglove context. You can tweak the initial panel state in [dev/mockPanelContext.ts](dev/mockPanelContext.ts).
+Different controllers (and the same controller on different platforms) lay out buttons and axes differently. Select the correct mapping in the Gamepad panel settings.
 
-### Snap Users
+Built-in mappings: **Xbox**, **PS5**, **Steam Deck**, **Generic**.
 
-Right now it seems that this panel will **not** work with the `snap` version of Foxglove Studio. Snaps do not allow joystick input by default and I am looking into what is required to use it (possibly the Foxglove team enabling the `joystick` interface).
+Built-in mappings are defined in [src/mappings/gamepadJoyTransforms.ts](src/mappings/gamepadJoyTransforms.ts). To add a new one:
 
-### Steam Deck Users
+1. Use [Gamepad Tester](https://gamepad-tester.com/) to inspect the raw button/axis order of your controller.
+2. Add a new entry to `gamepadJoyTransforms` following the existing pattern.
+3. The new key will automatically appear in the panel settings dropdown.
 
-Please follow [this guide](docs/steamdeck.md).
+> **Note:** the browser Gamepad API reports axes with reversed sign compared to the standard ROS `joy` driver. The extension corrects for this automatically.
 
-## Mapping
+---
 
-Different controllers (and in some cases the same controller on different platforms) will have the buttons/axes arranged in a different order.
+## Platform Notes
 
-Some more complex examples of this are D-Pads (sometimes register as two axes, sometimes four buttons) and triggers (sometimes register as axes + buttons, sometimes buttons with a variable value, unsupported by `Joy`).
+### Steam Deck
 
-You can select the Gamepad to Joy transformation that works in the panel options. The Gamepad to Joy transformations are stored in the [mappings](src/mappings/gamepadJoyTransforms.ts) file.
+See [docs/steamdeck.md](docs/steamdeck.md) for a full step-by-step guide to running Foxglove or the web harness on a Steam Deck with correct controller passthrough.
 
-To create a new mapping, you can use the [Gamepad Tester](https://gamepad-tester.com/) to see the order of the buttons and axes on your controller. Then add a the new mapping logic to the [mappings](src/mappings/gamepadJoyTransforms.ts) 
+### Snap (Linux)
 
-Also note that the HTML gamepad API seems to have the axes reversed compared to what typically comes out of the `joy` drivers, so the panel flips those values back automatically.
+The `snap` package of Foxglove Studio does **not** support gamepad input — snaps block joystick device access by default. Use the `.deb` or AppImage version instead.
 
-## Layouts
+---
 
-Currently consist of a `.json` to determine button locations and an entry in `GamepadBackground.tsx` for the background. 
+## Project Structure
 
-To add a new mapping, create a new .json mapping file in the [mappings](src/mappings) and be sure to update the `GamepadLayoutMappingKey` with the id `gamepadLayoutMappings` object with the new mapping so the panel options are also updated.
+```
+src/
+  ControlPanel/       # Top-level panel logic (state, effects, callbacks)
+  components/
+    Gamepad/          # Gamepad control UI + SVG overlay
+    Joystick/         # On-screen joystick
+    Keyboard/         # Keyboard input UI
+    ui/               # Shared UI primitives (shadcn/ui)
+  config/             # PanelConfig types, defaults, Foxglove settings tree
+  hooks/              # useGamepad, useGamepadInteractions, usePanPrevention
+  mappings/           # Gamepad→Joy transform definitions + keyboard map JSONs
+  types/              # Shared TypeScript types
+  utils/              # Twist mapping helpers
+dev/                  # Vite dev harness (no Foxglove required)
+docs/                 # Platform-specific guides
+```
 
-## Planned functionality/improvements
+---
 
-- **Source modes**
-  - [x] Source Mode 1 (Subscriber)
-  - [x] Source Mode 2 (Gamepad)
-    - [ ] Option for a custom mapping from gamepad to `Joy` (e.g. GP 6-> Joy 8)
-    - [ ] Dead-zones, inversion, scaling, etc.
-  - [x] Source Mode 3 (Keyboard)
-  - [x] Source Mode 4 (Interactive)
-- **Display modes**
-  - [x] Simple Auto-Generated Display
-    - [ ] Better identification of axes
-  - [x] Gamepad visual mimic
-    - [ ] Different options for the image
-    - [ ] Different options for mapping joy buttons to image buttons
-    - [x] Options for axes to be sticks, d-pads, triggers, or more
-    - [ ] General improved customisability
+## Acknowledgements
 
-## Contributions
-
-Thanks to [rgov](https://github.com/rgov) for creating [this repo](https://github.com/ARMADAMarineRobotics/studio-extension-gamepad) which I originally worked on this project from before rewriting it mostly from scratch (but have retained [useGamepads.ts](src/hooks/useGamepad.ts)).
+Based on [studio-extension-gamepad](https://github.com/ARMADAMarineRobotics/studio-extension-gamepad) by [rgov](https://github.com/rgov). The core gamepad polling hook ([src/hooks/useGamepad.ts](src/hooks/useGamepad.ts)) is derived from that project. The rest of the extension has been substantially rewritten.
