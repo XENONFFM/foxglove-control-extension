@@ -8,6 +8,7 @@ module.exports = {
   },
   moduleNameMapper: {
     "^lodash-es$": "lodash",
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
   setupFilesAfterEnv: ["@testing-library/jest-dom"],
 };

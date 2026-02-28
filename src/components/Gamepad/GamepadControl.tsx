@@ -144,7 +144,6 @@ export function useGamepadPolling(
 
 // Controller Card Component
 export default function GamepadControl({
-  gamepad,
   enabled,
   onEnabledChange,
   showRightSide = true,
@@ -162,7 +161,6 @@ export default function GamepadControl({
   onShowAxesChange,
   onAxisVisualizationChange,
 }: {
-  gamepad: GamepadState | null;
   enabled: boolean;
   onEnabledChange: (options: { enabled: boolean }) => void;
   showRightSide?: boolean;
@@ -180,6 +178,7 @@ export default function GamepadControl({
   onShowAxesChange?: (payload: { showAxes: boolean }) => void;
   onAxisVisualizationChange?: (mode: AxisVisualizationMode) => void;
 }): JSX.Element {
+  const gamepad = useGamepadPolling(selectedControllerIndex);
   const gamepadTransformOptions = getGamepadJoyTransformOptions();
 
   const handleVibrationTest = () => {

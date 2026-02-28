@@ -1,55 +1,22 @@
-import GamepadControl, { useGamepadPolling } from "@/components/Gamepad/GamepadControl";
+import GamepadControl from "@/components/Gamepad/GamepadControl";
 import JoystickControl from "@/components/Joystick/JoystickControl";
 import KeyboardControl from "@/components/Keyboard";
-import useKeyboard from "@/components/Keyboard/useKeyboard";
 import { PanelConfig } from "@/config";
-import { AxisVisualizationMode, JoystickAxisMode, JoystickSize } from "@/config/types";
-import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
 import { Joy } from "@/types";
+
+export type ControlPanelViewProps = {
+  readonly config: PanelConfig;
+  /** Partial config patch — only changes the supplied keys. */
+  readonly onConfigChange: (patch: Partial<PanelConfig>) => void;
+  /** Interactive/joystick Joy updates (not a config change). */
+  readonly onInteractiveJoy: (joy: Joy) => void;
+};
 
 export function ControlPanelView({
   config,
-  handleKbSwitch,
-  handleGamepadSwitch,
-  handleJoystickSwitch,
-  handleInteractiveJoy,
-  handleGamepadIdChange,
-  handleGamepadJoyTransformChange,
-  handleShowButtonsChange,
-  handleShowAxesChange,
-  handleAxisVisualizationChange,
-  handleShowGamepadRightSideChange,
-  handleShowKeyboardRightSideChange,
-  handleKeyboardLayoutChange,
-  handleJoystickAxisChange,
-  handleJoystickSizeChange,
-  handleJoystickStickyChange,
-  handleShowJoystickRightSideChange,
-  handleDataSourceChange,
-}: {
-  readonly config: PanelConfig;
-  readonly handleKbSwitch: (payload: { enabled: boolean }) => void;
-  readonly handleGamepadSwitch: (payload: { enabled: boolean }) => void;
-  readonly handleJoystickSwitch: (payload: { enabled: boolean }) => void;
-  readonly handleInteractiveJoy: (interactiveJoy: Joy) => void;
-  readonly handleGamepadIdChange?: (gamepadId: number) => void;
-  readonly handleGamepadJoyTransformChange?: (mapping: GamepadJoyTransformKey) => void;
-  readonly handleShowButtonsChange?: (payload: { showButtons: boolean }) => void;
-  readonly handleShowAxesChange?: (payload: { showAxes: boolean }) => void;
-  readonly handleAxisVisualizationChange?: (mode: AxisVisualizationMode) => void;
-  readonly handleShowGamepadRightSideChange?: (payload: { showRightSide: boolean }) => void;
-  readonly handleShowKeyboardRightSideChange?: (payload: { showRightSide: boolean }) => void;
-  readonly handleKeyboardLayoutChange?: (layout: "wasd" | "arrows") => void;
-  readonly handleJoystickAxisChange?: (axis: JoystickAxisMode) => void;
-  readonly handleJoystickSizeChange?: (size: JoystickSize) => void;
-  readonly handleJoystickStickyChange?: (payload: { sticky: boolean }) => void;
-  readonly handleShowJoystickRightSideChange?: (payload: { showRightSide: boolean }) => void;
-  readonly handleDataSourceChange?: (payload: { dataSource: string; enabled: boolean }) => void;
-}): JSX.Element {
-  const selectedControllerIndex = config.gamepadId;
-  const gamepad = useGamepadPolling(selectedControllerIndex);
-  const keyState = useKeyboard();
-
+  onConfigChange,
+  onInteractiveJoy,
+}: ControlPanelViewProps): JSX.Element {
   const isGamepadEnabled = config.dataSource === "gamepad";
   const isJoystickEnabled = config.dataSource === "joystick";
   const isKeyboardEnabled = config.dataSource === "keyboard";
@@ -60,60 +27,65 @@ export function ControlPanelView({
         <div className="flex flex-col gap-4">
           {config.showGamepad && (
             <GamepadControl
-              gamepad={gamepad}
               enabled={isGamepadEnabled}
               showControlButtons={config.showControlButtons}
               showRightSide={config.showGamepadRightSide}
               onEnabledChange={({ enabled }) => {
-                handleDataSourceChange?.({ dataSource: "gamepad", enabled });
-                handleGamepadSwitch({ enabled });
+                if (enabled) onConfigChange({ dataSource: "gamepad" });
               }}
-              selectedControllerIndex={selectedControllerIndex}
-              onSelectedControllerIndexChange={handleGamepadIdChange}
-              onSelectedControllerIndexConfigChange={handleGamepadIdChange}
+              selectedControllerIndex={config.gamepadId}
+              onSelectedControllerIndexChange={(gamepadId) => onConfigChange({ gamepadId })}
+              onSelectedControllerIndexConfigChange={(gamepadId) => onConfigChange({ gamepadId })}
               showButtons={config.showButtons}
               showAxes={config.showAxes}
               gamepadJoyTransform={config.gamepadJoyTransform}
-              onGamepadJoyTransformChange={handleGamepadJoyTransformChange}
-              onShowButtonsChange={handleShowButtonsChange}
-              onShowAxesChange={handleShowAxesChange}
+              onGamepadJoyTransformChange={(gamepadJoyTransform) =>
+                onConfigChange({ gamepadJoyTransform })
+              }
+              onShowButtonsChange={({ showButtons }) => onConfigChange({ showButtons })}
+              onShowAxesChange={({ showAxes }) => onConfigChange({ showAxes })}
               axisVisualization={config.axisVisualization}
-              onAxisVisualizationChange={handleAxisVisualizationChange}
-              onShowRightSideChange={handleShowGamepadRightSideChange}
+              onAxisVisualizationChange={(axisVisualization) =>
+                onConfigChange({ axisVisualization })
+              }
+              onShowRightSideChange={({ showRightSide }) =>
+                onConfigChange({ showGamepadRightSide: showRightSide })
+              }
             />
           )}
           {config.showJoystick && (
             <JoystickControl
-              onInteractiveJoy={handleInteractiveJoy}
+              onInteractiveJoy={onInteractiveJoy}
               axis={config.joystickAxis}
               size={config.joystickSize}
               sticky={config.joystickSticky}
               showControlButtons={config.showControlButtons}
               showRightSide={config.showJoystickRightSide}
-              onAxisChange={handleJoystickAxisChange}
-              onSizeChange={handleJoystickSizeChange}
-              onStickyChange={handleJoystickStickyChange}
-              onShowRightSideChange={handleShowJoystickRightSideChange}
+              onAxisChange={(joystickAxis) => onConfigChange({ joystickAxis })}
+              onSizeChange={(joystickSize) => onConfigChange({ joystickSize })}
+              onStickyChange={({ sticky }) => onConfigChange({ joystickSticky: sticky })}
+              onShowRightSideChange={({ showRightSide }) =>
+                onConfigChange({ showJoystickRightSide: showRightSide })
+              }
               enabled={isJoystickEnabled}
               onEnabledChange={({ enabled }) => {
-                handleDataSourceChange?.({ dataSource: "joystick", enabled });
-                handleJoystickSwitch({ enabled });
+                if (enabled) onConfigChange({ dataSource: "joystick" });
               }}
             />
           )}
           {config.showKeyboard && (
             <KeyboardControl
-              keyState={keyState}
               layout={config.keyboardLayout}
               showControlButtons={config.showControlButtons}
               showRightSide={config.showKeyboardRightSide}
-              onShowRightSideChange={handleShowKeyboardRightSideChange}
+              onShowRightSideChange={({ showRightSide }) =>
+                onConfigChange({ showKeyboardRightSide: showRightSide })
+              }
               enabled={isKeyboardEnabled}
               onEnabledChange={({ enabled }) => {
-                handleDataSourceChange?.({ dataSource: "keyboard", enabled });
-                handleKbSwitch({ enabled });
+                if (enabled) onConfigChange({ dataSource: "keyboard" });
               }}
-              onLayoutChange={handleKeyboardLayoutChange}
+              onLayoutChange={(keyboardLayout) => onConfigChange({ keyboardLayout })}
             />
           )}
         </div>

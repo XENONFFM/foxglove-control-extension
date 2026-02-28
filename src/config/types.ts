@@ -44,9 +44,9 @@ export type PanelConfig = {
   joystickSticky: boolean;
   gamepadJoyTransform: GamepadJoyTransformKey;
   twistMapping: TwistMapping;
-  options: PanelOptions;
 };
 
-export type PanelOptions = {
+/** Runtime-only state: not serialised into panel config / saveState. */
+export type PanelRuntimeState = {
   availableControllers: Gamepad[];
 };

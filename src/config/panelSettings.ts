@@ -1,46 +1,9 @@
-import { SettingsTreeAction, SettingsTreeFields, SettingsTreeNodes } from "@foxglove/extension";
-import { produce } from "immer";
-import * as _ from "lodash";
+import { SettingsTreeFields, SettingsTreeNodes } from "@foxglove/extension";
 
-import { PanelConfig, PanelOptions } from "./types";
+import { PanelConfig } from "./types";
+import { createDefaultConfig } from "./defaultConfig";
+import { collectNodeKeys, makeSettingsReducer } from "@/lib/makeSettingsReducer";
 import { getGamepadJoyTransformOptions } from "@/mappings/gamepadJoyTransforms";
-
-export function settingsActionReducer(
-  prevConfig: PanelConfig,
-  action: SettingsTreeAction,
-): PanelConfig {
-  return produce(prevConfig, (draft) => {
-    if (action.action === "update") {
-      const { path, value } = action.payload;
-      const rawPath = path.slice(1).join(".");
-      const pathSegments = rawPath.split(".").filter(Boolean);
-      const settingsNodeSegments = new Set([
-        "input",
-        "output",
-        "visiblePanels",
-        "dataSource",
-        "publish",
-        "gamepad",
-        "keyboard",
-        "joystick",
-        "twistMapping",
-      ]);
-
-      while (pathSegments.length > 0 && settingsNodeSegments.has(pathSegments[0]!)) {
-        pathSegments.shift();
-      }
-
-      const pathString = pathSegments.join(".") || rawPath;
-      const shouldParseNumber =
-        typeof value === "string" &&
-        (pathString.endsWith("gamepadId") ||
-          pathString.endsWith("sourceIndex") ||
-          pathString.endsWith("scale"));
-      const normalizedValue = shouldParseNumber ? Number(value) : value;
-      _.set(draft, pathString, normalizedValue);
-    }
-  });
-}
 
 const sourceTypeOptions = [
   { label: "None", value: "none" },
@@ -133,8 +96,10 @@ function buildTwistMappingFields(
   return fields;
 }
 
-export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
-  const options: PanelOptions = config.options;
+export function buildSettingsTree(
+  config: PanelConfig,
+  availableControllers: Gamepad[] = [],
+): SettingsTreeNodes {
 
   const dataSourceFields: SettingsTreeFields = {
     dataSource: {
@@ -192,7 +157,7 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
       input: "select",
       value: config.gamepadId.toString(),
       help: "Select which connected gamepad is used when Data Source is set to Gamepad.",
-      options: options.availableControllers.map((gp: Gamepad) => ({
+      options: availableControllers.map((gp: Gamepad) => ({
         label: gp.id,
         value: gp.index.toString(),
       })),
@@ -334,7 +299,7 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
 
   const currentGamepad =
     config.dataSource === "gamepad"
-      ? options.availableControllers.find((gp) => gp.index === config.gamepadId)
+      ? availableControllers.find((gp) => gp.index === config.gamepadId)
       : undefined;
   const twistMappingFields = buildTwistMappingFields(config, currentGamepad);
   const twistMappingFieldsWithPublishState: SettingsTreeFields = {};
@@ -398,3 +363,19 @@ export function buildSettingsTree(config: PanelConfig): SettingsTreeNodes {
 
   return settings;
 }
+
+/**
+ * Field suffixes that arrive as strings from the Foxglove settings editor but
+ * must be stored as numbers in PanelConfig.
+ */
+const NUMBER_FIELD_SUFFIXES = new Set(["gamepadId", "sourceIndex", "scale"]);
+
+/**
+ * Reducer for Foxglove SettingsTreeAction updates.
+ * Node keys and coercion rules are derived from the tree definition above —
+ * no manual maintenance required.
+ */
+export const settingsActionReducer = makeSettingsReducer<PanelConfig>(
+  collectNodeKeys(buildSettingsTree(createDefaultConfig())),
+  NUMBER_FIELD_SUFFIXES,
+);

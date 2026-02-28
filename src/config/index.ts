@@ -1,3 +1,3 @@
 export { settingsActionReducer, buildSettingsTree } from "./panelSettings";
-export { createDefaultConfig, createKeyboardMapping } from "./defaultConfig";
-export type { PanelConfig, PanelOptions as Options } from "./types";
+export { createDefaultConfig } from "./defaultConfig";
+export type { PanelConfig, PanelRuntimeState } from "./types";

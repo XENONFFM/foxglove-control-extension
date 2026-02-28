@@ -4,7 +4,7 @@
   "description": "Foxglove panel for remote control.",
   "publisher": "ASLZ",
   "homepage": "",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "type": "module",
   "license": "MIT",
   "main": "./dist/extension.js",
@@ -18,7 +18,6 @@
     "lint:fix": "eslint --fix .",
     "local-install": "foxglove-extension install",
     "package": "foxglove-extension package",
-    "pretest": "foxglove-extension pretest",
     "test": "jest"
   },
   "devDependencies": {

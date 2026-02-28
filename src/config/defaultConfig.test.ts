@@ -1,16 +1,14 @@
-import { PanelExtensionContext } from "@foxglove/extension";
-
-import { createDefaultConfig, createKeyboardMapping } from "./defaultConfig";
+import { PanelConfig } from "./types";
+import { createDefaultConfig } from "./defaultConfig";
+import { createKeyboardMapping } from "../components/Keyboard";
 
 describe("createDefaultConfig", () => {
   it("creates default config with initial state", () => {
-    const mockContext = {
-      initialState: {
-        publishJoy: true,
-      },
-    } as unknown as PanelExtensionContext;
+    const savedState: Partial<PanelConfig> = {
+      publishJoy: true,
+    };
 
-    const config = createDefaultConfig(mockContext);
+    const config = createDefaultConfig(savedState);
 
     expect(config.publishJoy).toBe(true);
     expect(config.pubJoyTopic).toBe("/joy");
@@ -21,11 +19,7 @@ describe("createDefaultConfig", () => {
   });
 
   it("creates default config without initial state", () => {
-    const mockContext = {
-      initialState: {},
-    } as unknown as PanelExtensionContext;
-
-    const config = createDefaultConfig(mockContext);
+    const config = createDefaultConfig();
 
     expect(config.publishJoy).toBe(false);
     expect(config.pubJoyTopic).toBe("/joy");

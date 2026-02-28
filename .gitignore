@@ -137,3 +137,5 @@ local-install
 run
 
 .pnpm-store
+.DS_Store
+

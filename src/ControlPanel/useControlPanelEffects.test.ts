@@ -2,6 +2,7 @@ import { PanelExtensionContext } from "@foxglove/extension";
 import { renderHook } from "@testing-library/react";
 
 import { useControlPanelEffects, ControlPanelEffectsProps } from "./useControlPanelEffects";
+import { createDefaultConfig } from "@/config";
 
 describe("useControlPanelEffects", () => {
   const mockContext = {
@@ -17,51 +18,13 @@ describe("useControlPanelEffects", () => {
   const mockProps: ControlPanelEffectsProps = {
     context: mockContext,
     config: {
+      ...createDefaultConfig(),
       dataSource: "gamepad",
-      gamepadId: 0,
-      publishJoy: false,
-      pubJoyTopic: "/joy",
-      publishTwistMode: false,
-      pubTwistTopic: "/cmd_vel",
-      showButtons: true,
-      showAxes: true,
-      axisVisualization: "bars",
-      showGamepad: true,
-      showKeyboard: true,
-      showJoystick: true,
-      keyboardLayout: "wasd",
-      gamepadJoyTransform: "xbox",
-      twistMapping: {
-        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
-      },
-      options: { availableControllers: [] },
     },
     setConfig: jest.fn(),
     joy: undefined,
     setJoy: jest.fn(),
-    pubTopic: undefined,
-    setPubTopic: jest.fn(),
-    pubTwistTopic: undefined,
-    setPubTwistTopic: jest.fn(),
-    trackedKeys: new Map(),
-    callbacks: {
-      handleKeyDown: (): void => {
-        return;
-      },
-      handleKeyUp: jest.fn(),
-      interactiveCb: jest.fn(),
-      handleKbSwitch: jest.fn(),
-      handleGamepadSwitch: jest.fn(),
-      handleJoystickSwitch: jest.fn(),
-      handleGamepadConnect: jest.fn(),
-      handleGamepadDisconnect: jest.fn(),
-      handleGamepadUpdate: jest.fn(),
-    },
+    availableControllers: [],
   };
 
   it("registers panel settings editor", () => {

@@ -1,9 +1,9 @@
 import { PanelExtensionContext, SettingsTreeAction } from "@foxglove/extension";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useControlPanelCallbacks } from "./controlPanelCallbacks";
 import { useControlPanelState } from "./useControlPanelState";
 import { buildSettingsTree, settingsActionReducer } from "@/config/panelSettings";
+import { createKeyboardMapping } from "@/components/Keyboard";
 import { Joy, KbMap } from "@/types";
 import { joyToTwist } from "@/utils/twistMapping";
 
@@ -13,12 +13,7 @@ export type ControlPanelEffectsProps = {
   setConfig: ReturnType<typeof useControlPanelState>["setConfig"];
   joy: Joy | undefined;
   setJoy: (joy: Joy | undefined) => void;
-  pubTopic: string | undefined;
-  setPubTopic: (topic: string | undefined) => void;
-  pubTwistTopic: string | undefined;
-  setPubTwistTopic: (topic: string | undefined) => void;
-  trackedKeys: Map<string, KbMap> | undefined;
-  callbacks: ReturnType<typeof useControlPanelCallbacks>;
+  availableControllers: Gamepad[];
 };
 
 export function useControlPanelEffects({
@@ -27,14 +22,39 @@ export function useControlPanelEffects({
   setConfig,
   joy,
   setJoy,
-  pubTopic,
-  setPubTopic,
-  pubTwistTopic,
-  setPubTwistTopic,
-  trackedKeys,
-  callbacks,
+  availableControllers,
 }: ControlPanelEffectsProps): void {
-  // Reset Joy when input source changes to prevent stale output from the previous source.
+  // Keyboard state — private to this hook, not needed by any other consumer
+  const [trackedKeys, setTrackedKeys] = useState<Map<string, KbMap> | undefined>(() =>
+    createKeyboardMapping(),
+  );
+
+  // Advertised topic refs — bookkeeping only, mutations don't need re-renders
+  const pubTopicRef = useRef<string | undefined>(undefined);
+  const pubTwistTopicRef = useRef<string | undefined>(undefined);
+
+  // Keyboard callbacks — private, consumed only by the event listeners below
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    setTrackedKeys((prev) => {
+      if (!prev?.has(event.key)) return prev;
+      const next = new Map(prev);
+      const k = next.get(event.key);
+      if (k != undefined) k.value = 1;
+      return next;
+    });
+  }, []);
+
+  const handleKeyUp = useCallback((event: KeyboardEvent) => {
+    setTrackedKeys((prev) => {
+      if (!prev) return prev;
+      const next = new Map(prev);
+      const k = next.get(event.key);
+      if (k) k.value = 0;
+      return next;
+    });
+  }, []);
+
+  // Reset Joy when input source changes
   useEffect(() => {
     setJoy(undefined);
   }, [config.dataSource, setJoy]);
@@ -45,103 +65,82 @@ export function useControlPanelEffects({
       actionHandler: (action: SettingsTreeAction) => {
         setConfig((prevConfig) => settingsActionReducer(prevConfig, action));
       },
-      nodes: buildSettingsTree(config),
+      nodes: buildSettingsTree(config, availableControllers),
     });
-  }, [context, config, setConfig]);
+  }, [context, config, setConfig, availableControllers]);
 
   // Keyboard event listeners
   useEffect(() => {
     if (config.dataSource === "keyboard") {
-      document.addEventListener("keydown", callbacks.handleKeyDown);
-      document.addEventListener("keyup", callbacks.handleKeyUp);
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
       return () => {
-        document.removeEventListener("keydown", callbacks.handleKeyDown);
-        document.removeEventListener("keyup", callbacks.handleKeyUp);
+        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener("keyup", handleKeyUp);
       };
     }
     return undefined;
-  }, [config.dataSource, callbacks.handleKeyDown, callbacks.handleKeyUp]);
+  }, [config.dataSource, handleKeyDown, handleKeyUp]);
 
-  // Generate Joy from Keyboard keystrokes Keys
+  // Generate Joy from keyboard keystrokes
   useEffect(() => {
-    if (config.dataSource !== "keyboard") {
-      return;
-    }
+    if (config.dataSource !== "keyboard") return;
 
     const axes: number[] = [];
     const buttons: number[] = [];
 
     trackedKeys?.forEach((value) => {
       if (value.button >= 0) {
-        while (buttons.length <= value.button) {
-          buttons.push(0);
-        }
+        while (buttons.length <= value.button) buttons.push(0);
         buttons[value.button] = value.value;
       } else if (value.axis >= 0) {
-        while (axes.length <= value.axis) {
-          axes.push(0);
-        }
+        while (axes.length <= value.axis) axes.push(0);
         if (axes[value.axis] != undefined) {
           axes[value.axis]! += (value.direction > 0 ? 1 : -1) * value.value; // NOSONAR
         }
       }
     });
 
-    setJoy({
-      header: {
-        frame_id: "",
-        stamp: { sec: 0, nsec: 0 }, // You might want to use a proper timestamp here
-      },
-      axes,
-      buttons,
-    });
+    setJoy({ header: { frame_id: "", stamp: { sec: 0, nsec: 0 } }, axes, buttons });
   }, [config.dataSource, trackedKeys, setJoy]);
 
-  // Advertise the topic to publish
+  // Advertise / unadvertise Joy topic
   useEffect(() => {
     if (config.publishJoy) {
-      setPubTopic(config.pubJoyTopic);
+      pubTopicRef.current = config.pubJoyTopic;
       context.advertise?.(config.pubJoyTopic, "sensor_msgs/msg/Joy");
-    } else if (pubTopic) {
-      context.unadvertise?.(pubTopic);
-      setPubTopic(undefined);
+    } else if (pubTopicRef.current) {
+      context.unadvertise?.(pubTopicRef.current);
+      pubTopicRef.current = undefined;
     }
-  }, [config.pubJoyTopic, config.publishJoy, context, pubTopic, setPubTopic]);
+  }, [config.pubJoyTopic, config.publishJoy, context]);
 
-  // Advertise the twist topic to publish
+  // Advertise / unadvertise Twist topic
   useEffect(() => {
     if (config.publishTwistMode) {
-      setPubTwistTopic(config.pubTwistTopic);
+      pubTwistTopicRef.current = config.pubTwistTopic;
       context.advertise?.(config.pubTwistTopic, "geometry_msgs/msg/Twist");
-    } else if (pubTwistTopic) {
-      context.unadvertise?.(pubTwistTopic);
-      setPubTwistTopic(undefined);
+    } else if (pubTwistTopicRef.current) {
+      context.unadvertise?.(pubTwistTopicRef.current);
+      pubTwistTopicRef.current = undefined;
     }
-  }, [config.pubTwistTopic, config.publishTwistMode, context, pubTwistTopic, setPubTwistTopic]);
+  }, [config.pubTwistTopic, config.publishTwistMode, context]);
 
-  // Publish the joy message
+  // Publish Joy
   useEffect(() => {
-    if (config.publishJoy && pubTopic && pubTopic === config.pubJoyTopic && joy) {
-      context.publish?.(pubTopic, joy);
+    if (config.publishJoy && pubTopicRef.current && joy) {
+      context.publish?.(pubTopicRef.current, joy);
     }
-  }, [context, config.pubJoyTopic, config.publishJoy, joy, pubTopic]);
+  }, [context, config.pubJoyTopic, config.publishJoy, joy]);
 
-  // Publish the twist message
+  // Publish Twist
   useEffect(() => {
-    if (config.publishTwistMode && pubTwistTopic && pubTwistTopic === config.pubTwistTopic && joy) {
-      const twist = joyToTwist(joy, config.twistMapping);
-      context.publish?.(pubTwistTopic, twist);
+    if (config.publishTwistMode && pubTwistTopicRef.current && joy) {
+      context.publish?.(pubTwistTopicRef.current, joyToTwist(joy, config.twistMapping));
     }
-  }, [
-    context,
-    config.pubTwistTopic,
-    config.publishTwistMode,
-    joy,
-    pubTwistTopic,
-    config.twistMapping,
-  ]);
+  }, [context, config.pubTwistTopic, config.publishTwistMode, joy, config.twistMapping]);
 
-  // Save state
+  // Persist config
   useEffect(() => {
     context.saveState(config);
   }, [context, config]);

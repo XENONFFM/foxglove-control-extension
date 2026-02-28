@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { ControlCard } from "@/components/control-card";
 import { SettingsSection, SettingsItem } from "@/components/settings";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import useKeyboard from "./useKeyboard";
 
 export interface KeyState {
   w: boolean;
@@ -15,7 +16,6 @@ export interface KeyState {
 }
 
 export interface KeyboardControlProps {
-  keyState: KeyState;
   layout?: "wasd" | "arrows";
   showRightSide?: boolean;
   onShowRightSideChange?: (payload: { showRightSide: boolean }) => void;
@@ -26,7 +26,6 @@ export interface KeyboardControlProps {
 }
 
 export default function KeyboardControl({
-  keyState,
   layout = "wasd",
   showRightSide = true,
   onShowRightSideChange,
@@ -35,6 +34,7 @@ export default function KeyboardControl({
   onEnabledChange,
   onLayoutChange,
 }: KeyboardControlProps): JSX.Element {
+  const keyState = useKeyboard();
   const forwardPressed = layout === "wasd" ? keyState.w : keyState.arrowUp;
   const backwardPressed = layout === "wasd" ? keyState.s : keyState.arrowDown;
   const leftPressed = layout === "wasd" ? keyState.a : keyState.arrowLeft;
