@@ -4,6 +4,11 @@ export type InputSourceType = "none" | "axis" | "button";
 export type AxisVisualizationMode = "plots" | "bars";
 export type JoystickAxisMode = "x" | "y" | "both";
 export type JoystickSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type GamepadVisualizationMode =
+  | "auto"
+  | "generic"
+  | "xbox"
+  | "dualsense";
 
 export type InputMapping = {
   sourceType: InputSourceType; // "none", "axis", "button"
@@ -38,12 +43,16 @@ export type PanelConfig = {
   axisVisualization: AxisVisualizationMode;
   showGamepad: boolean;
   showGamepadRightSide: boolean;
+  gamepadVisualization: GamepadVisualizationMode;
   keyboardLayout: "wasd" | "arrows";
   joystickAxis: JoystickAxisMode;
   joystickSize: JoystickSize;
   joystickSticky: boolean;
+  joystickSecond: boolean;
   gamepadJoyTransform: GamepadJoyTransformKey;
-  twistMapping: TwistMapping;
+  twistMappingGamepad: TwistMapping;
+  twistMappingKeyboard: TwistMapping;
+  twistMappingJoystick: TwistMapping;
 };
 
 /** Runtime-only state: not serialised into panel config / saveState. */

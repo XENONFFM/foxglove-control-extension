@@ -9,7 +9,7 @@ export function SettingsSection({
 }: {
   title?: string;
   children: React.ReactNode;
-}): React.JSX.Element {
+}): React.ReactElement {
   const childrenArray = React.Children.toArray(children);
 
   return (
@@ -57,7 +57,7 @@ export function SettingsValue({
 }: {
   mono?: boolean;
   children: React.ReactNode;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <span className={`text-sm font-medium text-muted-foreground ${mono ? "font-mono" : ""}`}>
       {children}

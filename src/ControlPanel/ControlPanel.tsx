@@ -1,5 +1,6 @@
 import { PanelExtensionContext } from "@foxglove/extension";
 import { useCallback, useEffect, useLayoutEffect } from "react";
+import type * as React from "react";
 
 import { ControlPanelView } from "./ControlPanelView";
 import { useControlPanelEffects } from "./useControlPanelEffects";
@@ -12,7 +13,7 @@ export function ControlPanel({
   context,
 }: {
   readonly context: PanelExtensionContext;
-}): JSX.Element {
+}): React.ReactElement {
   const {
     config,
     setConfig,

@@ -8,7 +8,23 @@ describe("settingsActionReducer", () => {
       ...createDefaultConfig(),
       dataSource: "gamepad",
       gamepadJoyTransform: "xbox",
-      twistMapping: {
+      twistMappingGamepad: {
+        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      },
+      twistMappingKeyboard: {
+        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      },
+      twistMappingJoystick: {
         linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
         linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
         linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
@@ -32,7 +48,23 @@ describe("buildSettingsTree", () => {
     const config: PanelConfig = {
       ...createDefaultConfig(),
       dataSource: "gamepad",
-      twistMapping: {
+      twistMappingGamepad: {
+        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      },
+      twistMappingKeyboard: {
+        linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+        angularZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
+      },
+      twistMappingJoystick: {
         linearX: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
         linearY: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
         linearZ: { sourceType: "none", sourceIndex: 0, scale: 1, invert: false },
@@ -53,7 +85,11 @@ describe("buildSettingsTree", () => {
     expect(tree.input?.children?.gamepad).toBeDefined();
     expect(tree.input?.children?.keyboard).toBeDefined();
     expect(tree.input?.children?.joystick).toBeDefined();
-    expect(tree.output?.children?.twistMapping).toBeDefined();
+    expect(tree.output?.children?.twist).toBeDefined();
+    expect(tree.output?.children?.twist?.children?.mapping).toBeDefined();
+    expect(tree.output?.children?.twist?.children?.mapping?.children?.gamepad).toBeDefined();
+    expect(tree.output?.children?.twist?.children?.mapping?.children?.keyboard).toBeDefined();
+    expect(tree.output?.children?.twist?.children?.mapping?.children?.joystick).toBeDefined();
 
     expect(tree.visiblePanels?.children?.gamepad?.fields?.showButtons?.value).toBe(true);
     expect(tree.visiblePanels?.children?.gamepad?.fields?.showAxes?.value).toBe(true);
@@ -62,8 +98,8 @@ describe("buildSettingsTree", () => {
     expect(tree.visiblePanels?.children?.keyboard?.fields?.showKeyboardRightSide?.value).toBe(true);
     expect(tree.visiblePanels?.children?.joystick?.fields?.showJoystickRightSide?.value).toBe(true);
 
-    expect(tree.input?.fields?.dataSource?.value).toBe("gamepad");
-    expect(tree.output?.fields?.publishJoy?.value).toBe(false);
-    expect(tree.output?.fields?.publishTwistMode?.value).toBe(false);
+    expect(tree.output?.fields?.dataSource?.value).toBe("gamepad");
+    expect(tree.output?.children?.joy?.fields?.publishJoy?.value).toBe(false);
+    expect(tree.output?.children?.twist?.fields?.publishTwistMode?.value).toBe(false);
   });
 });

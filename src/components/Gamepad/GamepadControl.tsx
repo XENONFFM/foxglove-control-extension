@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import type * as React from "react";
 
-import { GamepadSVG } from "./GamepadSVG";
-import { AxisVisualizationMode } from "@/config/types";
+import { GamepadSVG } from "./index";
+import { AxisVisualizationMode, GamepadVisualizationMode } from "@/config/types";
 import { cn } from "@/lib/utils";
 import {
   GamepadJoyTransformKey,
@@ -10,29 +10,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ControlCard } from "@/components/control-card";
-import { Progress } from "@/components/ui/progress";
 import { SettingsSection, SettingsItem, SettingsValue } from "@/components/settings";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-
-interface GamepadState {
-  id: string;
-  index: number;
-  selectedControllerIndex: number;
-  connected: boolean;
-  connectedControllersCount: number;
-  connectedControllers: Array<{ index: number; id: string }>;
-  mapping: string;
-  timestamp: number;
-  vibrationSupported: boolean;
-  vibrationActuatorType: string;
-  hapticActuatorsCount: number;
-  hapticActuatorsTypes: string[];
-  buttons: number[];
-  buttonsPressed: boolean[];
-  buttonsTouched: boolean[];
-  axes: number[];
-}
+import { useGamepadPolling } from "./useGamepadPolling";
 
 // Helper functions for formatting gamepad data
 function formatAxisValues(axes: number[] | undefined): string {
@@ -63,88 +52,10 @@ function formatHapticTypes(types: string[] | undefined): string {
   return types && types.length > 0 ? types.join(", ") : "none";
 }
 
-// Custom hook for gamepad polling
-export function useGamepadPolling(
-  selectedControllerIndex: number | null = null,
-): GamepadState | null {
-  const [gamepad, setGamepad] = useState<GamepadState | null>(null);
-
-  useEffect(() => {
-    const pollGamepads = () => {
-      const gamepads = navigator.getGamepads();
-      const connectedControllers = Array.from(gamepads)
-        .map((controller, index) => ({ controller, index }))
-        .filter(
-          (
-            entry,
-          ): entry is {
-            controller: Gamepad;
-            index: number;
-          } => entry.controller != null && entry.controller.connected,
-        );
-      const connectedControllersCount = connectedControllers.length;
-      let foundGamepad: GamepadState | null = null;
-
-      const selectedEntry =
-        selectedControllerIndex != null
-          ? connectedControllers.find((entry) => entry.index === selectedControllerIndex)
-          : undefined;
-      const activeEntry = selectedEntry ?? connectedControllers[0];
-
-      if (activeEntry != null) {
-        const gp = activeEntry.controller;
-        const activeIndex = activeEntry.index;
-        const maybeHapticActuators = (
-          gp as Gamepad & {
-            hapticActuators?: GamepadHapticActuator[];
-          }
-        ).hapticActuators;
-        const hapticActuators = Array.isArray(maybeHapticActuators) ? maybeHapticActuators : [];
-        const vibrationActuatorType = String(
-          (gp.vibrationActuator as { type?: unknown } | null)?.type ?? "none",
-        );
-
-        foundGamepad = {
-          id: gp.id,
-          index: activeIndex,
-          selectedControllerIndex: activeIndex,
-          connected: gp.connected,
-          connectedControllersCount,
-          connectedControllers: connectedControllers.map((entry) => ({
-            index: entry.index,
-            id: entry.controller.id,
-          })),
-          mapping: gp.mapping || "standard",
-          timestamp: gp.timestamp,
-          vibrationSupported: Boolean(gp.vibrationActuator),
-          vibrationActuatorType,
-          hapticActuatorsCount: hapticActuators.length,
-          hapticActuatorsTypes: hapticActuators.map((actuator) =>
-            String((actuator as { type?: unknown }).type ?? "unknown"),
-          ),
-          buttons: Array.from(gp.buttons).map((btn) => (typeof btn === "object" ? btn.value : btn)),
-          buttonsPressed: Array.from(gp.buttons).map((btn) => btn.pressed),
-          buttonsTouched: Array.from(gp.buttons).map((btn) => btn.touched),
-          axes: Array.from(gp.axes),
-        };
-      }
-
-      setGamepad(foundGamepad);
-      requestAnimationFrame(pollGamepads);
-    };
-
-    const frameId = requestAnimationFrame(pollGamepads);
-    return () => {
-      cancelAnimationFrame(frameId);
-    };
-  }, [selectedControllerIndex]);
-
-  return gamepad;
-}
-
 // Controller Card Component
 export default function GamepadControl({
   enabled,
+  compact = false,
   onEnabledChange,
   showRightSide = true,
   onShowRightSideChange,
@@ -153,15 +64,18 @@ export default function GamepadControl({
   showButtons = true,
   showAxes = true,
   gamepadJoyTransform = "default",
+  gamepadVisualization = "auto",
   axisVisualization = "bars",
   showControlButtons = true,
   onSelectedControllerIndexConfigChange,
   onGamepadJoyTransformChange,
+  onGamepadVisualizationChange,
   onShowButtonsChange,
   onShowAxesChange,
   onAxisVisualizationChange,
 }: {
   enabled: boolean;
+  compact?: boolean;
   onEnabledChange: (options: { enabled: boolean }) => void;
   showRightSide?: boolean;
   onShowRightSideChange?: (payload: { showRightSide: boolean }) => void;
@@ -170,16 +84,19 @@ export default function GamepadControl({
   showButtons?: boolean;
   showAxes?: boolean;
   gamepadJoyTransform?: GamepadJoyTransformKey;
+  gamepadVisualization?: GamepadVisualizationMode;
   axisVisualization?: AxisVisualizationMode;
   showControlButtons?: boolean;
   onSelectedControllerIndexConfigChange?: (index: number) => void;
   onGamepadJoyTransformChange?: (mapping: GamepadJoyTransformKey) => void;
+  onGamepadVisualizationChange?: (mode: GamepadVisualizationMode) => void;
   onShowButtonsChange?: (payload: { showButtons: boolean }) => void;
   onShowAxesChange?: (payload: { showAxes: boolean }) => void;
   onAxisVisualizationChange?: (mode: AxisVisualizationMode) => void;
-}): JSX.Element {
+}): React.ReactElement {
   const gamepad = useGamepadPolling(selectedControllerIndex);
   const gamepadTransformOptions = getGamepadJoyTransformOptions();
+  const preferredVisualType = gamepadJoyTransform === "ps5" ? "dualsense" : "xbox";
 
   const handleVibrationTest = () => {
     if (gamepad?.vibrationSupported === true) {
@@ -241,55 +158,71 @@ export default function GamepadControl({
           </SettingsItem>
         )}
         <SettingsItem label="Mapping">
-          <ToggleGroup
-            variant="outline"
-            size="sm"
-            value={[gamepadJoyTransform]}
-            onValueChange={(values) => {
-              const value = values[0] ?? "";
-              if (value in gamepadTransformOptions) {
+          <Select
+            value={gamepadJoyTransform}
+            onValueChange={(value) => {
+              if (value != null && value in gamepadTransformOptions) {
                 onGamepadJoyTransformChange?.(value as GamepadJoyTransformKey);
               }
             }}
           >
-            {Object.entries(gamepadTransformOptions).map(([key, option]) => (
-              <ToggleGroupItem key={key} value={key}>
-                {option.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            <SelectTrigger size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(gamepadTransformOptions).map(([key, option]) => (
+                <SelectItem key={key} value={key}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </SettingsItem>
+        <SettingsItem label="Visualization">
+          <Select
+            value={gamepadVisualization}
+            onValueChange={(value) => {
+              if (
+                value != null &&
+                (
+                  value === "auto" ||
+                  value === "generic" ||
+                  value === "xbox" ||
+                  value === "dualsense"
+                )
+              ) {
+                onGamepadVisualizationChange?.(value);
+              }
+            }}
+          >
+            <SelectTrigger size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="auto">Auto</SelectItem>
+              <SelectItem value="generic">Generic</SelectItem>
+              <SelectItem value="xbox">Xbox</SelectItem>
+              <SelectItem value="dualsense">DualSense (PS5)</SelectItem>
+            </SelectContent>
+          </Select>
         </SettingsItem>
         <SettingsItem label="Show Buttons">
-          <ToggleGroup
-            variant="outline"
-            size="sm"
-            value={[showButtons ? "on" : "off"]}
-            onValueChange={(values) => {
-              const value = values[0] ?? "";
-              if (value === "on" || value === "off") {
-                onShowButtonsChange?.({ showButtons: value === "on" });
-              }
+          <Switch
+            checked={showButtons}
+            onCheckedChange={(nextShowButtons) => {
+              onShowButtonsChange?.({ showButtons: nextShowButtons });
             }}
-          >
-            <ToggleGroupItem value="on">On</ToggleGroupItem>
-            <ToggleGroupItem value="off">Off</ToggleGroupItem>
-          </ToggleGroup>
+            size="default"
+          />
         </SettingsItem>
         <SettingsItem label="Show Axes">
-          <ToggleGroup
-            variant="outline"
-            size="sm"
-            value={[showAxes ? "on" : "off"]}
-            onValueChange={(values) => {
-              const value = values[0] ?? "";
-              if (value === "on" || value === "off") {
-                onShowAxesChange?.({ showAxes: value === "on" });
-              }
+          <Switch
+            checked={showAxes}
+            onCheckedChange={(nextShowAxes) => {
+              onShowAxesChange?.({ showAxes: nextShowAxes });
             }}
-          >
-            <ToggleGroupItem value="on">On</ToggleGroupItem>
-            <ToggleGroupItem value="off">Off</ToggleGroupItem>
-          </ToggleGroup>
+            size="default"
+          />
         </SettingsItem>
         <SettingsItem label="Axis Visualization">
           <ToggleGroup
@@ -464,8 +397,12 @@ export default function GamepadControl({
 
   return (
     <ControlCard
+      title="Gamepad"
+      compact={compact}
       enabled={enabled}
       onEnabledChange={onEnabledChange}
+      leftPaneReservedWidth={520}
+      rightPaneMinWidth={320}
       showRightPane={showRightSide}
       onRightPaneChange={({ show }) => {
         onShowRightSideChange?.({ showRightSide: show });
@@ -482,8 +419,12 @@ export default function GamepadControl({
           !enabled && "opacity-30",
         )}
       >
-        <GamepadSVG gamepad={gamepad} />
-        <div className="pointer-events-none absolute -bottom-6 left-1/2 -translate-x-1/2">
+        <GamepadSVG
+          gamepad={gamepad}
+          visualMode={gamepadVisualization}
+          preferredVisualType={preferredVisualType}
+        />
+        <div className="pointer-events-none absolute -bottom-6.5 left-1/2 -translate-x-1/2">
           <Badge variant="secondary" className="flex items-center gap-2">
             <span
               className={cn(
@@ -501,12 +442,17 @@ export default function GamepadControl({
   );
 }
 
-function GamepadAxisProgressBars({ axes }: { axes: number[] }): JSX.Element {
+function GamepadAxisProgressBars({ axes }: { axes: number[] }): React.ReactElement {
   return (
     <div className="space-y-3">
       {axes.map((axisValue, index) => {
         const clampedValue = Math.max(-1, Math.min(1, axisValue));
-        const progressValue = ((clampedValue + 1) / 2) * 100;
+        const magnitudePercent = Math.abs(clampedValue) * 50;
+        const barClassName = cn(
+          "absolute top-0 h-full bg-primary transition-none",
+          clampedValue >= 0 ? "left-1/2" : "right-1/2",
+        );
+        const barStyle = { width: `${magnitudePercent}%` };
 
         return (
           <div key={index} className="rounded-xl border p-3">
@@ -516,9 +462,13 @@ function GamepadAxisProgressBars({ axes }: { axes: number[] }): JSX.Element {
                 {clampedValue.toFixed(5)}
               </span>
             </div>
-            <Progress value={progressValue} className="h-2 transition-none" />
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2" />
+              <div className={barClassName} style={barStyle} />
+            </div>
             <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
               <span>-1.0</span>
+              <span>0.0</span>
               <span>+1.0</span>
             </div>
           </div>
@@ -536,7 +486,7 @@ function GamepadStick({
   label: string;
   axisX: number;
   axisY: number;
-}): JSX.Element {
+}): React.ReactElement {
   const clampedX = Math.max(-1, Math.min(1, axisX));
   const clampedY = Math.max(-1, Math.min(1, axisY));
 
@@ -574,7 +524,7 @@ function GamepadStick({
   );
 }
 
-function GamepadButtons({ buttons }: { buttons?: number[] }): JSX.Element {
+function GamepadButtons({ buttons }: { buttons?: number[] }): React.ReactElement {
   return (
     <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6">
       {buttons?.map((value, index) => (

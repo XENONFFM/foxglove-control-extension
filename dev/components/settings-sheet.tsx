@@ -16,7 +16,7 @@ import {
   SettingsTreeNode,
 } from "@foxglove/extension";
 import { ChevronRightIcon } from "lucide-react";
-import { MockPanelContext, MockSettingsEditor } from "./mockPanelContext";
+import { MockPanelContext, MockSettingsEditor } from "@dev/mockPanelContext";
 
 function isMockPanelContext(context: PanelExtensionContext): context is MockPanelContext {
   return (
@@ -186,7 +186,7 @@ function renderSettingsNode(
   );
 }
 
-export function SettingsMenu({ context }: { context: PanelExtensionContext }): ReactElement {
+export function SettingsSheet({ context }: { context: PanelExtensionContext }): ReactElement {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [settingsEditor, setSettingsEditor] = useState<MockSettingsEditor | undefined>(undefined);
 
@@ -226,6 +226,7 @@ export function SettingsMenu({ context }: { context: PanelExtensionContext }): R
 
       <SheetContent
         side="right"
+        showCloseButton={true}
         className="inset-y-0 right-0 h-full bg-background backdrop-blur data-[side=right]:w-md data-[side=right]:max-w-none sm:data-[side=right]:max-w-none"
       >
         <SheetHeader className="pb-2">

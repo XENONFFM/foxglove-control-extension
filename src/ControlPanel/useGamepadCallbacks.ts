@@ -41,14 +41,19 @@ export function useGamepadCallbacks(
 
   const handleGamepadConnect = useCallback(
     (gp: Gamepad) => {
-      setAvailableControllers((prev) => [...prev, gp]);
+      setAvailableControllers((prev) => {
+        if (prev.some((controller) => controller.index === gp.index)) {
+          return prev;
+        }
+        return [...prev, gp];
+      });
     },
     [setAvailableControllers],
   );
 
   const handleGamepadDisconnect = useCallback(
     (gp: Gamepad) => {
-      setAvailableControllers((prev) => prev.filter((c) => c.id !== gp.id));
+      setAvailableControllers((prev) => prev.filter((controller) => controller.index !== gp.index));
     },
     [setAvailableControllers],
   );

@@ -125,3 +125,26 @@ html[data-color-mode="dark"],
     @apply bg-background text-foreground;
   }
 }
+
+.gamepad-skin {
+  --gp-base: hsl(210 50% 85%);
+  --gp-accent-rgb: 74 222 128;
+  --gp-shadow: #121212;
+}
+
+.gamepad-skin [stroke="hsl(210,50%,85%)"] {
+  stroke: var(--gp-base);
+}
+
+.gamepad-skin [fill="hsl(210,50%,85%)"] {
+  fill: var(--gp-base);
+}
+
+.gamepad-skin [fill="#121212"],
+.gamepad-skin [fill="#121212 "] {
+  fill: var(--gp-shadow);
+}
+
+.gamepad-skin [fill="rgba(74, 222, 128, 0.3)"] {
+  fill: rgb(var(--gp-accent-rgb) / 0.3);
+}

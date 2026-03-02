@@ -136,9 +136,24 @@ export function useControlPanelEffects({
   // Publish Twist
   useEffect(() => {
     if (config.publishTwistMode && pubTwistTopicRef.current && joy) {
-      context.publish?.(pubTwistTopicRef.current, joyToTwist(joy, config.twistMapping));
+      const activeTwistMapping =
+        config.dataSource === "gamepad"
+          ? config.twistMappingGamepad
+          : config.dataSource === "keyboard"
+            ? config.twistMappingKeyboard
+            : config.twistMappingJoystick;
+      context.publish?.(pubTwistTopicRef.current, joyToTwist(joy, activeTwistMapping));
     }
-  }, [context, config.pubTwistTopic, config.publishTwistMode, joy, config.twistMapping]);
+  }, [
+    context,
+    config.dataSource,
+    config.pubTwistTopic,
+    config.publishTwistMode,
+    config.twistMappingGamepad,
+    config.twistMappingKeyboard,
+    config.twistMappingJoystick,
+    joy,
+  ]);
 
   // Persist config
   useEffect(() => {

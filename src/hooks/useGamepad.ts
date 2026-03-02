@@ -64,11 +64,18 @@ export function useGamepad({
   useEffect(() => {
     window.addEventListener("gamepadconnected", onConnect);
     window.addEventListener("gamepaddisconnected", onDisconnect);
+
+    for (const gamepad of navigator.getGamepads()) {
+      if (gamepad != null) {
+        didConnect(gamepad);
+      }
+    }
+
     return () => {
       window.removeEventListener("gamepadconnected", onConnect);
       window.removeEventListener("gamepaddisconnected", onDisconnect);
     };
-  }, [onConnect, onDisconnect]);
+  }, [didConnect, onConnect, onDisconnect]);
 
   // Cancel any pending animation frames when the component unmounts
   useEffect(() => {

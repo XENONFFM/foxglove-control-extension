@@ -10,6 +10,43 @@ import { SettingsSection, SettingsItem } from "@/components/settings";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
+const JOYSTICK_SIZE_PX: Record<JoystickSize, number> = {
+  xs: 96,
+  sm: 112,
+  md: 160,
+  lg: 224,
+  xl: 256,
+};
+
+const JOYSTICK_SIZE_ORDER: JoystickSize[] = ["xs", "sm", "md", "lg", "xl"];
+
+function getFittedJoystickSize(
+  preferredSize: JoystickSize,
+  secondEnabled: boolean,
+  availableWidth: number,
+  availableHeight: number,
+): JoystickSize {
+  const preferredIndex = Math.max(0, JOYSTICK_SIZE_ORDER.indexOf(preferredSize));
+  const maxGap = secondEnabled ? 24 : 0;
+  const horizontalPadding = secondEnabled ? 16 : 0;
+  const safeAvailableWidth = Math.max(0, availableWidth - horizontalPadding);
+  const safeAvailableHeight = Math.max(0, availableHeight);
+
+  const candidates = JOYSTICK_SIZE_ORDER.slice(0, preferredIndex + 1).reverse();
+  for (const candidate of candidates) {
+    const diameter = JOYSTICK_SIZE_PX[candidate];
+    const requiredWidth = secondEnabled ? diameter * 2 + maxGap : diameter;
+    const fitsWidth = requiredWidth <= safeAvailableWidth;
+    const fitsHeight = diameter <= safeAvailableHeight;
+
+    if (fitsWidth && fitsHeight) {
+      return candidate;
+    }
+  }
+
+  return "xs";
+}
+
 function LiveOutput({ position }: { position: JoystickPosition }) {
   return (
     <div className="grid grid-cols-2 gap-3 text-sm font-mono">
@@ -40,12 +77,15 @@ function LiveOutput({ position }: { position: JoystickPosition }) {
 
 export default function JoystickControl({
   onInteractiveJoy,
+  compact = false,
   axis,
   size,
   sticky,
+  secondJoystick,
   onAxisChange,
   onSizeChange,
   onStickyChange,
+  onSecondJoystickChange,
   showRightSide = true,
   onShowRightSideChange,
   enabled = true,
@@ -53,29 +93,42 @@ export default function JoystickControl({
   onEnabledChange,
 }: {
   onInteractiveJoy?: (interactiveJoy: Joy) => void;
+  compact?: boolean;
   axis?: JoystickAxisMode;
   size?: JoystickSize;
   sticky?: boolean;
+  secondJoystick?: boolean;
   onAxisChange?: (axis: JoystickAxisMode) => void;
   onSizeChange?: (size: JoystickSize) => void;
   onStickyChange?: (payload: { sticky: boolean }) => void;
+  onSecondJoystickChange?: (payload: { secondJoystick: boolean }) => void;
   showRightSide?: boolean;
   onShowRightSideChange?: (payload: { showRightSide: boolean }) => void;
   enabled?: boolean;
   showControlButtons?: boolean;
   onEnabledChange?: (payload: { enabled: boolean }) => void;
-}): JSX.Element {
+}): React.ReactElement {
   const [mainPos, setMainPos] = React.useState<JoystickPosition>({
     x: 0,
     y: 0,
     distance: 0,
     angle: 0,
   });
-
-  const [_isDragging, setIsDragging] = React.useState(false);
+  const [secondPos, setSecondPos] = React.useState<JoystickPosition>({
+    x: 0,
+    y: 0,
+    distance: 0,
+    angle: 0,
+  });
   const [sizeState, setSizeState] = React.useState<JoystickSize>(size ?? "md");
   const [axisState, setAxisState] = React.useState<JoystickAxisMode>(axis ?? "both");
   const [stickyState, setStickyState] = React.useState(sticky ?? false);
+  const [secondJoystickState, setSecondJoystickState] = React.useState(secondJoystick ?? false);
+  const [availableSize, setAvailableSize] = React.useState({ width: 0, height: 0 });
+
+  const mainPosRef = React.useRef(mainPos);
+  const secondPosRef = React.useRef(secondPos);
+  const joysticksRowRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     setSizeState(size ?? "md");
@@ -89,11 +142,66 @@ export default function JoystickControl({
     setStickyState(sticky ?? false);
   }, [sticky]);
 
+  React.useEffect(() => {
+    setSecondJoystickState(secondJoystick ?? false);
+  }, [secondJoystick]);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined" || !joysticksRowRef.current) {
+      return;
+    }
+
+    const updateAvailableSize = () => {
+      const rect = joysticksRowRef.current?.getBoundingClientRect();
+      if (!rect) {
+        return;
+      }
+
+      setAvailableSize({
+        width: rect.width,
+        height: Math.max(0, window.innerHeight - rect.top - 24),
+      });
+    };
+
+    updateAvailableSize();
+
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            updateAvailableSize();
+          })
+        : undefined;
+    if (joysticksRowRef.current) {
+      observer?.observe(joysticksRowRef.current);
+    }
+
+    window.addEventListener("resize", updateAvailableSize);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateAvailableSize);
+    };
+  }, [secondJoystickState, compact]);
+
+  const effectiveSize = React.useMemo(
+    () =>
+      getFittedJoystickSize(
+        sizeState,
+        secondJoystickState,
+        availableSize.width,
+        availableSize.height,
+      ),
+    [sizeState, secondJoystickState, availableSize.width, availableSize.height],
+  );
+
   const emitInteractiveJoy = React.useCallback(
-    (position: JoystickPosition) => {
+    (leftPosition: JoystickPosition, rightPosition: JoystickPosition, secondEnabled: boolean) => {
+      const axes = secondEnabled
+        ? [leftPosition.x, leftPosition.y, rightPosition.x, rightPosition.y]
+        : [leftPosition.x, leftPosition.y];
       onInteractiveJoy?.({
         header: { stamp: { sec: 0, nsec: 0 }, frame_id: "" },
-        axes: [position.x, position.y],
+        axes,
         buttons: [],
       });
     },
@@ -148,21 +256,44 @@ export default function JoystickControl({
           size="default"
         />
       </SettingsItem>
+
+      <SettingsItem label="Second Joystick">
+        <Switch
+          checked={secondJoystickState}
+          onCheckedChange={(nextSecondJoystick) => {
+            setSecondJoystickState(nextSecondJoystick);
+            onSecondJoystickChange?.({ secondJoystick: nextSecondJoystick });
+          }}
+          size="default"
+        />
+      </SettingsItem>
     </SettingsSection>
   );
 
   const rightPaneContent = (
-    <div>
-      <h3 className="text-sm font-medium text-muted-foreground mb-3">Output</h3>
-      <LiveOutput position={mainPos} />
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground mb-3">Output (Left)</h3>
+        <LiveOutput position={mainPos} />
+      </div>
+      {secondJoystickState && (
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">Output (Right)</h3>
+          <LiveOutput position={secondPos} />
+        </div>
+      )}
     </div>
   );
 
   return (
     <div className="flex flex-col gap-8">
       <ControlCard
+        title="Joystick"
+        compact={compact}
         enabled={enabled}
         onEnabledChange={onEnabledChange}
+        leftPaneReservedWidth={secondJoystickState ? 620 : 360}
+        rightPaneMinWidth={320}
         showPowerButton={showControlButtons}
         showSettingsButton={showControlButtons}
         showRightPaneToggleButton={showControlButtons}
@@ -173,24 +304,72 @@ export default function JoystickControl({
         settingsContent={settingsContent}
         rightPaneContent={rightPaneContent}
       >
-        <Joystick
-          size={sizeState}
-          axis={axisState}
-          snapToCenter={!stickyState}
-          disabled={!enabled}
-          onMove={(position) => {
-            setMainPos(position);
-            emitInteractiveJoy(position);
-          }}
-          onStart={() => {
-            setIsDragging(true);
-          }}
-          onEnd={(pos) => {
-            setMainPos(pos);
-            setIsDragging(false);
-            emitInteractiveJoy(pos);
-          }}
-        />
+        <div
+          ref={joysticksRowRef}
+          className={
+            secondJoystickState
+              ? "mx-auto flex w-full max-w-3xl items-center justify-between gap-6"
+              : "flex justify-center"
+          }
+        >
+          {secondJoystickState ? (
+            <>
+              <div className="flex justify-center">
+                <Joystick
+                  size={effectiveSize}
+                  axis={axisState}
+                  snapToCenter={!stickyState}
+                  disabled={!enabled}
+                  onMove={(position) => {
+                    mainPosRef.current = position;
+                    setMainPos(position);
+                    emitInteractiveJoy(position, secondPosRef.current, true);
+                  }}
+                  onEnd={(position) => {
+                    mainPosRef.current = position;
+                    setMainPos(position);
+                    emitInteractiveJoy(position, secondPosRef.current, true);
+                  }}
+                />
+              </div>
+              <div className="flex justify-center">
+                <Joystick
+                  size={effectiveSize}
+                  axis={axisState}
+                  snapToCenter={!stickyState}
+                  disabled={!enabled}
+                  onMove={(position) => {
+                    secondPosRef.current = position;
+                    setSecondPos(position);
+                    emitInteractiveJoy(mainPosRef.current, position, true);
+                  }}
+                  onEnd={(position) => {
+                    secondPosRef.current = position;
+                    setSecondPos(position);
+                    emitInteractiveJoy(mainPosRef.current, position, true);
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <Joystick
+              size={effectiveSize}
+              axis={axisState}
+              snapToCenter={!stickyState}
+              disabled={!enabled}
+              onMove={(position) => {
+                mainPosRef.current = position;
+                setMainPos(position);
+                emitInteractiveJoy(position, secondPosRef.current, false);
+              }}
+              onEnd={(position) => {
+                mainPosRef.current = position;
+                setMainPos(position);
+                emitInteractiveJoy(position, secondPosRef.current, false);
+              }}
+            />
+          )}
+        </div>
       </ControlCard>
     </div>
   );

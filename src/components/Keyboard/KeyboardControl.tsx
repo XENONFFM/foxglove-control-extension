@@ -1,3 +1,5 @@
+import type * as React from "react";
+
 import { cn } from "@/lib/utils";
 import { ControlCard } from "@/components/control-card";
 import { SettingsSection, SettingsItem } from "@/components/settings";
@@ -17,6 +19,7 @@ export interface KeyState {
 
 export interface KeyboardControlProps {
   layout?: "wasd" | "arrows";
+  compact?: boolean;
   showRightSide?: boolean;
   onShowRightSideChange?: (payload: { showRightSide: boolean }) => void;
   enabled?: boolean;
@@ -27,13 +30,14 @@ export interface KeyboardControlProps {
 
 export default function KeyboardControl({
   layout = "wasd",
+  compact = false,
   showRightSide = true,
   onShowRightSideChange,
   enabled = true,
   showControlButtons = true,
   onEnabledChange,
   onLayoutChange,
-}: KeyboardControlProps): JSX.Element {
+}: KeyboardControlProps): React.ReactElement {
   const keyState = useKeyboard();
   const forwardPressed = layout === "wasd" ? keyState.w : keyState.arrowUp;
   const backwardPressed = layout === "wasd" ? keyState.s : keyState.arrowDown;
@@ -82,6 +86,8 @@ export default function KeyboardControl({
 
   return (
     <ControlCard
+      title="Keyboard"
+      compact={compact}
       enabled={enabled}
       onEnabledChange={
         onEnabledChange
@@ -90,6 +96,8 @@ export default function KeyboardControl({
             }
           : undefined
       }
+      leftPaneReservedWidth={220}
+      rightPaneMinWidth={320}
       showRightPane={showRightSide}
       onRightPaneChange={({ show }) => {
         onShowRightSideChange?.({ showRightSide: show });
@@ -113,7 +121,7 @@ function KeyboardVisualization({
   keyState: KeyState;
   layout: "wasd" | "arrows";
   enabled?: boolean;
-}): JSX.Element {
+}): React.ReactElement {
   if (layout === "wasd") {
     return (
       <div
@@ -153,7 +161,7 @@ function KeyButton({
   label: string;
   pressed: boolean;
   enabled?: boolean;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <button
       className={cn(
