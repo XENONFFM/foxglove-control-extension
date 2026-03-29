@@ -16,12 +16,7 @@ export function LightCardFrame({
   className?: string;
 }): React.ReactElement {
   return (
-    <section
-      className={cn(
-        "flex h-full min-h-0 w-full flex-col rounded-xl border border-border/60 bg-background/90 p-1.5",
-        className,
-      )}
-    >
+    <section className={cn("flex h-full min-h-0 w-full flex-col rounded-xl p-1", className)}>
       {showHeader && (
         <header className="mb-1 flex items-center justify-between gap-1.5">
           <h2 className="truncate text-[11px] font-semibold text-foreground">{title}</h2>

@@ -1,30 +1,24 @@
 # Control Extension
 
+[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/XENONFFM/foxglove-joystick)
+
 A [Foxglove Studio](https://github.com/foxglove/studio) panel extension for teleoperating robots. It accepts input from a gamepad, keyboard, or on-screen joystick, and publishes `sensor_msgs/Joy` and/or `geometry_msgs/Twist` messages over a Foxglove WebSocket connection.
-
-![Control Extension screenshot](docs/preview.png)
-
----
-
-## Input Sources
-
-Exactly one input source is active at a time. The active source is selected via the power button on each control panel or through the panel settings. Switching source automatically clears any stale output so no unintended commands are sent.
-
-| Source        | Description                                                                 | Typical use                                      |
-| ------------- | --------------------------------------------------------------------------- | ------------------------------------------------ |
-| **Gamepad**   | Reads a locally-connected USB/Bluetooth gamepad via the browser Gamepad API | Primary teleoperation with a standard controller |
-| **Keyboard**  | Maps keyboard keys to axes and buttons                                      | Quick bench-testing when no gamepad is available |
-| **Joystick**  | On-screen draggable joystick (touch-friendly)                               | Touchscreen devices or mouse-based control       |
-| **Subscribe** | Subscribes to an existing `Joy` topic and visualises it                     | Monitoring/replay of recorded operator input     |
-
----
+|||
+|-|-|
+| ![Control Extension screenshot](docs/Control_panel.webp) | ![Control Extension screenshot](docs/Control-lite_panel.webp) |
 
 ## Features
+
+### Input
+
+- **Gamepad:** Reads a locally-connected USB/Bluetooth gamepad via the browser Gamepad API
+- **Keyboard:** Maps keyboard keys to axes and buttons
+- **Joystick:** On-screen draggable joystick (touch-friendly)
 
 ### Output
 
 - Publishes `sensor_msgs/Joy` to a configurable topic.
-- Optionally publishes `geometry_msgs/Twist` with a fully configurable axis-to-field mapping (scale, inversion, source index per field).
+- Publishes `geometry_msgs/Twist` with a fully configurable axis-to-field mapping (scale, inversion, source index per field).
 - Output is gated to the active input source — only one source publishes at a time.
 
 ### Gamepad
@@ -43,8 +37,8 @@ Exactly one input source is active at a time. The active source is selected via 
 ### Joystick
 
 - Draggable on-screen joystick.
-- Configurable axis mode: X only, Y only, or both axes.
-- Five size presets (xs → xl) configurable from Display settings.
+- Configurable axis locking: lock X axis, lock Y axis, or both axes free.
+- Multiple size presets (xs → xxl) configurable from Display settings.
 - Optional sticky mode (holds last position after release).
 
 ### Display / UI
@@ -57,6 +51,36 @@ Exactly one input source is active at a time. The active source is selected via 
 ### Settings
 
 All panel options are exposed in the Foxglove settings tree so they persist across sessions and can be managed from the Foxglove settings sidebar.
+
+---
+
+## Panels
+
+This extension provides **two panel variants** optimized for different use cases:
+
+### [ASLZ Control](docs/CONTROL_PANEL.md) — Full-Featured
+
+**Best for** larger displays and detailed configuration. Displays all control sources in a stacked card layout, all visible at once. Includes advanced Twist mapping, multiple visualization modes, and a Subscribe card for monitoring.
+
+- Multiple cards stacked on screen
+- Collapsible/expandable layout
+- Full Twist mapping configuration per source
+- Settings panel per card
+- Ideal for large displays and detailed teleoperation
+
+**[→ Full Documentation](docs/CONTROL_PANEL.md)**
+
+### [ASLZ Control Lite](docs/CONTROL_PANEL_LITE.md) — Streamlined & Compact
+
+**Best for** touch screens and minimal UIs. Displays one control source at a time via a tab bar. Optimized for embedded displays and mobile teleoperation.
+
+- Single card view (tab-based switching)
+- Large, touch-friendly controls
+- Compact settings—essentials only
+- Automatic responsive sizing
+- Ideal for small displays and focused workflows
+
+**[→ Full Documentation](docs/CONTROL_PANEL_LITE.md)**
 
 ---
 
@@ -74,6 +98,14 @@ pnpm run package   # produces a .foxe file
 pnpm run local-install  # build + install into local Foxglove desktop
 ```
 
+### Development in Dev Container
+
+This repository supports VS Code Dev Containers for a consistent local environment.
+
+- Open the repo in VS Code and choose **Reopen in Container**.
+- The container includes the required toolchain for development (Node.js, pnpm, TypeScript, ESLint, and Git).
+- Run the same commands shown in this README inside the container terminal.
+
 ### Dev harness (no Foxglove required)
 
 Iterate on the UI in a browser without launching Foxglove:
@@ -83,7 +115,9 @@ pnpm install
 pnpm run dev       # starts Vite at http://localhost:5173
 ```
 
-The harness renders the panel with a mocked Foxglove context. Adjust the initial state in [dev/mockPanelContext.ts](dev/mockPanelContext.ts). Panel settings are accessible via the gear icon in the top-right corner.
+The harness renders both panel variants with a mocked Foxglove context, allowing you to test UI changes and settings in real-time. Switch between full and lite panels, adjust initial state, and toggle themes—all without Foxglove.
+
+**[→ Full Dev Harness Documentation](docs/DEV_HARNESS.md)**
 
 ---
 

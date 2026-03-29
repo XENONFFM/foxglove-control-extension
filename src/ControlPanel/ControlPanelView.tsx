@@ -126,7 +126,7 @@ export function ControlPanelView({
   }, [visiblePanels, config.dataSource, collapseInactiveCards]);
 
   return (
-    <div className="min-h-screen w-full bg-background">
+    <div className="min-h-screen w-full bg-secondary">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4">
         <div ref={cardsStackRef} className="flex flex-col gap-4">
           {config.showGamepad && (

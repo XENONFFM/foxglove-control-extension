@@ -501,10 +501,7 @@ export default function GamepadControl({
             ) : showWaitingSpinner ? (
               <Spinner data-icon="inline-start" />
             ) : (
-              <span
-                data-icon="inline-start"
-                className="h-2 w-2 rounded-full bg-muted-foreground/40"
-              />
+              <span data-icon="inline-start" className="h-2 w-2 rounded-full bg-ring" />
             )}
             {isConnected ? "Connected" : enabled ? "Waiting for controller" : "Inactive"}
           </Badge>

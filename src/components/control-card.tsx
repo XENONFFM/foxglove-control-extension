@@ -182,7 +182,7 @@ export function ControlCard({
                           className="h-8 w-8 p-0"
                         >
                           <Power
-                            className={`h-4 w-4 ${enabled ? "text-green-600" : "text-muted-foreground"}`}
+                            className={`h-4 w-4 ${enabled ? "text-green-500" : "text-muted-foreground"}`}
                           />
                         </Button>
                       }
@@ -229,7 +229,7 @@ export function ControlCard({
                               className="h-8 w-8 p-0"
                             >
                               <Power
-                                className={`h-4 w-4 ${enabled ? "text-green-600" : "text-muted-foreground"}`}
+                                className={`h-4 w-4 ${enabled ? "text-green-500" : "text-muted-foreground"}`}
                               />
                             </Button>
                           }

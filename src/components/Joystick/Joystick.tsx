@@ -404,7 +404,7 @@ const Joystick = React.forwardRef<HTMLDivElement, JoystickProps>(
           aria-hidden
           className={cn(
             thumbVariants({ size }),
-            dragging ? "border-green-500" : "border-primary",
+            dragging ? "border-blue-500" : "border-primary",
             "bg-background border-2",
             dragging ? "ring-ring/40 ring-4" : "ring-ring/20 hover:ring-2",
           )}

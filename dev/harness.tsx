@@ -38,7 +38,7 @@ export function Harness({ context }: { context: PanelExtensionContext }): ReactE
   return (
     <ThemeProvider defaultTheme="system" storageKey="nina-harness-theme">
       <TooltipProvider delay={1000}>
-        <div className="relative mx-auto flex h-full w-full bg-background">
+        <div className="relative mx-auto flex h-full w-full">
           <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
             <div className="mx-auto flex w-full max-w-6xl justify-center px-4 mt-1.5">
               <div

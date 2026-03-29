@@ -360,7 +360,7 @@ export function SettingsSheet({
                     "h-7 w-7 rounded-sm p-0",
                     controlVisibilityDisabled && "text-muted-foreground/40",
                     isGamepadOutputActive
-                      ? "text-green-600"
+                      ? "text-green-500"
                       : showGamepad
                         ? "text-foreground"
                         : "text-muted-foreground/40",
@@ -395,7 +395,7 @@ export function SettingsSheet({
                     "h-7 w-7 rounded-sm p-0",
                     controlVisibilityDisabled && "text-muted-foreground/40",
                     isJoystickOutputActive
-                      ? "text-green-600"
+                      ? "text-green-500"
                       : showJoystick
                         ? "text-foreground"
                         : "text-muted-foreground/40",
@@ -430,7 +430,7 @@ export function SettingsSheet({
                     "h-7 w-7 rounded-sm p-0",
                     controlVisibilityDisabled && "text-muted-foreground/40",
                     isKeyboardOutputActive
-                      ? "text-green-600"
+                      ? "text-green-500"
                       : showKeyboard
                         ? "text-foreground"
                         : "text-muted-foreground/40",

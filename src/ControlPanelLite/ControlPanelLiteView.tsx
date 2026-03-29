@@ -2,9 +2,9 @@ import { CircleDot, Gamepad2, Keyboard } from "lucide-react";
 import * as React from "react";
 
 import { LightGamepadCard, LightJoystickCard, LightKeyboardCard } from "@/components/light";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PanelConfig } from "@/config";
-import { cn } from "@/lib/utils";
 import { Joy } from "@/types";
 
 type PanelKey = "gamepad" | "joystick" | "keyboard";
@@ -44,7 +44,7 @@ export function ControlPanelLiteView({
     return panels;
   }, [config.showGamepad, config.showJoystick, config.showKeyboard]);
 
-  const [selectedPanel, setSelectedPanel] = React.useState<PanelKey>("gamepad");
+  const selectedPanel = config.dataSource as PanelKey;
 
   React.useEffect(() => {
     if (visiblePanels.length === 0) {
@@ -53,7 +53,6 @@ export function ControlPanelLiteView({
 
     const currentDataSource = config.dataSource as PanelKey;
     if (visiblePanels.includes(currentDataSource)) {
-      setSelectedPanel(currentDataSource);
       return;
     }
 
@@ -61,64 +60,42 @@ export function ControlPanelLiteView({
     if (fallbackPanel && config.dataSource !== fallbackPanel) {
       onConfigChange({ dataSource: fallbackPanel });
     }
-    setSelectedPanel(fallbackPanel ?? "gamepad");
   }, [config.dataSource, onConfigChange, visiblePanels]);
 
-  const activePanel = visiblePanels.includes(selectedPanel) ? selectedPanel : visiblePanels[0];
   const preferredVisualType = config.gamepadJoyTransform === "ps5" ? "dualsense" : "xbox";
 
-  const selectPanel = (panel: PanelKey): void => {
-    setSelectedPanel(panel);
-    if (config.dataSource !== panel) {
-      onConfigChange({ dataSource: panel });
-    }
-  };
-
   return (
-    <div className="h-full w-full overflow-hidden">
-      <div className="flex h-full w-full flex-col gap-1 p-1">
-        {config.showLiteTabBar && (
-          <div className="shrink-0">
-            <Tabs
-              value={activePanel}
-              onValueChange={(next) => {
-                if (next === "gamepad" || next === "joystick" || next === "keyboard") {
-                  selectPanel(next);
-                }
-              }}
-            >
-              <TabsList className="grid w-full grid-cols-3">
-                {PANEL_BUTTONS.map((panelButton) => {
-                  const isVisible = visiblePanels.includes(panelButton.key);
-
-                  return (
-                    <TabsTrigger
-                      key={panelButton.key}
-                      value={panelButton.key}
-                      disabled={!isVisible}
-                      aria-label={panelButton.label}
-                      title={panelButton.label}
-                      className={cn("h-6 w-full", !isVisible && "opacity-35")}
-                    >
-                      <span className="inline-flex w-full items-center justify-center truncate">
-                        {panelButton.icon}
-                      </span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </Tabs>
-          </div>
-        )}
-
-        <div className="flex min-h-0 flex-1">
-          {!activePanel && (
-            <div className="flex h-full items-center justify-center rounded-xl border border-border/60 bg-background/90 px-2 text-center text-xs text-muted-foreground">
-              Enable at least one panel in settings.
-            </div>
+    <div className="h-full w-full overflow-hidden p-1 bg-secondary">
+      <Card className="flex h-full w-full flex-col gap-1 p-1">
+        <Tabs
+          value={selectedPanel}
+          onValueChange={(value) => {
+            const nextPanel = value as PanelKey;
+            if (nextPanel !== config.dataSource) {
+              onConfigChange({ dataSource: nextPanel });
+            }
+          }}
+          className="h-full w-full"
+        >
+          {config.showLiteTabBar && (
+            <TabsList className="w-full h-6 shrink-0">
+              {PANEL_BUTTONS.map((panelButton) => {
+                return (
+                  <TabsTrigger
+                    key={panelButton.key}
+                    value={panelButton.key}
+                    aria-label={panelButton.label}
+                    title={panelButton.label}
+                  >
+                    <span className="inline-flex w-full items-center justify-center truncate">
+                      {panelButton.icon}
+                    </span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
           )}
-
-          {activePanel === "gamepad" && (
+          <TabsContent value="gamepad">
             <LightGamepadCard
               enabled={config.dataSource === "gamepad"}
               selectedControllerIndex={config.gamepadId}
@@ -127,9 +104,8 @@ export function ControlPanelLiteView({
               gamepadDeadzoneEnabled={config.gamepadDeadzoneEnabled}
               gamepadDeadzone={config.gamepadDeadzone}
             />
-          )}
-
-          {activePanel === "joystick" && (
+          </TabsContent>
+          <TabsContent value="joystick">
             <LightJoystickCard
               size={config.joystickSize}
               axisLeft={config.joystickAxisLeft}
@@ -139,16 +115,15 @@ export function ControlPanelLiteView({
               enabled={config.dataSource === "joystick"}
               onInteractiveJoy={onInteractiveJoy}
             />
-          )}
-
-          {activePanel === "keyboard" && (
+          </TabsContent>
+          <TabsContent value="keyboard">
             <LightKeyboardCard
               layout={config.keyboardLayout}
               enabled={config.dataSource === "keyboard"}
             />
-          )}
-        </div>
-      </div>
+          </TabsContent>
+        </Tabs>
+      </Card>
     </div>
   );
 }
