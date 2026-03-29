@@ -1,10 +1,11 @@
 import * as React from "react";
 
+import { LightCardFrame } from "./LightCardFrame";
+
 import { Joystick, type JoystickPosition } from "@/components/Joystick/Joystick";
 import { JoystickAxisMode, JoystickSize } from "@/config/types";
 import { cn } from "@/lib/utils";
 import { Joy } from "@/types";
-import { LightCardFrame } from "./LightCardFrame";
 
 const ORIGIN_POSITION: JoystickPosition = { x: 0, y: 0, distance: 0, angle: 0 };
 const LITE_SIZE_PX: Record<Exclude<JoystickSize, "auto">, number> = {
@@ -26,15 +27,12 @@ function fitJoystickDiameterPx(
   return Math.max(64, Math.floor(Math.min(widthPerJoystick, Math.max(0, availableHeight))));
 }
 
-function resolveJoystickDiameterPx(
-  requestedSize: JoystickSize,
-  fittedDiameterPx: number,
-): number {
+function resolveJoystickDiameterPx(requestedSize: JoystickSize, fittedDiameterPx: number): number {
   if (requestedSize === "auto") {
     return fittedDiameterPx;
   }
 
-  const requestedPx = LITE_SIZE_PX[requestedSize] ?? fittedDiameterPx;
+  const requestedPx = LITE_SIZE_PX[requestedSize];
   return Math.max(64, Math.min(requestedPx, fittedDiameterPx));
 }
 
@@ -74,10 +72,10 @@ export function LightJoystickCard({
   enabled: boolean;
   onInteractiveJoy: (joy: Joy) => void;
 }): React.ReactElement {
-  const [leftPos, setLeftPos] = React.useState<JoystickPosition>(ORIGIN_POSITION);
-  const [rightPos, setRightPos] = React.useState<JoystickPosition>(ORIGIN_POSITION);
+  const [leftPos, setLeftPos] = React.useState(ORIGIN_POSITION);
+  const [rightPos, setRightPos] = React.useState(ORIGIN_POSITION);
   const joysticksRef = React.useRef<HTMLDivElement | null>(null);
-  const [fittedDiameterPx, setFittedDiameterPx] = React.useState<number>(96);
+  const [fittedDiameterPx, setFittedDiameterPx] = React.useState(96);
 
   React.useEffect(() => {
     const container = joysticksRef.current;
@@ -124,8 +122,15 @@ export function LightJoystickCard({
   );
 
   return (
-    <LightCardFrame title="Joystick" subtitle={secondJoystick ? "dual" : "single"} showHeader={false}>
-      <div ref={joysticksRef} className="flex min-h-0 flex-1 items-center justify-center gap-2 overflow-hidden">
+    <LightCardFrame
+      title="Joystick"
+      subtitle={secondJoystick ? "dual" : "single"}
+      showHeader={false}
+    >
+      <div
+        ref={joysticksRef}
+        className="flex min-h-0 flex-1 items-center justify-center gap-2 overflow-hidden"
+      >
         <Joystick
           size={resolvedJoystickVariant}
           className={cn("max-h-full max-w-full")}

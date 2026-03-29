@@ -2,6 +2,7 @@ import { PanelExtensionContext } from "@foxglove/extension";
 import { renderHook } from "@testing-library/react";
 
 import { useControlPanelEffects, ControlPanelEffectsProps } from "./useControlPanelEffects";
+
 import { createDefaultConfig } from "@/config";
 
 describe("useControlPanelEffects", () => {

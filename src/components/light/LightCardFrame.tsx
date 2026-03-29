@@ -25,7 +25,9 @@ export function LightCardFrame({
       {showHeader && (
         <header className="mb-1 flex items-center justify-between gap-1.5">
           <h2 className="truncate text-[11px] font-semibold text-foreground">{title}</h2>
-          {subtitle && <span className="truncate text-[9px] text-muted-foreground">{subtitle}</span>}
+          {subtitle && (
+            <span className="truncate text-[9px] text-muted-foreground">{subtitle}</span>
+          )}
         </header>
       )}
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>

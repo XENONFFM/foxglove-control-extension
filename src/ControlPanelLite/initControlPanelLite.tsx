@@ -1,8 +1,9 @@
 import { PanelExtensionContext } from "@foxglove/extension";
 import { createRoot } from "react-dom/client";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { ControlPanelLite } from "./ControlPanelLite";
+
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export function initControlPanelLite(context: PanelExtensionContext): () => void {
   const root = createRoot(context.panelElement);

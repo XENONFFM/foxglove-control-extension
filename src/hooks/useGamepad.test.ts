@@ -9,7 +9,7 @@ describe("useGamepad", () => {
 
   beforeEach(() => {
     // Mock the Gamepad API
-    global.navigator.getGamepads = jest.fn(
+    window.navigator.getGamepads = jest.fn(
       () => [{ id: "Gamepad 1", index: 0, buttons: [], axes: [] }] as unknown as Gamepad[],
     );
   });

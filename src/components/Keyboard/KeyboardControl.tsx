@@ -1,10 +1,11 @@
 import type * as React from "react";
 
-import { cn } from "@/lib/utils";
+import useKeyboard from "./useKeyboard";
+
 import { ControlCard } from "@/components/control-card";
 import { SettingsSection, SettingsItem } from "@/components/settings";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import useKeyboard from "./useKeyboard";
+import { cn } from "@/lib/utils";
 
 export interface KeyState {
   w: boolean;

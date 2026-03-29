@@ -3,12 +3,13 @@
 import * as React from "react";
 
 import { Joystick, type JoystickPosition } from "./Joystick";
-import { JoystickAxisMode, JoystickSize } from "@/config/types";
-import { Joy } from "@/types";
+
 import { ControlCard } from "@/components/control-card";
 import { SettingsSection, SettingsItem } from "@/components/settings";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { JoystickAxisMode, JoystickSize } from "@/config/types";
+import { Joy } from "@/types";
 
 const JOYSTICK_SIZE_PX: Record<JoystickSize, number> = {
   auto: 0,
@@ -27,7 +28,10 @@ function getFittedJoystickSize(
   availableWidth: number,
   availableHeight: number,
 ): Exclude<JoystickSize, "auto"> {
-  const preferredIndex = Math.max(0, JOYSTICK_SIZE_ORDER.indexOf(preferredSize as Exclude<JoystickSize, "auto">));
+  const preferredIndex = Math.max(
+    0,
+    JOYSTICK_SIZE_ORDER.indexOf(preferredSize as Exclude<JoystickSize, "auto">),
+  );
   const maxGap = secondEnabled ? 24 : 0;
   const horizontalPadding = secondEnabled ? 16 : 0;
   const safeAvailableWidth = Math.max(0, availableWidth - horizontalPadding);
@@ -116,13 +120,13 @@ export default function JoystickControl({
   showControlButtons?: boolean;
   onEnabledChange?: (payload: { enabled: boolean }) => void;
 }): React.ReactElement {
-  const [mainPos, setMainPos] = React.useState<JoystickPosition>({
+  const [mainPos, setMainPos] = React.useState({
     x: 0,
     y: 0,
     distance: 0,
     angle: 0,
   });
-  const [secondPos, setSecondPos] = React.useState<JoystickPosition>({
+  const [secondPos, setSecondPos] = React.useState({
     x: 0,
     y: 0,
     distance: 0,

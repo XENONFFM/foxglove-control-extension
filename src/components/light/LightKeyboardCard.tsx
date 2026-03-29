@@ -1,9 +1,10 @@
 import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { LightCardFrame } from "./LightCardFrame";
+
 import useKeyboard from "@/components/Keyboard/useKeyboard";
 import { cn } from "@/lib/utils";
-import { LightCardFrame } from "./LightCardFrame";
 
 function KeyTile({
   label,
@@ -20,7 +21,9 @@ function KeyTile({
     <span
       className={cn(
         "flex items-center justify-center rounded-md border font-semibold transition-colors",
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border/80 bg-muted/20 text-muted-foreground",
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border/80 bg-muted/20 text-muted-foreground",
       )}
       style={{ width: `${sizePx}px`, height: `${sizePx}px`, fontSize: `${fontSizePx}px` }}
     >
@@ -37,20 +40,20 @@ export function LightKeyboardCard({
   enabled: boolean;
 }): React.ReactElement {
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const [tileSizePx, setTileSizePx] = useState<number>(32);
-  const [gapPx, setGapPx] = useState<number>(6);
+  const [tileSizePx, setTileSizePx] = useState(32);
+  const [gapPx, setGapPx] = useState(6);
   const keyState = useKeyboard();
   const labels: [string, string, string, string] =
     layout === "wasd" ? ["W", "A", "S", "D"] : ["↑", "←", "↓", "→"];
   const active =
     layout === "wasd"
       ? ([keyState.w, keyState.a, keyState.s, keyState.d] as [boolean, boolean, boolean, boolean])
-      : ([
-          keyState.arrowUp,
-          keyState.arrowLeft,
-          keyState.arrowDown,
-          keyState.arrowRight,
-        ] as [boolean, boolean, boolean, boolean]);
+      : ([keyState.arrowUp, keyState.arrowLeft, keyState.arrowDown, keyState.arrowRight] as [
+          boolean,
+          boolean,
+          boolean,
+          boolean,
+        ]);
 
   useEffect(() => {
     const container = gridRef.current;
@@ -96,11 +99,11 @@ export function LightKeyboardCard({
       showHeader={false}
       className={!enabled ? "opacity-70" : undefined}
     >
-      <div ref={gridRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
-        <div
-          className="grid grid-cols-3"
-          style={{ gap: `${gapPx}px` }}
-        >
+      <div
+        ref={gridRef}
+        className="flex min-h-0 flex-1 items-center justify-center overflow-hidden"
+      >
+        <div className="grid grid-cols-3" style={{ gap: `${gapPx}px` }}>
           <span style={{ width: `${tileSizePx}px`, height: `${tileSizePx}px` }} />
           <KeyTile label={labels[0]} active={active[0]} sizePx={tileSizePx} />
           <span style={{ width: `${tileSizePx}px`, height: `${tileSizePx}px` }} />

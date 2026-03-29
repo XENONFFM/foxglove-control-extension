@@ -2,8 +2,9 @@ import { PanelExtensionContext, SettingsTreeAction, SettingsTreeNodes } from "@f
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useControlPanelState } from "./useControlPanelState";
-import { buildSettingsTree, settingsActionReducer } from "@/config/panelSettings";
+
 import { createKeyboardMapping } from "@/components/Keyboard";
+import { buildSettingsTree, settingsActionReducer } from "@/config/panelSettings";
 import { Joy, KbMap } from "@/types";
 import { joyToTwist } from "@/utils/twistMapping";
 
@@ -14,7 +15,10 @@ export type ControlPanelEffectsProps = {
   joy: Joy | undefined;
   setJoy: (joy: Joy | undefined) => void;
   availableControllers: Gamepad[];
-  buildSettingsTreeFn?: (config: ReturnType<typeof useControlPanelState>["config"], availableControllers: Gamepad[]) => SettingsTreeNodes;
+  buildSettingsTreeFn?: (
+    config: ReturnType<typeof useControlPanelState>["config"],
+    availableControllers: Gamepad[],
+  ) => SettingsTreeNodes;
 };
 
 export function useControlPanelEffects({
@@ -38,20 +42,28 @@ export function useControlPanelEffects({
   // Keyboard callbacks — private, consumed only by the event listeners below
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     setTrackedKeys((prev) => {
-      if (!prev?.has(event.key)) return prev;
+      if (!(prev?.has(event.key) ?? false)) {
+        return prev;
+      }
       const next = new Map(prev);
       const k = next.get(event.key);
-      if (k != undefined) k.value = 1;
+      if (k != undefined) {
+        k.value = 1;
+      }
       return next;
     });
   }, []);
 
   const handleKeyUp = useCallback((event: KeyboardEvent) => {
     setTrackedKeys((prev) => {
-      if (!prev) return prev;
+      if (!prev) {
+        return prev;
+      }
       const next = new Map(prev);
       const k = next.get(event.key);
-      if (k) k.value = 0;
+      if (k) {
+        k.value = 0;
+      }
       return next;
     });
   }, []);
@@ -86,17 +98,23 @@ export function useControlPanelEffects({
 
   // Generate Joy from keyboard keystrokes
   useEffect(() => {
-    if (config.dataSource !== "keyboard") return;
+    if (config.dataSource !== "keyboard") {
+      return;
+    }
 
     const axes: number[] = [];
     const buttons: number[] = [];
 
     trackedKeys?.forEach((value) => {
       if (value.button >= 0) {
-        while (buttons.length <= value.button) buttons.push(0);
+        while (buttons.length <= value.button) {
+          buttons.push(0);
+        }
         buttons[value.button] = value.value;
       } else if (value.axis >= 0) {
-        while (axes.length <= value.axis) axes.push(0);
+        while (axes.length <= value.axis) {
+          axes.push(0);
+        }
         if (axes[value.axis] != undefined) {
           axes[value.axis]! += (value.direction > 0 ? 1 : -1) * value.value; // NOSONAR
         }

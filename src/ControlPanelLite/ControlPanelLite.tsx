@@ -3,6 +3,7 @@ import { useCallback, useEffect, useLayoutEffect } from "react";
 import type * as React from "react";
 
 import { ControlPanelLiteView } from "./ControlPanelLiteView";
+
 import { useControlPanelEffects } from "@/ControlPanel/useControlPanelEffects";
 import { useControlPanelState } from "@/ControlPanel/useControlPanelState";
 import { useGamepadCallbacks } from "@/ControlPanel/useGamepadCallbacks";
@@ -62,5 +63,11 @@ export function ControlPanelLite({
     renderDone?.();
   }, [renderDone]);
 
-  return <ControlPanelLiteView config={config} onConfigChange={patchConfig} onInteractiveJoy={interactiveCb} />;
+  return (
+    <ControlPanelLiteView
+      config={config}
+      onConfigChange={patchConfig}
+      onInteractiveJoy={interactiveCb}
+    />
+  );
 }

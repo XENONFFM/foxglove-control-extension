@@ -1,11 +1,11 @@
 import type * as React from "react";
 
-import { GamepadSVG } from "@/components/Gamepad";
-import { GamepadVisualizationMode } from "@/config/types";
-
-import { useGamepadPolling } from "@/components/Gamepad/useGamepadPolling";
-import { cn } from "@/lib/utils";
 import { LightCardFrame } from "./LightCardFrame";
+
+import { GamepadSVG } from "@/components/Gamepad";
+import { useGamepadPolling } from "@/components/Gamepad/useGamepadPolling";
+import { GamepadVisualizationMode } from "@/config/types";
+import { cn } from "@/lib/utils";
 
 const GAMEPAD_ASPECT_RATIO = "441 / 383";
 

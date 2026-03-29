@@ -1,6 +1,6 @@
+import { createDefaultConfig } from "./defaultConfig";
 import { settingsActionReducer, buildSettingsTree } from "./panelSettings";
 import { PanelConfig } from "./types";
-import { createDefaultConfig } from "./defaultConfig";
 
 describe("settingsActionReducer", () => {
   it("updates config with new values", () => {

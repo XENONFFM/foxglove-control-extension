@@ -1,19 +1,12 @@
 import * as React from "react";
 
 import { GamepadSVG } from "./index";
-import { AxisVisualizationMode, GamepadVisualizationMode } from "@/config/types";
-import { cn } from "@/lib/utils";
-import {
-  GamepadJoyTransformKey,
-  getGamepadJoyTransformOptions,
-} from "@/mappings/gamepadJoyTransforms";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useGamepadPolling } from "./useGamepadPolling";
+
 import { ControlCard } from "@/components/control-card";
-import { Input } from "@/components/ui/input";
 import { SettingsSection, SettingsItem, SettingsValue } from "@/components/settings";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -22,9 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useGamepadPolling } from "./useGamepadPolling";
+import { AxisVisualizationMode, GamepadVisualizationMode } from "@/config/types";
+import { cn } from "@/lib/utils";
+import {
+  GamepadJoyTransformKey,
+  getGamepadJoyTransformOptions,
+} from "@/mappings/gamepadJoyTransforms";
 
 // Helper functions for formatting gamepad data
 function formatAxisValues(axes: number[] | undefined): string {
@@ -109,268 +109,242 @@ export default function GamepadControl({
   const gamepadTransformOptions = getGamepadJoyTransformOptions();
   const preferredVisualType = gamepadJoyTransform === "ps5" ? "dualsense" : "xbox";
 
-  const handleVibrationTest = () => {
-    if (gamepad?.vibrationSupported === true) {
-      // Test vibration for 200ms
-      const gamepads = navigator.getGamepads();
-      const gp = gamepads[gamepad.index];
-      if (gp?.vibrationActuator) {
-        void gp.vibrationActuator
-          .playEffect("dual-rumble", {
-            startDelay: 0,
-            duration: 200,
-            weakMagnitude: 0.5,
-            strongMagnitude: 0.5,
-          })
-          .catch(() => {
-            // Silently handle vibration errors
-          });
-      }
-    }
-  };
-
-  const preferencesSettingsContent = (
-    <SettingsSection>
-      <SettingsItem label="Active Controller ID">
-        <Select
-          value={
-            gamepad != null && gamepad.connectedControllers.length > 0
-              ? String(
-                  selectedControllerIndex ??
-                    gamepad.selectedControllerIndex ??
-                    gamepad.connectedControllers[0]?.index ??
-                    "none",
-                )
-              : "none"
-          }
-          onValueChange={(value) => {
-            if (value != null && value !== "none") {
-              const parsedIndex = Number(value);
-              if (!Number.isNaN(parsedIndex)) {
-                onSelectedControllerIndexChange?.(parsedIndex);
-                onSelectedControllerIndexConfigChange?.(parsedIndex);
-              }
-            }
-          }}
-        >
-          <SelectTrigger size="sm" className="w-44">
-            <SelectValue className="truncate" />
-          </SelectTrigger>
-          <SelectContent align="end" className="min-w-72 max-w-md">
-            <SelectGroup>
-              {gamepad != null && gamepad.connectedControllers.length > 0 ? (
-                gamepad.connectedControllers.map((controller) => {
-                  const controllerName = controller.id.replace(/\s*\(.*/, "").trim();
-                  const controllerLabel = `${controller.index}: ${controllerName}`;
-                  return (
-                    <SelectItem key={controller.index} value={String(controller.index)}>
-                      <span className="block max-w-[24rem] truncate" title={controllerLabel}>
-                        {controllerLabel}
-                      </span>
-                    </SelectItem>
-                  );
-                })
-              ) : (
-                <SelectItem value="none">0: no controller connected</SelectItem>
-              )}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </SettingsItem>
-      {gamepad?.vibrationSupported === true && (
-        <SettingsItem label="Test Vibration">
-          <Button variant="outline" size="sm" onClick={handleVibrationTest}>
-            Vibrate
-          </Button>
-        </SettingsItem>
-      )}
-      <SettingsItem label="Mapping">
-        <Select
-          value={gamepadJoyTransform}
-          onValueChange={(value) => {
-            if (value != null && value in gamepadTransformOptions) {
-              onGamepadJoyTransformChange?.(value as GamepadJoyTransformKey);
-            }
-          }}
-        >
-          <SelectTrigger size="sm" className="w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="end">
-            <SelectGroup>
-              {Object.entries(gamepadTransformOptions).map(([key, option]) => (
-                <SelectItem key={key} value={key}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </SettingsItem>
-      <SettingsItem label="Visualization">
-        <Select
-          value={gamepadVisualization}
-          onValueChange={(value) => {
-            if (
-              value != null &&
-              (value === "auto" || value === "generic" || value === "xbox" || value === "dualsense")
-            ) {
-              onGamepadVisualizationChange?.(value);
-            }
-          }}
-        >
-          <SelectTrigger size="sm" className="w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="end">
-            <SelectGroup>
-              <SelectItem value="auto">Auto</SelectItem>
-              <SelectItem value="generic">Generic</SelectItem>
-              <SelectItem value="xbox">Xbox</SelectItem>
-              <SelectItem value="dualsense">DualSense (PS5)</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </SettingsItem>
-      <SettingsItem label="Show Buttons">
-        <Switch
-          checked={showButtons}
-          onCheckedChange={(nextShowButtons) => {
-            onShowButtonsChange?.({ showButtons: nextShowButtons });
-          }}
-          size="default"
-        />
-      </SettingsItem>
-      <SettingsItem label="Show Axes">
-        <Switch
-          checked={showAxes}
-          onCheckedChange={(nextShowAxes) => {
-            onShowAxesChange?.({ showAxes: nextShowAxes });
-          }}
-          size="default"
-        />
-      </SettingsItem>
-      <SettingsItem label="Axis Visualization">
-        <ToggleGroup
-          variant="outline"
-          size="sm"
-          data-horizontal
-          spacing={0}
-          value={[axisVisualization]}
-          onValueChange={(values) => {
-            const value = values[0] ?? "";
-            if (value === "plots" || value === "bars") {
-              onAxisVisualizationChange?.(value);
-            }
-          }}
-          disabled={!showAxes}
-        >
-          <ToggleGroupItem value="plots">Plots</ToggleGroupItem>
-          <ToggleGroupItem value="bars">Bars</ToggleGroupItem>
-        </ToggleGroup>
-      </SettingsItem>
-      <SettingsItem label="Stick Deadzone">
-        <Switch
-          checked={gamepadDeadzoneEnabled}
-          onCheckedChange={(enabled) => {
-            onGamepadDeadzoneEnabledChange?.({ gamepadDeadzoneEnabled: enabled });
-          }}
-          size="default"
-        />
-      </SettingsItem>
-      <SettingsItem label="Deadzone Value">
-        <Input
-          type="number"
-          min={0}
-          max={0.99}
-          step={0.01}
-          className="h-8 w-24"
-          value={gamepadDeadzone.toFixed(2)}
-          disabled={!gamepadDeadzoneEnabled}
-          onChange={(event) => {
-            const next = Number(event.target.value);
-            if (Number.isNaN(next)) {
-              return;
-            }
-            const clamped = Math.max(0, Math.min(0.99, next));
-            onGamepadDeadzoneChange?.(clamped);
-          }}
-        />
-      </SettingsItem>
-    </SettingsSection>
-  );
-
-  const gamepadDetailsSettingsContent = (
-    <>
+  const settingsSections = React.useMemo(() => {
+    const preferencesSettingsContent = (
       <SettingsSection>
-        <SettingsItem label="Connected Controllers">
-          <SettingsValue mono>{gamepad?.connectedControllersCount ?? 0}</SettingsValue>
-        </SettingsItem>
-      </SettingsSection>
-
-      <SettingsSection title="Active Gamepad Info">
-        <SettingsItem label="Index">
-          <SettingsValue mono>{gamepad?.index ?? "N/A"}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Name">
-          <SettingsValue>{gamepad?.id ?? "Unknown"}</SettingsValue>
+        <SettingsItem label="Active Controller ID">
+          <Select
+            value={
+              gamepad != null && gamepad.connectedControllers.length > 0
+                ? String(selectedControllerIndex)
+                : "none"
+            }
+            onValueChange={(value) => {
+              if (value !== "none") {
+                const parsedIndex = Number(value);
+                if (!Number.isNaN(parsedIndex)) {
+                  onSelectedControllerIndexChange?.(parsedIndex);
+                  onSelectedControllerIndexConfigChange?.(parsedIndex);
+                }
+              }
+            }}
+          >
+            <SelectTrigger size="sm" className="w-44">
+              <SelectValue className="truncate" />
+            </SelectTrigger>
+            <SelectContent align="end" className="min-w-72 max-w-md">
+              <SelectGroup>
+                {gamepad != null && gamepad.connectedControllers.length > 0 ? (
+                  gamepad.connectedControllers.map((controller) => {
+                    const controllerName = controller.id.replace(/\s*\(.*/, "").trim();
+                    const controllerLabel = `${controller.index}: ${controllerName}`;
+                    return (
+                      <SelectItem key={controller.index} value={String(controller.index)}>
+                        <span className="block max-w-[24rem] truncate" title={controllerLabel}>
+                          {controllerLabel}
+                        </span>
+                      </SelectItem>
+                    );
+                  })
+                ) : (
+                  <SelectItem value="none">0: no controller connected</SelectItem>
+                )}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </SettingsItem>
         <SettingsItem label="Mapping">
-          <SettingsValue>{gamepad?.mapping ?? "standard"}</SettingsValue>
+          <Select
+            value={gamepadJoyTransform}
+            onValueChange={(value) => {
+              if (value != null && value in gamepadTransformOptions) {
+                onGamepadJoyTransformChange?.(value as GamepadJoyTransformKey);
+              }
+            }}
+          >
+            <SelectTrigger size="sm" className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                {Object.entries(gamepadTransformOptions).map(([key, option]) => (
+                  <SelectItem key={key} value={key}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </SettingsItem>
-        <SettingsItem label="Connected">
-          <SettingsValue>{gamepad?.connected === true ? "true" : "false"}</SettingsValue>
+        <SettingsItem label="Visualization">
+          <Select
+            value={gamepadVisualization}
+            onValueChange={(value) => {
+              if (
+                value === "auto" ||
+                value === "generic" ||
+                value === "xbox" ||
+                value === "dualsense"
+              ) {
+                onGamepadVisualizationChange?.(value);
+              }
+            }}
+          >
+            <SelectTrigger size="sm" className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectGroup>
+                <SelectItem value="auto">Auto</SelectItem>
+                <SelectItem value="generic">Generic</SelectItem>
+                <SelectItem value="xbox">Xbox</SelectItem>
+                <SelectItem value="dualsense">DualSense (PS5)</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </SettingsItem>
-        <SettingsItem label="Timestamp">
-          <SettingsValue mono>{gamepad ? gamepad.timestamp.toFixed(2) : "0.00"}</SettingsValue>
+        <SettingsItem label="Show Buttons">
+          <Switch
+            checked={showButtons}
+            onCheckedChange={(nextShowButtons) => {
+              onShowButtonsChange?.({ showButtons: nextShowButtons });
+            }}
+            size="default"
+          />
         </SettingsItem>
-        <SettingsItem label="Buttons">
-          <SettingsValue mono>{gamepad?.buttons.length ?? 0}</SettingsValue>
+        <SettingsItem label="Show Axes">
+          <Switch
+            checked={showAxes}
+            onCheckedChange={(nextShowAxes) => {
+              onShowAxesChange?.({ showAxes: nextShowAxes });
+            }}
+            size="default"
+          />
         </SettingsItem>
-        <SettingsItem label="Pressed Buttons">
-          <SettingsValue mono>{gamepad?.buttonsPressed.filter(Boolean).length ?? 0}</SettingsValue>
+        <SettingsItem label="Axis Visualization">
+          <ToggleGroup
+            variant="outline"
+            size="sm"
+            data-horizontal
+            spacing={0}
+            value={[axisVisualization]}
+            onValueChange={(values) => {
+              const value = values[0] ?? "";
+              if (value === "plots" || value === "bars") {
+                onAxisVisualizationChange?.(value);
+              }
+            }}
+            disabled={!showAxes}
+          >
+            <ToggleGroupItem value="plots">Plots</ToggleGroupItem>
+            <ToggleGroupItem value="bars">Bars</ToggleGroupItem>
+          </ToggleGroup>
         </SettingsItem>
-        <SettingsItem label="Touched Buttons">
-          <SettingsValue mono>{gamepad?.buttonsTouched.filter(Boolean).length ?? 0}</SettingsValue>
+        <SettingsItem label="Stick Deadzone">
+          <Switch
+            checked={gamepadDeadzoneEnabled}
+            onCheckedChange={(deadzoneEnabled) => {
+              onGamepadDeadzoneEnabledChange?.({ gamepadDeadzoneEnabled: deadzoneEnabled });
+            }}
+            size="default"
+          />
         </SettingsItem>
-        <SettingsItem label="Axes">
-          <SettingsValue mono>{gamepad?.axes.length ?? 0}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Vibration">
-          <SettingsValue>
-            {gamepad?.vibrationSupported === true ? "supported" : "unsupported"}
-          </SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Vibration Type">
-          <SettingsValue mono>{gamepad?.vibrationActuatorType ?? "none"}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Haptic Actuators">
-          <SettingsValue mono>{gamepad?.hapticActuatorsCount ?? 0}</SettingsValue>
+        <SettingsItem label="Deadzone Value">
+          <Input
+            type="number"
+            min={0}
+            max={0.99}
+            step={0.01}
+            className="h-8 w-24"
+            value={gamepadDeadzone.toFixed(2)}
+            disabled={!gamepadDeadzoneEnabled}
+            onChange={(event) => {
+              const next = Number(event.target.value);
+              if (Number.isNaN(next)) {
+                return;
+              }
+              const clamped = Math.max(0, Math.min(0.99, next));
+              onGamepadDeadzoneChange?.(clamped);
+            }}
+          />
         </SettingsItem>
       </SettingsSection>
+    );
 
-      <SettingsSection title="Detailed Data">
-        <SettingsItem label="Axes Values">
-          <SettingsValue mono>{formatAxisValues(gamepad?.axes)}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Button Values">
-          <SettingsValue mono>{formatButtonValues(gamepad?.buttons)}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Pressed Indices">
-          <SettingsValue mono>{formatPressedIndices(gamepad?.buttonsPressed)}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Touched Indices">
-          <SettingsValue mono>{formatTouchedIndices(gamepad?.buttonsTouched)}</SettingsValue>
-        </SettingsItem>
-        <SettingsItem label="Haptic Types">
-          <SettingsValue mono>{formatHapticTypes(gamepad?.hapticActuatorsTypes)}</SettingsValue>
-        </SettingsItem>
-      </SettingsSection>
-    </>
-  );
+    const gamepadDetailsSettingsContent = (
+      <>
+        <SettingsSection>
+          <SettingsItem label="Connected Controllers">
+            <SettingsValue mono>{gamepad?.connectedControllersCount ?? 0}</SettingsValue>
+          </SettingsItem>
+        </SettingsSection>
 
-  const settingsSections = React.useMemo(
-    () => [
+        <SettingsSection title="Active Gamepad Info">
+          <SettingsItem label="Index">
+            <SettingsValue mono>{gamepad?.index ?? "N/A"}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Name">
+            <SettingsValue>{gamepad?.id ?? "Unknown"}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Mapping">
+            <SettingsValue>{gamepad?.mapping ?? "standard"}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Connected">
+            <SettingsValue>{gamepad?.connected === true ? "true" : "false"}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Timestamp">
+            <SettingsValue mono>{gamepad ? gamepad.timestamp.toFixed(2) : "0.00"}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Buttons">
+            <SettingsValue mono>{gamepad?.buttons.length ?? 0}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Pressed Buttons">
+            <SettingsValue mono>
+              {gamepad?.buttonsPressed.filter(Boolean).length ?? 0}
+            </SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Touched Buttons">
+            <SettingsValue mono>
+              {gamepad?.buttonsTouched.filter(Boolean).length ?? 0}
+            </SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Axes">
+            <SettingsValue mono>{gamepad?.axes.length ?? 0}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Vibration">
+            <SettingsValue>
+              {gamepad?.vibrationSupported === true ? "supported" : "unsupported"}
+            </SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Vibration Type">
+            <SettingsValue mono>{gamepad?.vibrationActuatorType ?? "none"}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Haptic Actuators">
+            <SettingsValue mono>{gamepad?.hapticActuatorsCount ?? 0}</SettingsValue>
+          </SettingsItem>
+        </SettingsSection>
+
+        <SettingsSection title="Detailed Data">
+          <SettingsItem label="Axes Values">
+            <SettingsValue mono>{formatAxisValues(gamepad?.axes)}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Button Values">
+            <SettingsValue mono>{formatButtonValues(gamepad?.buttons)}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Pressed Indices">
+            <SettingsValue mono>{formatPressedIndices(gamepad?.buttonsPressed)}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Touched Indices">
+            <SettingsValue mono>{formatTouchedIndices(gamepad?.buttonsTouched)}</SettingsValue>
+          </SettingsItem>
+          <SettingsItem label="Haptic Types">
+            <SettingsValue mono>{formatHapticTypes(gamepad?.hapticActuatorsTypes)}</SettingsValue>
+          </SettingsItem>
+        </SettingsSection>
+      </>
+    );
+
+    return [
       {
         key: "preferences",
         label: "Preferences",
@@ -381,9 +355,28 @@ export default function GamepadControl({
         label: "Gamepad Details",
         content: gamepadDetailsSettingsContent,
       },
-    ],
-    [gamepadDetailsSettingsContent, preferencesSettingsContent],
-  );
+    ];
+  }, [
+    gamepad,
+    selectedControllerIndex,
+    gamepadJoyTransform,
+    gamepadTransformOptions,
+    gamepadVisualization,
+    showButtons,
+    showAxes,
+    axisVisualization,
+    gamepadDeadzoneEnabled,
+    gamepadDeadzone,
+    onSelectedControllerIndexChange,
+    onSelectedControllerIndexConfigChange,
+    onGamepadJoyTransformChange,
+    onGamepadVisualizationChange,
+    onShowButtonsChange,
+    onShowAxesChange,
+    onAxisVisualizationChange,
+    onGamepadDeadzoneEnabledChange,
+    onGamepadDeadzoneChange,
+  ]);
 
   const isConnected = gamepad?.connected === true;
   const showWaitingSpinner = enabled && !isConnected;

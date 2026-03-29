@@ -1,16 +1,8 @@
 import type * as React from "react";
 
-import {
-  DualSenseController,
-  GenericController,
-  XboxController,
-} from "./controllers";
+import { DualSenseController, GenericController, XboxController } from "./controllers";
 import { buildRenderContext, detectGamepadVisualType } from "./renderContext";
-import {
-  ControllerDeadzoneSettings,
-  GamepadState,
-  GamepadVisualizationMode,
-} from "./types";
+import { ControllerDeadzoneSettings, GamepadState, GamepadVisualizationMode } from "./types";
 
 export function GamepadSVG({
   gamepad,

@@ -1,7 +1,7 @@
 import type * as React from "react";
 
-import { ControllerRendererProps } from "../types";
 import { getStickMotionStroke, getStickPressFill } from "../renderContext";
+import { ControllerRendererProps } from "../types";
 
 export function DualSenseController({ ctx }: ControllerRendererProps): React.ReactElement {
   const leftStickBaseX = 861.7;

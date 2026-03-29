@@ -29,10 +29,7 @@ export function Harness({ context }: { context: PanelExtensionContext }): ReactE
 
   const handleOverlayMenuMouseLeave = (): void => {
     const activeElement = document.activeElement;
-    if (
-      activeElement instanceof HTMLElement &&
-      overlayMenuRef.current?.contains(activeElement)
-    ) {
+    if (activeElement instanceof HTMLElement && overlayMenuRef.current?.contains(activeElement)) {
       // Clearing focus ensures group-focus-within drops when the pointer leaves.
       activeElement.blur();
     }
@@ -63,7 +60,11 @@ export function Harness({ context }: { context: PanelExtensionContext }): ReactE
             </div>
           </div>
 
-          {page === "lite" ? <ControlPanelLite context={context} /> : <ControlPanel context={context} />}
+          {page === "lite" ? (
+            <ControlPanelLite context={context} />
+          ) : (
+            <ControlPanel context={context} />
+          )}
         </div>
       </TooltipProvider>
     </ThemeProvider>

@@ -21,7 +21,8 @@ export interface JoystickPosition {
 }
 
 export interface JoystickProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange">,
+  extends
+    Omit<React.HTMLAttributes<HTMLDivElement>, "onChange">,
     VariantProps<typeof joystickVariants> {
   /** Called continuously while dragging */
   onMove?: (position: JoystickPosition) => void;
@@ -161,7 +162,7 @@ const Joystick = React.forwardRef<HTMLDivElement, JoystickProps>(
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [dragging, setDragging] = React.useState(false);
     const [thumbOffset, setThumbOffset] = React.useState({ x: 0, y: 0 });
-    const lastPos = React.useRef<JoystickPosition>(ORIGIN);
+    const lastPos = React.useRef(ORIGIN);
 
     // Derive radius from the container when we start dragging
     const getRadius = React.useCallback(() => {
@@ -357,7 +358,7 @@ const Joystick = React.forwardRef<HTMLDivElement, JoystickProps>(
     return (
       <div
         ref={(node) => {
-          (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          containerRef.current = node;
           if (typeof ref === "function") {
             ref(node);
           } else if (ref) {
@@ -411,9 +412,7 @@ const Joystick = React.forwardRef<HTMLDivElement, JoystickProps>(
             left: `calc(50% + ${thumbOffset.x}px)`,
             top: `calc(50% + ${thumbOffset.y}px)`,
             transform: "translate(-50%, -50%)",
-            transition: dragging
-              ? "box-shadow 150ms"
-              : "all 200ms cubic-bezier(0.25, 1, 0.5, 1)",
+            transition: dragging ? "box-shadow 150ms" : "all 200ms cubic-bezier(0.25, 1, 0.5, 1)",
           }}
         />
       </div>

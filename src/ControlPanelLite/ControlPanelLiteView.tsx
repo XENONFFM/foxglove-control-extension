@@ -1,9 +1,9 @@
-import * as React from "react";
 import { CircleDot, Gamepad2, Keyboard } from "lucide-react";
+import * as React from "react";
 
-import { PanelConfig } from "@/config";
 import { LightGamepadCard, LightJoystickCard, LightKeyboardCard } from "@/components/light";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PanelConfig } from "@/config";
 import { cn } from "@/lib/utils";
 import { Joy } from "@/types";
 
@@ -88,24 +88,24 @@ export function ControlPanelLiteView({
               }}
             >
               <TabsList className="grid w-full grid-cols-3">
-              {PANEL_BUTTONS.map((panelButton) => {
-                const isVisible = visiblePanels.includes(panelButton.key);
+                {PANEL_BUTTONS.map((panelButton) => {
+                  const isVisible = visiblePanels.includes(panelButton.key);
 
-                return (
-                  <TabsTrigger
-                    key={panelButton.key}
-                    value={panelButton.key}
-                    disabled={!isVisible}
-                    aria-label={panelButton.label}
-                    title={panelButton.label}
-                    className={cn("h-6 w-full", !isVisible && "opacity-35")}
-                  >
-                    <span className="inline-flex w-full items-center justify-center truncate">
-                      {panelButton.icon}
-                    </span>
-                  </TabsTrigger>
-                );
-              })}
+                  return (
+                    <TabsTrigger
+                      key={panelButton.key}
+                      value={panelButton.key}
+                      disabled={!isVisible}
+                      aria-label={panelButton.label}
+                      title={panelButton.label}
+                      className={cn("h-6 w-full", !isVisible && "opacity-35")}
+                    >
+                      <span className="inline-flex w-full items-center justify-center truncate">
+                        {panelButton.icon}
+                      </span>
+                    </TabsTrigger>
+                  );
+                })}
               </TabsList>
             </Tabs>
           </div>

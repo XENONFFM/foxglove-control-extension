@@ -1,5 +1,5 @@
-import { PanelConfig } from "./types";
 import { createDefaultConfig } from "./defaultConfig";
+import { PanelConfig } from "./types";
 import { createKeyboardMapping } from "../components/Keyboard";
 
 describe("createDefaultConfig", () => {

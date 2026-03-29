@@ -10,46 +10,52 @@ A [Foxglove Studio](https://github.com/foxglove/studio) panel extension for tele
 
 Exactly one input source is active at a time. The active source is selected via the power button on each control panel or through the panel settings. Switching source automatically clears any stale output so no unintended commands are sent.
 
-| Source | Description | Typical use |
-|--------|-------------|-------------|
-| **Gamepad** | Reads a locally-connected USB/Bluetooth gamepad via the browser Gamepad API | Primary teleoperation with a standard controller |
-| **Keyboard** | Maps keyboard keys to axes and buttons | Quick bench-testing when no gamepad is available |
-| **Joystick** | On-screen draggable joystick (touch-friendly) | Touchscreen devices or mouse-based control |
-| **Subscribe** | Subscribes to an existing `Joy` topic and visualises it | Monitoring/replay of recorded operator input |
+| Source        | Description                                                                 | Typical use                                      |
+| ------------- | --------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Gamepad**   | Reads a locally-connected USB/Bluetooth gamepad via the browser Gamepad API | Primary teleoperation with a standard controller |
+| **Keyboard**  | Maps keyboard keys to axes and buttons                                      | Quick bench-testing when no gamepad is available |
+| **Joystick**  | On-screen draggable joystick (touch-friendly)                               | Touchscreen devices or mouse-based control       |
+| **Subscribe** | Subscribes to an existing `Joy` topic and visualises it                     | Monitoring/replay of recorded operator input     |
 
 ---
 
 ## Features
 
 ### Output
+
 - Publishes `sensor_msgs/Joy` to a configurable topic.
 - Optionally publishes `geometry_msgs/Twist` with a fully configurable axis-to-field mapping (scale, inversion, source index per field).
 - Output is gated to the active input source — only one source publishes at a time.
 
 ### Gamepad
+
 - Auto-detects connected gamepads.
 - Selectable controller-to-Joy transformation mapping (Xbox, PS5, Steam Deck, and generic profiles included).
 - Axes and button visualisation with bar or plot display modes.
 - Configurable gamepad layout overlay.
 
 ### Keyboard
+
 - WASD or arrow-key layouts.
 - Live key-press visualisation.
 - Outputs non-zero Joy values while keys are held and resets on release.
 
 ### Joystick
+
 - Draggable on-screen joystick.
 - Configurable axis mode: X only, Y only, or both axes.
 - Five size presets (xs → xl) configurable from Display settings.
 - Optional sticky mode (holds last position after release).
 
 ### Display / UI
+
 - Each control panel (Gamepad, Keyboard, Joystick) can be shown or hidden independently.
 - Settings pane per panel slides in from the right side of that panel.
 - Global option to hide all in-panel control buttons (useful for a clean deployment).
 - Dark/light/system theme support.
 
 ### Settings
+
 All panel options are exposed in the Foxglove settings tree so they persist across sessions and can be managed from the Foxglove settings sidebar.
 
 ---

@@ -9,7 +9,14 @@ import { LuGamepad2, LuJoystick, LuKeyboard, LuSettings } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -87,10 +94,7 @@ function renderFieldEditor(
         <SelectTrigger className={isGamepadIdField ? "h-9 w-64" : "h-9 w-44"}>
           <SelectValue className={isGamepadIdField ? "truncate" : undefined} />
         </SelectTrigger>
-        <SelectContent
-          align="end"
-          className={isGamepadIdField ? "min-w-72 max-w-md" : undefined}
-        >
+        <SelectContent align="end" className={isGamepadIdField ? "min-w-72 max-w-md" : undefined}>
           <SelectGroup>
             {(field.options ?? []).map((option, index) => {
               if (option.value == undefined) {
@@ -235,11 +239,7 @@ function renderSettingsNode(
       />
 
       <CollapsibleContent
-        className={cn(
-          "pt-2",
-          depth >= 1 && "ml-1 pl-2",
-          depth >= 2 && "ml-2 pl-3",
-        )}
+        className={cn("pt-2", depth >= 1 && "ml-1 pl-2", depth >= 2 && "ml-2 pl-3")}
       >
         {content}
       </CollapsibleContent>
@@ -312,13 +312,20 @@ export function SettingsSheet({
     return topLevelNodes.find((entry) => entry.key === selectedTopLevelKey) ?? topLevelNodes[0];
   }, [selectedTopLevelKey, topLevelNodes]);
 
-  const visiblePanelsNode = settingsEditor?.nodes?.["visiblePanels"] as SettingsTreeNode | undefined;
+  const visiblePanelsNode = settingsEditor?.nodes?.["visiblePanels"] as
+    | SettingsTreeNode
+    | undefined;
   const outputNode = settingsEditor?.nodes?.["output"] as SettingsTreeNode | undefined;
   const activeDataSource = (outputNode?.fields?.["dataSource"] as SettingsTreeField | undefined)
     ?.value as string | undefined;
-  const showGamepad = ((visiblePanelsNode?.fields?.["showGamepad"] as SettingsTreeField | undefined)?.value ?? true) as boolean;
-  const showJoystick = ((visiblePanelsNode?.fields?.["showJoystick"] as SettingsTreeField | undefined)?.value ?? true) as boolean;
-  const showKeyboard = ((visiblePanelsNode?.fields?.["showKeyboard"] as SettingsTreeField | undefined)?.value ?? true) as boolean;
+  const showGamepad = ((visiblePanelsNode?.fields?.["showGamepad"] as SettingsTreeField | undefined)
+    ?.value ?? true) as boolean;
+  const showJoystick = ((
+    visiblePanelsNode?.fields?.["showJoystick"] as SettingsTreeField | undefined
+  )?.value ?? true) as boolean;
+  const showKeyboard = ((
+    visiblePanelsNode?.fields?.["showKeyboard"] as SettingsTreeField | undefined
+  )?.value ?? true) as boolean;
   const isGamepadOutputActive = activeDataSource === "gamepad";
   const isJoystickOutputActive = activeDataSource === "joystick";
   const isKeyboardOutputActive = activeDataSource === "keyboard";
@@ -339,191 +346,191 @@ export function SettingsSheet({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <div className={cn("z-20", className)}>
         <Menubar className="h-8 gap-0 rounded-lg border-border/70 bg-background/92 p-0.5 shadow-sm supports-backdrop-filter:bg-background/75 supports-backdrop-filter:backdrop-blur-xs">
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      togglePanel("showGamepad", showGamepad);
-                    }}
-                    disabled={controlVisibilityDisabled}
-                    className={cn(
-                      "h-7 w-7 rounded-sm p-0",
-                      controlVisibilityDisabled && "text-muted-foreground/40",
-                      isGamepadOutputActive
-                        ? "text-green-600"
-                        : showGamepad
-                          ? "text-foreground"
-                          : "text-muted-foreground/40",
-                    )}
-                  >
-                    <LuGamepad2 className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>
-                <p>
-                  {controlVisibilityDisabled
-                    ? "Panel visibility toggles are unavailable in Minimal Mode"
-                    : showGamepad
-                      ? "Hide Gamepad Panel"
-                      : "Show Gamepad Panel"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    togglePanel("showGamepad", showGamepad);
+                  }}
+                  disabled={controlVisibilityDisabled}
+                  className={cn(
+                    "h-7 w-7 rounded-sm p-0",
+                    controlVisibilityDisabled && "text-muted-foreground/40",
+                    isGamepadOutputActive
+                      ? "text-green-600"
+                      : showGamepad
+                        ? "text-foreground"
+                        : "text-muted-foreground/40",
+                  )}
+                >
+                  <LuGamepad2 className="size-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>
+              <p>
+                {controlVisibilityDisabled
+                  ? "Panel visibility toggles are unavailable in Minimal Mode"
+                  : showGamepad
+                    ? "Hide Gamepad Panel"
+                    : "Show Gamepad Panel"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      togglePanel("showJoystick", showJoystick);
-                    }}
-                    disabled={controlVisibilityDisabled}
-                    className={cn(
-                      "h-7 w-7 rounded-sm p-0",
-                      controlVisibilityDisabled && "text-muted-foreground/40",
-                      isJoystickOutputActive
-                        ? "text-green-600"
-                        : showJoystick
-                          ? "text-foreground"
-                          : "text-muted-foreground/40",
-                    )}
-                  >
-                    <LuJoystick className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>
-                <p>
-                  {controlVisibilityDisabled
-                    ? "Panel visibility toggles are unavailable in Minimal Mode"
-                    : showJoystick
-                      ? "Hide Joystick Panel"
-                      : "Show Joystick Panel"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    togglePanel("showJoystick", showJoystick);
+                  }}
+                  disabled={controlVisibilityDisabled}
+                  className={cn(
+                    "h-7 w-7 rounded-sm p-0",
+                    controlVisibilityDisabled && "text-muted-foreground/40",
+                    isJoystickOutputActive
+                      ? "text-green-600"
+                      : showJoystick
+                        ? "text-foreground"
+                        : "text-muted-foreground/40",
+                  )}
+                >
+                  <LuJoystick className="size-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>
+              <p>
+                {controlVisibilityDisabled
+                  ? "Panel visibility toggles are unavailable in Minimal Mode"
+                  : showJoystick
+                    ? "Hide Joystick Panel"
+                    : "Show Joystick Panel"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      togglePanel("showKeyboard", showKeyboard);
-                    }}
-                    disabled={controlVisibilityDisabled}
-                    className={cn(
-                      "h-7 w-7 rounded-sm p-0",
-                      controlVisibilityDisabled && "text-muted-foreground/40",
-                      isKeyboardOutputActive
-                        ? "text-green-600"
-                        : showKeyboard
-                          ? "text-foreground"
-                          : "text-muted-foreground/40",
-                    )}
-                  >
-                    <LuKeyboard className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>
-                <p>
-                  {controlVisibilityDisabled
-                    ? "Panel visibility toggles are unavailable in Minimal Mode"
-                    : showKeyboard
-                      ? "Hide Keyboard Panel"
-                      : "Show Keyboard Panel"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    togglePanel("showKeyboard", showKeyboard);
+                  }}
+                  disabled={controlVisibilityDisabled}
+                  className={cn(
+                    "h-7 w-7 rounded-sm p-0",
+                    controlVisibilityDisabled && "text-muted-foreground/40",
+                    isKeyboardOutputActive
+                      ? "text-green-600"
+                      : showKeyboard
+                        ? "text-foreground"
+                        : "text-muted-foreground/40",
+                  )}
+                >
+                  <LuKeyboard className="size-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>
+              <p>
+                {controlVisibilityDisabled
+                  ? "Panel visibility toggles are unavailable in Minimal Mode"
+                  : showKeyboard
+                    ? "Hide Keyboard Panel"
+                    : "Show Keyboard Panel"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
 
-            {onModeToggle && mode && (
-              <>
-                <div className="mx-0.5 h-4 w-px bg-border" />
+          {onModeToggle && mode && (
+            <>
+              <div className="mx-0.5 h-4 w-px bg-border" />
 
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={onModeToggle}
-                        className={cn(
-                          "h-7 rounded-sm px-2 text-[10px] font-semibold",
-                          mode === "lite"
-                            ? "bg-muted/60 text-foreground"
-                            : "text-muted-foreground hover:text-foreground",
-                        )}
-                      >
-                        <Minimize2 className="mr-1 size-3" />
-                        {mode === "lite" ? "Minimal" : "Full"}
-                      </Button>
-                    }
-                  />
-                  <TooltipContent>
-                    <p>{mode === "lite" ? "Switch to Full Mode" : "Switch to Minimal Mode"}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </>
-            )}
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onModeToggle}
+                      className={cn(
+                        "h-7 rounded-sm px-2 text-[10px] font-semibold",
+                        mode === "lite"
+                          ? "bg-muted/60 text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      <Minimize2 className="mr-1 size-3" />
+                      {mode === "lite" ? "Minimal" : "Full"}
+                    </Button>
+                  }
+                />
+                <TooltipContent>
+                  <p>{mode === "lite" ? "Switch to Full Mode" : "Switch to Minimal Mode"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </>
+          )}
 
-            <div className="mx-0.5 h-4 w-px bg-border" />
+          <div className="mx-0.5 h-4 w-px bg-border" />
 
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setTheme(nextTheme);
-                    }}
-                    className="h-7 rounded-sm px-2 text-[10px] font-semibold"
-                  >
-                    <ThemeIcon className="mr-1 size-3" />
-                    {currentTheme === "system"
-                      ? "System"
-                      : currentTheme === "light"
-                        ? "Light"
-                        : "Dark"}
-                  </Button>
-                }
-              />
-              <TooltipContent>
-                <p>
-                  Theme: {currentTheme}. Click to switch to {nextTheme}.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setTheme(nextTheme);
+                  }}
+                  className="h-7 rounded-sm px-2 text-[10px] font-semibold"
+                >
+                  <ThemeIcon className="mr-1 size-3" />
+                  {currentTheme === "system"
+                    ? "System"
+                    : currentTheme === "light"
+                      ? "Light"
+                      : "Dark"}
+                </Button>
+              }
+            />
+            <TooltipContent>
+              <p>
+                Theme: {currentTheme}. Click to switch to {nextTheme}.
+              </p>
+            </TooltipContent>
+          </Tooltip>
 
-            <div className="mx-0.5 h-4 w-px bg-border" />
+          <div className="mx-0.5 h-4 w-px bg-border" />
 
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setIsDialogOpen(true);
-                    }}
-                    className="h-7 w-7 rounded-sm p-0 text-muted-foreground hover:text-foreground"
-                  >
-                    <LuSettings className="size-4" />
-                  </Button>
-                }
-              />
-              <TooltipContent>
-                <p>Open Panel Settings</p>
-              </TooltipContent>
-            </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setIsDialogOpen(true);
+                  }}
+                  className="h-7 w-7 rounded-sm p-0 text-muted-foreground hover:text-foreground"
+                >
+                  <LuSettings className="size-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>
+              <p>Open Panel Settings</p>
+            </TooltipContent>
+          </Tooltip>
         </Menubar>
       </div>
 

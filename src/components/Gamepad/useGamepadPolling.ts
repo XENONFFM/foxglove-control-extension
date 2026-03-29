@@ -35,7 +35,7 @@ export function useGamepadPolling(
           ): entry is {
             controller: Gamepad;
             index: number;
-          } => entry.controller != null && entry.controller.connected,
+          } => entry.controller?.connected ?? false,
         );
       const connectedControllersCount = connectedControllers.length;
       let foundGamepad: GamepadState | null = null;

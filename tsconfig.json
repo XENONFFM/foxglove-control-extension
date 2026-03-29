@@ -1,20 +1,13 @@
 {
   "extends": "create-foxglove-extension/tsconfig/tsconfig.json",
   "include": ["./src/**/*", "dev"],
-  "exclude": [
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/__tests__/**"
-  ],
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": ".",
     "outDir": "./dist",
     "lib": ["dom", "es2020"],
     "jsx": "react-jsx",
-    "types": ["react", "react-dom"],
+    "types": ["react", "react-dom", "jest"],
 
     "paths": {
       "@/*": ["./src/*"],

@@ -5,9 +5,9 @@ import { Power, PanelRightOpen, PanelRightClose, Settings, X } from "lucide-reac
 import * as React from "react";
 
 import type { SettingsMenuSection } from "@/components/settings-menu";
+import { SettingsMenuLayout } from "@/components/settings-menu";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SettingsMenuLayout } from "@/components/settings-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export interface ControlCardProps {
@@ -105,7 +105,9 @@ export function ControlCard({
       return;
     }
 
-    const hasSelected = settingsSections.some((section) => section.key === selectedSettingsSectionKey);
+    const hasSelected = settingsSections.some(
+      (section) => section.key === selectedSettingsSectionKey,
+    );
     if (!hasSelected) {
       setSelectedSettingsSectionKey(settingsSections[0]?.key);
     }
@@ -141,7 +143,7 @@ export function ControlCard({
   );
   const resolvedSettingsContent =
     settingsSections && settingsSections.length > 0
-      ? selectedSettingsSection?.content ?? settingsSections[0]?.content
+      ? (selectedSettingsSection?.content ?? settingsSections[0]?.content)
       : settingsContent;
   const hasSettingsSections = Boolean(settingsSections && settingsSections.length > 0);
 
@@ -158,11 +160,15 @@ export function ControlCard({
   return (
     <div ref={cardRef} className="w-full">
       <motion.div layout="position" transition={{ duration: 0.28, ease: "easeInOut" }}>
-        <Card className={`relative overflow-hidden ${compact ? "py-1" : "py-2"} ${className ?? ""}`}>
+        <Card
+          className={`relative overflow-hidden ${compact ? "py-1" : "py-2"} ${className ?? ""}`}
+        >
           {compact ? (
             <motion.div initial={false} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
               <div className="flex items-center justify-between px-2 py-1">
-                <span className="text-sm font-medium text-muted-foreground">{title ?? "Control"}</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {title ?? "Control"}
+                </span>
                 {showPowerButton && onEnabledChange && (
                   <Tooltip>
                     <TooltipTrigger
@@ -198,14 +204,14 @@ export function ControlCard({
                 visibility: showExpandedContent ? "visible" : "hidden",
               }}
             >
-                <motion.div
-                  initial={false}
-                  className="grid gap-0 md:p-0"
-                  animate={{
-                    gridTemplateColumns: shouldShowRightPane ? "1fr 1px 1fr" : "1fr 0px 0fr",
-                  }}
-                  transition={{ duration: 0.38, ease: "easeInOut" }}
-                >
+              <motion.div
+                initial={false}
+                className="grid gap-0 md:p-0"
+                animate={{
+                  gridTemplateColumns: shouldShowRightPane ? "1fr 1px 1fr" : "1fr 0px 0fr",
+                }}
+                transition={{ duration: 0.38, ease: "easeInOut" }}
+              >
                 {/* Main Content Section */}
                 <div className="relative flex flex-col items-center justify-center gap-4 p-8">
                   {/* Power Button - Top Right */}
@@ -312,8 +318,7 @@ export function ControlCard({
                     <div className="flex flex-col gap-6 p-6 md:p-8">{rightPaneContent}</div>
                   </motion.div>
                 )}
-                </motion.div>
-
+              </motion.div>
             </motion.div>
           )}
 
@@ -333,7 +338,10 @@ export function ControlCard({
                     className="rounded-none border-0 bg-transparent p-0"
                     sections={
                       hasSettingsSections
-                        ? settingsSections?.map((section) => ({ key: section.key, label: section.label }))
+                        ? settingsSections?.map((section) => ({
+                            key: section.key,
+                            label: section.label,
+                          }))
                         : undefined
                     }
                     selectedSectionKey={selectedSettingsSectionKey}

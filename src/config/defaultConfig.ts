@@ -1,29 +1,5 @@
 import { PanelConfig } from "./types";
 
-type LegacyGamepadVisualizationMode = "ps4" | "ps5" | "dualshock" | "steamdeck";
-
-function normalizeGamepadVisualizationMode(
-  mode: PanelConfig["gamepadVisualization"] | LegacyGamepadVisualizationMode | undefined,
-): PanelConfig["gamepadVisualization"] {
-  if (mode === "ps4") {
-    return "dualsense";
-  }
-
-  if (mode === "ps5") {
-    return "dualsense";
-  }
-
-  if (mode === "dualshock") {
-    return "dualsense";
-  }
-
-  if (mode === "steamdeck") {
-    return "generic";
-  }
-
-  return mode ?? "auto";
-}
-
 function createDefaultGamepadTwistMapping(): PanelConfig["twistMappingGamepad"] {
   return {
     linearX: { sourceType: "axis", sourceIndex: 1, scale: 1, invert: true },
@@ -59,11 +35,6 @@ function createDefaultJoystickTwistMapping(): PanelConfig["twistMappingJoystick"
 
 export const createDefaultConfig = (saved?: Partial<PanelConfig>): PanelConfig => {
   const partialConfig = saved ?? {};
-  const legacySavedTwistMapping = (saved as { twistMapping?: PanelConfig["twistMappingGamepad"] })
-    ?.twistMapping;
-  const legacySavedManualMapping = (
-    saved as { twistMappingManual?: PanelConfig["twistMappingGamepad"] }
-  )?.twistMappingManual;
   const normalizedDataSource =
     partialConfig.dataSource === "interactive" ? "joystick" : partialConfig.dataSource;
 
@@ -76,34 +47,15 @@ export const createDefaultConfig = (saved?: Partial<PanelConfig>): PanelConfig =
     dataSource: normalizedDataSource ?? "gamepad",
     gamepadJoyTransform: partialConfig.gamepadJoyTransform ?? "default",
     gamepadId: partialConfig.gamepadId ?? 0,
-    twistMappingGamepad:
-      partialConfig.twistMappingGamepad ??
-      legacySavedTwistMapping ??
-      createDefaultGamepadTwistMapping(),
-    twistMappingKeyboard:
-      partialConfig.twistMappingKeyboard ??
-      legacySavedManualMapping ??
-      legacySavedTwistMapping ??
-      createDefaultKeyboardTwistMapping(),
-    twistMappingJoystick:
-      partialConfig.twistMappingJoystick ??
-      legacySavedManualMapping ??
-      legacySavedTwistMapping ??
-      createDefaultJoystickTwistMapping(),
+    twistMappingGamepad: partialConfig.twistMappingGamepad ?? createDefaultGamepadTwistMapping(),
+    twistMappingKeyboard: partialConfig.twistMappingKeyboard ?? createDefaultKeyboardTwistMapping(),
+    twistMappingJoystick: partialConfig.twistMappingJoystick ?? createDefaultJoystickTwistMapping(),
     showButtons: partialConfig.showButtons ?? true,
     showAxes: partialConfig.showAxes ?? true,
     axisVisualization: partialConfig.axisVisualization ?? "bars",
     showGamepad: partialConfig.showGamepad ?? true,
     showGamepadRightSide: partialConfig.showGamepadRightSide ?? true,
-    gamepadVisualization: normalizeGamepadVisualizationMode(
-      (
-        saved as {
-          gamepadVisualization?:
-            | PanelConfig["gamepadVisualization"]
-            | LegacyGamepadVisualizationMode;
-        }
-      )?.gamepadVisualization,
-    ),
+    gamepadVisualization: partialConfig.gamepadVisualization ?? "auto",
     gamepadDeadzoneEnabled: partialConfig.gamepadDeadzoneEnabled ?? true,
     gamepadDeadzone: partialConfig.gamepadDeadzone ?? 0.08,
     showKeyboard: partialConfig.showKeyboard ?? true,

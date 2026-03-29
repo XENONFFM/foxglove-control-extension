@@ -5,7 +5,6 @@ import { PanelConfig } from "@/config";
 import { transformGamepadToJoy } from "@/mappings/gamepadJoyTransforms";
 import { Joy } from "@/types";
 
-
 /**
  * Gamepad lifecycle callbacks and the interactive/joystick Joy callback.
  * Handles connect/disconnect (updates available-controllers list) and per-frame

@@ -46,7 +46,7 @@ export function ControlPanelView({
     joystick: null,
     keyboard: null,
   });
-  const expandedHeightsRef = React.useRef<Record<PanelKey, number>>({
+  const expandedHeightsRef = React.useRef({
     gamepad: 0,
     joystick: 0,
     keyboard: 0,
@@ -137,40 +137,48 @@ export function ControlPanelView({
                 showControlButtons={config.showControlButtons}
                 showRightSide={config.showGamepadRightSide}
                 onEnabledChange={({ enabled }) => {
-                  if (enabled) onConfigChange({ dataSource: "gamepad" });
+                  if (enabled) {
+                    onConfigChange({ dataSource: "gamepad" });
+                  }
                 }}
                 selectedControllerIndex={config.gamepadId}
-                onSelectedControllerIndexChange={(gamepadId) => onConfigChange({ gamepadId })}
-                onSelectedControllerIndexConfigChange={(gamepadId) =>
-                  onConfigChange({ gamepadId })
-                }
+                onSelectedControllerIndexChange={(gamepadId) => {
+                  onConfigChange({ gamepadId });
+                }}
+                onSelectedControllerIndexConfigChange={(gamepadId) => {
+                  onConfigChange({ gamepadId });
+                }}
                 showButtons={config.showButtons}
                 showAxes={config.showAxes}
                 gamepadJoyTransform={config.gamepadJoyTransform}
                 gamepadVisualization={config.gamepadVisualization}
                 gamepadDeadzoneEnabled={config.gamepadDeadzoneEnabled}
                 gamepadDeadzone={config.gamepadDeadzone}
-                onGamepadJoyTransformChange={(gamepadJoyTransform) =>
-                  onConfigChange({ gamepadJoyTransform })
-                }
-                onGamepadVisualizationChange={(gamepadVisualization) =>
-                  onConfigChange({ gamepadVisualization })
-                }
-                onGamepadDeadzoneEnabledChange={({ gamepadDeadzoneEnabled }) =>
-                  onConfigChange({ gamepadDeadzoneEnabled })
-                }
-                onGamepadDeadzoneChange={(gamepadDeadzone) =>
-                  onConfigChange({ gamepadDeadzone })
-                }
-                onShowButtonsChange={({ showButtons }) => onConfigChange({ showButtons })}
-                onShowAxesChange={({ showAxes }) => onConfigChange({ showAxes })}
+                onGamepadJoyTransformChange={(gamepadJoyTransform) => {
+                  onConfigChange({ gamepadJoyTransform });
+                }}
+                onGamepadVisualizationChange={(gamepadVisualization) => {
+                  onConfigChange({ gamepadVisualization });
+                }}
+                onGamepadDeadzoneEnabledChange={({ gamepadDeadzoneEnabled }) => {
+                  onConfigChange({ gamepadDeadzoneEnabled });
+                }}
+                onGamepadDeadzoneChange={(gamepadDeadzone) => {
+                  onConfigChange({ gamepadDeadzone });
+                }}
+                onShowButtonsChange={({ showButtons }) => {
+                  onConfigChange({ showButtons });
+                }}
+                onShowAxesChange={({ showAxes }) => {
+                  onConfigChange({ showAxes });
+                }}
                 axisVisualization={config.axisVisualization}
-                onAxisVisualizationChange={(axisVisualization) =>
-                  onConfigChange({ axisVisualization })
-                }
-                onShowRightSideChange={({ showRightSide }) =>
-                  onConfigChange({ showGamepadRightSide: showRightSide })
-                }
+                onAxisVisualizationChange={(axisVisualization) => {
+                  onConfigChange({ axisVisualization });
+                }}
+                onShowRightSideChange={({ showRightSide }) => {
+                  onConfigChange({ showGamepadRightSide: showRightSide });
+                }}
               />
             </div>
           )}
@@ -186,19 +194,29 @@ export function ControlPanelView({
                 secondJoystick={config.joystickSecond}
                 showControlButtons={config.showControlButtons}
                 showRightSide={config.showJoystickRightSide}
-                onAxisLeftChange={(joystickAxisLeft) => onConfigChange({ joystickAxisLeft })}
-                onAxisRightChange={(joystickAxisRight) => onConfigChange({ joystickAxisRight })}
-                onSizeChange={(joystickSize) => onConfigChange({ joystickSize })}
-                onStickyChange={({ sticky }) => onConfigChange({ joystickSticky: sticky })}
-                onSecondJoystickChange={({ secondJoystick }) =>
-                  onConfigChange({ joystickSecond: secondJoystick })
-                }
-                onShowRightSideChange={({ showRightSide }) =>
-                  onConfigChange({ showJoystickRightSide: showRightSide })
-                }
+                onAxisLeftChange={(joystickAxisLeft) => {
+                  onConfigChange({ joystickAxisLeft });
+                }}
+                onAxisRightChange={(joystickAxisRight) => {
+                  onConfigChange({ joystickAxisRight });
+                }}
+                onSizeChange={(joystickSize) => {
+                  onConfigChange({ joystickSize });
+                }}
+                onStickyChange={({ sticky }) => {
+                  onConfigChange({ joystickSticky: sticky });
+                }}
+                onSecondJoystickChange={({ secondJoystick }) => {
+                  onConfigChange({ joystickSecond: secondJoystick });
+                }}
+                onShowRightSideChange={({ showRightSide }) => {
+                  onConfigChange({ showJoystickRightSide: showRightSide });
+                }}
                 enabled={isJoystickEnabled}
                 onEnabledChange={({ enabled }) => {
-                  if (enabled) onConfigChange({ dataSource: "joystick" });
+                  if (enabled) {
+                    onConfigChange({ dataSource: "joystick" });
+                  }
                 }}
               />
             </div>
@@ -210,14 +228,18 @@ export function ControlPanelView({
                 compact={collapseInactiveCards && !isKeyboardEnabled}
                 showControlButtons={config.showControlButtons}
                 showRightSide={config.showKeyboardRightSide}
-                onShowRightSideChange={({ showRightSide }) =>
-                  onConfigChange({ showKeyboardRightSide: showRightSide })
-                }
+                onShowRightSideChange={({ showRightSide }) => {
+                  onConfigChange({ showKeyboardRightSide: showRightSide });
+                }}
                 enabled={isKeyboardEnabled}
                 onEnabledChange={({ enabled }) => {
-                  if (enabled) onConfigChange({ dataSource: "keyboard" });
+                  if (enabled) {
+                    onConfigChange({ dataSource: "keyboard" });
+                  }
                 }}
-                onLayoutChange={(keyboardLayout) => onConfigChange({ keyboardLayout })}
+                onLayoutChange={(keyboardLayout) => {
+                  onConfigChange({ keyboardLayout });
+                }}
               />
             </div>
           )}

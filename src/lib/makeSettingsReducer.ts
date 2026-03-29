@@ -60,11 +60,9 @@ export function makeSettingsReducer<T extends object>(
         const pathString = segments.join(".") || rawPath;
         const fieldSuffix = pathString.split(".").pop() ?? "";
         const normalized =
-          typeof value === "string" && numberFieldSuffixes.has(fieldSuffix)
-            ? Number(value)
-            : value;
+          typeof value === "string" && numberFieldSuffixes.has(fieldSuffix) ? Number(value) : value;
 
         _.set(draft as object, pathString, normalized);
       }
-    }) as T;
+    });
 }

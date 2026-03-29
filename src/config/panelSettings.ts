@@ -1,7 +1,8 @@
 import { SettingsTreeFields, SettingsTreeNodes } from "@foxglove/extension";
 
-import { PanelConfig, TwistMapping } from "./types";
 import { createDefaultConfig } from "./defaultConfig";
+import { PanelConfig, TwistMapping } from "./types";
+
 import { collectNodeKeys, makeSettingsReducer } from "@/lib/makeSettingsReducer";
 import { getGamepadJoyTransformOptions } from "@/mappings/gamepadJoyTransforms";
 
@@ -123,7 +124,6 @@ export function buildSettingsTree(
   config: PanelConfig,
   availableControllers: Gamepad[] = [],
 ): SettingsTreeNodes {
-
   const dataSourceFields: SettingsTreeFields = {
     dataSource: {
       label: "Data Source",
@@ -191,7 +191,7 @@ export function buildSettingsTree(
             }))
           : [
               {
-              label: `${config.gamepadId}: No gamepads connected`,
+                label: `${config.gamepadId}: No gamepads connected`,
                 value: config.gamepadId.toString(),
               },
             ],
@@ -519,7 +519,12 @@ export function buildSettingsTreeLite(
               label: `${gp.index}: ${gp.id.replace(/\s*\([^)]*\)\s*$/, "").trim()}`,
               value: gp.index.toString(),
             }))
-          : [{ label: `${config.gamepadId}: ${currentGamepadLabel}`, value: config.gamepadId.toString() }],
+          : [
+              {
+                label: `${config.gamepadId}: ${currentGamepadLabel}`,
+                value: config.gamepadId.toString(),
+              },
+            ],
     },
     gamepadJoyTransform: {
       label: "GP→Joy Mapping",
