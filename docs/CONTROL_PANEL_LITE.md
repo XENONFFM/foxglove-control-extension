@@ -1,8 +1,8 @@
-# ASLZ Control Lite Panel
+# ASLZ Control Panel _Lite_
 
 The **ASLZ Control Lite** panel is a streamlined, space-efficient teleoperation interface optimized for **compact displays** and **touch-friendly interaction**. It uses a **tabbed layout** to present one control source at a time, making it ideal for embedded displays, mobile devices, or minimal UI deployments.
 
-![Control Lite Panel](Control-lite_panel.webp)
+![Control Lite Panel](images/2.webp)
 
 The Control Lite panel displays exactly one active control card at a time via a **tab bar**, and minimizes visual clutter while retaining all core functionality. It's perfect for scenarios where screen real estate is limited or you want a clean, focused interface.
 

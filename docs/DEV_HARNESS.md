@@ -4,9 +4,8 @@
 
 The **Development Harness** is a standalone browser-based testing environment for the ASLZ Control panels. It renders both the full and lite panels with a **mocked Foxglove context**, allowing you to iterate on the UI and features without launching Foxglove Studio.
 
-|                          |                          |
-| ------------------------ | ------------------------ |
-| ![Control Panel](3.webp) | ![Control Panel](4.webp) |
+| ![Control Panel](images/3.webp) | ![Control Panel](images/4.webp) |
+| :-----------------------------: | :-----------------------------: |
 
 ## Quick Start
 

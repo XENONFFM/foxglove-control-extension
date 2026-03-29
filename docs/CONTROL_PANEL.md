@@ -1,8 +1,8 @@
-# ASLZ Control Panel (Full)
+# ASLZ Control Panel
 
 The **ASLZ Control** panel is the full-featured teleoperation interface for robots. It provides a comprehensive set of controls with multiple input sources (Gamepad, Keyboard, Joystick, and subscription monitoring) displayed simultaneously.
 
-![Control Panel](Control_panel.webp)
+![Control Panel](images/1.webp)
 
 The Control Panel presents all available input controls in a **stacked card layout**, allowing you to see and interact with multiple control sources at the same time. Exactly one source is active and publishes output at any given moment.
 
