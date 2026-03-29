@@ -222,16 +222,28 @@ export function buildSettingsTree(
   };
 
   const joystickFields: SettingsTreeFields = {
-    joystickAxis: {
-      label: "Enabled Axis",
+    joystickAxisLeft: {
+      label: "Left Axis",
       input: "select",
-      value: config.joystickAxis,
+      value: config.joystickAxisLeft,
       options: [
         { label: "Both", value: "both" },
         { label: "X", value: "x" },
         { label: "Y", value: "y" },
       ],
-      help: "Limit joystick movement to the X axis, Y axis, or allow both.",
+      help: "Lock left joystick movement to X, Y, or allow both.",
+    },
+    joystickAxisRight: {
+      label: "Right Axis",
+      input: "select",
+      value: config.joystickAxisRight,
+      options: [
+        { label: "Both", value: "both" },
+        { label: "X", value: "x" },
+        { label: "Y", value: "y" },
+      ],
+      help: "Lock right joystick movement to X, Y, or allow both.",
+      disabled: !config.joystickSecond,
     },
     joystickSticky: {
       label: "Sticky Mode",
@@ -316,6 +328,19 @@ export function buildSettingsTree(
       disabled: !config.showAxes,
       help: "Choose whether axes are shown as stick pads or bars.",
     },
+    gamepadDeadzoneEnabled: {
+      label: "Stick Deadzone",
+      input: "boolean",
+      value: config.gamepadDeadzoneEnabled,
+      help: "Enable or disable deadzone filtering for gamepad stick axes.",
+    },
+    gamepadDeadzone: {
+      label: "Deadzone Value",
+      input: "number",
+      value: config.gamepadDeadzone,
+      disabled: !config.gamepadDeadzoneEnabled,
+      help: "Deadzone threshold between 0.00 and 0.99 for stick axis filtering.",
+    },
   };
 
   const keyboardVisibleFields: SettingsTreeFields = {
@@ -339,13 +364,14 @@ export function buildSettingsTree(
       input: "select",
       value: config.joystickSize,
       options: [
+        { label: "auto", value: "auto" },
         { label: "xs", value: "xs" },
         { label: "sm", value: "sm" },
         { label: "md", value: "md" },
         { label: "lg", value: "lg" },
         { label: "xl", value: "xl" },
       ],
-      help: "Choose the joystick display size.",
+      help: "Choose joystick size, or Auto to scale with available space.",
     },
   };
 
@@ -451,11 +477,199 @@ export function buildSettingsTree(
   return settings;
 }
 
+export function buildSettingsTreeLite(
+  config: PanelConfig,
+  availableControllers: Gamepad[] = [],
+): SettingsTreeNodes {
+  const currentGamepadLabel =
+    availableControllers.find((gp) => gp.index === config.gamepadId)?.id ?? "No gamepads connected";
+
+  const dataSourceFields: SettingsTreeFields = {
+    dataSource: {
+      label: "Active Card",
+      input: "select",
+      value: config.dataSource,
+      help: "Choose which control card is currently active in the Lite panel.",
+      options: [
+        { label: "Gamepad", value: "gamepad" },
+        { label: "Joystick", value: "joystick" },
+        { label: "Keyboard", value: "keyboard" },
+      ],
+    },
+  };
+
+  const displayFields: SettingsTreeFields = {
+    showLiteTabBar: {
+      label: "Show Top Tab Bar",
+      input: "boolean",
+      value: config.showLiteTabBar,
+      help: "Show or hide the top tab selector in the Lite panel.",
+    },
+  };
+
+  const gamepadFields: SettingsTreeFields = {
+    gamepadId: {
+      label: "Gamepad ID",
+      input: "select",
+      value: config.gamepadId.toString(),
+      help: "Select which connected gamepad is used by the Lite Gamepad card.",
+      options:
+        availableControllers.length > 0
+          ? availableControllers.map((gp: Gamepad) => ({
+              label: `${gp.index}: ${gp.id.replace(/\s*\([^)]*\)\s*$/, "").trim()}`,
+              value: gp.index.toString(),
+            }))
+          : [{ label: `${config.gamepadId}: ${currentGamepadLabel}`, value: config.gamepadId.toString() }],
+    },
+    gamepadJoyTransform: {
+      label: "GP→Joy Mapping",
+      input: "select",
+      value: config.gamepadJoyTransform,
+      options: Object.entries(getGamepadJoyTransformOptions()).map(([key, { label }]) => ({
+        label,
+        value: key,
+      })),
+      help: "Change how gamepad input is converted to Joy output.",
+    },
+    gamepadDeadzoneEnabled: {
+      label: "Stick Deadzone",
+      input: "boolean",
+      value: config.gamepadDeadzoneEnabled,
+      help: "Enable or disable deadzone filtering for gamepad stick axes.",
+    },
+    gamepadDeadzone: {
+      label: "Deadzone Value",
+      input: "number",
+      value: config.gamepadDeadzone,
+      disabled: !config.gamepadDeadzoneEnabled,
+      help: "Deadzone threshold between 0.00 and 0.99 for stick axis filtering.",
+    },
+  };
+
+  const joystickFields: SettingsTreeFields = {
+    joystickSize: {
+      label: "Size",
+      input: "select",
+      value: config.joystickSize,
+      options: [
+        { label: "auto", value: "auto" },
+        { label: "xs", value: "xs" },
+        { label: "sm", value: "sm" },
+        { label: "md", value: "md" },
+        { label: "lg", value: "lg" },
+        { label: "xl", value: "xl" },
+      ],
+      help: "Choose joystick size, or Auto to scale with available space.",
+    },
+    joystickAxisLeft: {
+      label: "Left Axis",
+      input: "select",
+      value: config.joystickAxisLeft,
+      options: [
+        { label: "Both", value: "both" },
+        { label: "X", value: "x" },
+        { label: "Y", value: "y" },
+      ],
+      help: "Lock left joystick movement to X, Y, or allow both.",
+    },
+    joystickAxisRight: {
+      label: "Right Axis",
+      input: "select",
+      value: config.joystickAxisRight,
+      options: [
+        { label: "Both", value: "both" },
+        { label: "X", value: "x" },
+        { label: "Y", value: "y" },
+      ],
+      help: "Lock right joystick movement to X, Y, or allow both.",
+      disabled: !config.joystickSecond,
+    },
+    joystickSticky: {
+      label: "Sticky Mode",
+      input: "boolean",
+      value: config.joystickSticky,
+      help: "Keep joystick position on release instead of snapping to center.",
+    },
+    joystickSecond: {
+      label: "Second Joystick",
+      input: "boolean",
+      value: config.joystickSecond,
+      help: "Enable dual-stick mode in the Lite Joystick card.",
+    },
+  };
+
+  const keyboardFields: SettingsTreeFields = {
+    keyboardLayout: {
+      label: "Keyboard Layout",
+      input: "select",
+      value: config.keyboardLayout,
+      options: [
+        { label: "WASD", value: "wasd" },
+        { label: "Arrow Keys", value: "arrows" },
+      ],
+      help: "Choose keyboard layout for the Lite Keyboard card.",
+    },
+  };
+
+  const joyFields: SettingsTreeFields = {
+    publishJoy: {
+      label: "Publish Joy",
+      input: "boolean",
+      value: config.publishJoy,
+      help: "Enable publishing sensor_msgs/Joy messages.",
+    },
+    pubJoyTopic: {
+      label: "Joy Topic Name",
+      input: "string",
+      value: config.pubJoyTopic,
+      help: "Topic used for Joy publishing.",
+    },
+  };
+
+  const twistFields: SettingsTreeFields = {
+    publishTwistMode: {
+      label: "Publish Twist",
+      input: "boolean",
+      value: config.publishTwistMode,
+      help: "Enable publishing geometry_msgs/Twist.",
+    },
+    pubTwistTopic: {
+      label: "Twist Topic Name",
+      input: "string",
+      value: config.pubTwistTopic,
+      help: "Topic used for Twist publishing.",
+    },
+  };
+
+  return {
+    display: {
+      label: "Display",
+      fields: displayFields,
+    },
+    input: {
+      label: "Input",
+      fields: dataSourceFields,
+      children: {
+        gamepad: { label: "Gamepad", fields: gamepadFields },
+        joystick: { label: "Joystick", fields: joystickFields },
+        keyboard: { label: "Keyboard", fields: keyboardFields },
+      },
+    },
+    output: {
+      label: "Output",
+      children: {
+        joy: { label: "Joy", fields: joyFields },
+        twist: { label: "Twist", fields: twistFields },
+      },
+    },
+  };
+}
+
 /**
  * Field suffixes that arrive as strings from the Foxglove settings editor but
  * must be stored as numbers in PanelConfig.
  */
-const NUMBER_FIELD_SUFFIXES = new Set(["gamepadId", "sourceIndex", "scale"]);
+const NUMBER_FIELD_SUFFIXES = new Set(["gamepadId", "sourceIndex", "scale", "gamepadDeadzone"]);
 
 /**
  * Reducer for Foxglove SettingsTreeAction updates.
@@ -463,6 +677,9 @@ const NUMBER_FIELD_SUFFIXES = new Set(["gamepadId", "sourceIndex", "scale"]);
  * no manual maintenance required.
  */
 export const settingsActionReducer = makeSettingsReducer<PanelConfig>(
-  collectNodeKeys(buildSettingsTree(createDefaultConfig())),
+  new Set([
+    ...collectNodeKeys(buildSettingsTree(createDefaultConfig())),
+    ...collectNodeKeys(buildSettingsTreeLite(createDefaultConfig())),
+  ]),
   NUMBER_FIELD_SUFFIXES,
 );

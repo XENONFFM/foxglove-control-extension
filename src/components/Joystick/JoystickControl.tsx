@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const JOYSTICK_SIZE_PX: Record<JoystickSize, number> = {
+  auto: 0,
   xs: 96,
   sm: 112,
   md: 160,
@@ -18,21 +19,24 @@ const JOYSTICK_SIZE_PX: Record<JoystickSize, number> = {
   xl: 256,
 };
 
-const JOYSTICK_SIZE_ORDER: JoystickSize[] = ["xs", "sm", "md", "lg", "xl"];
+const JOYSTICK_SIZE_ORDER: Array<Exclude<JoystickSize, "auto">> = ["xs", "sm", "md", "lg", "xl"];
 
 function getFittedJoystickSize(
   preferredSize: JoystickSize,
   secondEnabled: boolean,
   availableWidth: number,
   availableHeight: number,
-): JoystickSize {
-  const preferredIndex = Math.max(0, JOYSTICK_SIZE_ORDER.indexOf(preferredSize));
+): Exclude<JoystickSize, "auto"> {
+  const preferredIndex = Math.max(0, JOYSTICK_SIZE_ORDER.indexOf(preferredSize as Exclude<JoystickSize, "auto">));
   const maxGap = secondEnabled ? 24 : 0;
   const horizontalPadding = secondEnabled ? 16 : 0;
   const safeAvailableWidth = Math.max(0, availableWidth - horizontalPadding);
   const safeAvailableHeight = Math.max(0, availableHeight);
 
-  const candidates = JOYSTICK_SIZE_ORDER.slice(0, preferredIndex + 1).reverse();
+  const candidates =
+    preferredSize === "auto"
+      ? [...JOYSTICK_SIZE_ORDER].reverse()
+      : JOYSTICK_SIZE_ORDER.slice(0, preferredIndex + 1).reverse();
   for (const candidate of candidates) {
     const diameter = JOYSTICK_SIZE_PX[candidate];
     const requiredWidth = secondEnabled ? diameter * 2 + maxGap : diameter;
@@ -78,11 +82,13 @@ function LiveOutput({ position }: { position: JoystickPosition }) {
 export default function JoystickControl({
   onInteractiveJoy,
   compact = false,
-  axis,
+  axisLeft,
+  axisRight,
   size,
   sticky,
   secondJoystick,
-  onAxisChange,
+  onAxisLeftChange,
+  onAxisRightChange,
   onSizeChange,
   onStickyChange,
   onSecondJoystickChange,
@@ -94,11 +100,13 @@ export default function JoystickControl({
 }: {
   onInteractiveJoy?: (interactiveJoy: Joy) => void;
   compact?: boolean;
-  axis?: JoystickAxisMode;
+  axisLeft?: JoystickAxisMode;
+  axisRight?: JoystickAxisMode;
   size?: JoystickSize;
   sticky?: boolean;
   secondJoystick?: boolean;
-  onAxisChange?: (axis: JoystickAxisMode) => void;
+  onAxisLeftChange?: (axis: JoystickAxisMode) => void;
+  onAxisRightChange?: (axis: JoystickAxisMode) => void;
   onSizeChange?: (size: JoystickSize) => void;
   onStickyChange?: (payload: { sticky: boolean }) => void;
   onSecondJoystickChange?: (payload: { secondJoystick: boolean }) => void;
@@ -121,7 +129,8 @@ export default function JoystickControl({
     angle: 0,
   });
   const [sizeState, setSizeState] = React.useState<JoystickSize>(size ?? "md");
-  const [axisState, setAxisState] = React.useState<JoystickAxisMode>(axis ?? "both");
+  const [axisLeftState, setAxisLeftState] = React.useState<JoystickAxisMode>(axisLeft ?? "both");
+  const [axisRightState, setAxisRightState] = React.useState<JoystickAxisMode>(axisRight ?? "both");
   const [stickyState, setStickyState] = React.useState(sticky ?? false);
   const [secondJoystickState, setSecondJoystickState] = React.useState(secondJoystick ?? false);
   const [availableSize, setAvailableSize] = React.useState({ width: 0, height: 0 });
@@ -135,8 +144,12 @@ export default function JoystickControl({
   }, [size]);
 
   React.useEffect(() => {
-    setAxisState(axis ?? "both");
-  }, [axis]);
+    setAxisLeftState(axisLeft ?? "both");
+  }, [axisLeft]);
+
+  React.useEffect(() => {
+    setAxisRightState(axisRight ?? "both");
+  }, [axisRight]);
 
   React.useEffect(() => {
     setStickyState(sticky ?? false);
@@ -211,8 +224,8 @@ export default function JoystickControl({
   const settingsContent = (
     <SettingsSection>
       <SettingsItem label="Size">
-        <ToggleGroup variant="outline" size="sm" value={[sizeState]}>
-          {["xs", "sm", "md", "lg", "xl"].map((s) => (
+        <ToggleGroup variant="outline" size="sm" data-horizontal value={[sizeState]}>
+          {["auto", "xs", "sm", "md", "lg", "xl"].map((s) => (
             <ToggleGroupItem
               key={s}
               value={s}
@@ -228,16 +241,40 @@ export default function JoystickControl({
         </ToggleGroup>
       </SettingsItem>
 
-      <SettingsItem label="Enabled Axis">
-        <ToggleGroup variant="outline" size="sm" value={[axisState]}>
+      <SettingsItem label="Left Axis">
+        <ToggleGroup variant="outline" size="sm" data-horizontal value={[axisLeftState]}>
           {["both", "x", "y"].map((a) => (
             <ToggleGroupItem
               key={a}
               value={a}
               onClick={() => {
                 const nextAxis = a as JoystickAxisMode;
-                setAxisState(nextAxis);
-                onAxisChange?.(nextAxis);
+                setAxisLeftState(nextAxis);
+                onAxisLeftChange?.(nextAxis);
+              }}
+            >
+              {a}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </SettingsItem>
+
+      <SettingsItem label="Right Axis">
+        <ToggleGroup
+          variant="outline"
+          size="sm"
+          data-horizontal
+          value={[axisRightState]}
+          disabled={!secondJoystickState}
+        >
+          {["both", "x", "y"].map((a) => (
+            <ToggleGroupItem
+              key={a}
+              value={a}
+              onClick={() => {
+                const nextAxis = a as JoystickAxisMode;
+                setAxisRightState(nextAxis);
+                onAxisRightChange?.(nextAxis);
               }}
             >
               {a}
@@ -270,6 +307,14 @@ export default function JoystickControl({
     </SettingsSection>
   );
 
+  const settingsSections = [
+    {
+      key: "preferences",
+      label: "Preferences",
+      content: settingsContent,
+    },
+  ];
+
   const rightPaneContent = (
     <div className="space-y-4">
       <div>
@@ -301,7 +346,7 @@ export default function JoystickControl({
         onRightPaneChange={({ show }) => {
           onShowRightSideChange?.({ showRightSide: show });
         }}
-        settingsContent={settingsContent}
+        settingsSections={settingsSections}
         rightPaneContent={rightPaneContent}
       >
         <div
@@ -317,7 +362,7 @@ export default function JoystickControl({
               <div className="flex justify-center">
                 <Joystick
                   size={effectiveSize}
-                  axis={axisState}
+                  axis={axisLeftState}
                   snapToCenter={!stickyState}
                   disabled={!enabled}
                   onMove={(position) => {
@@ -335,7 +380,7 @@ export default function JoystickControl({
               <div className="flex justify-center">
                 <Joystick
                   size={effectiveSize}
-                  axis={axisState}
+                  axis={axisRightState}
                   snapToCenter={!stickyState}
                   disabled={!enabled}
                   onMove={(position) => {
@@ -354,7 +399,7 @@ export default function JoystickControl({
           ) : (
             <Joystick
               size={effectiveSize}
-              axis={axisState}
+              axis={axisLeftState}
               snapToCenter={!stickyState}
               disabled={!enabled}
               onMove={(position) => {

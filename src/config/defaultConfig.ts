@@ -68,6 +68,7 @@ export const createDefaultConfig = (saved?: Partial<PanelConfig>): PanelConfig =
     partialConfig.dataSource === "interactive" ? "joystick" : partialConfig.dataSource;
 
   return {
+    showLiteTabBar: partialConfig.showLiteTabBar ?? true,
     pubJoyTopic: partialConfig.pubJoyTopic ?? "/joy",
     publishJoy: partialConfig.publishJoy ?? false,
     publishTwistMode: partialConfig.publishTwistMode ?? false,
@@ -76,7 +77,9 @@ export const createDefaultConfig = (saved?: Partial<PanelConfig>): PanelConfig =
     gamepadJoyTransform: partialConfig.gamepadJoyTransform ?? "default",
     gamepadId: partialConfig.gamepadId ?? 0,
     twistMappingGamepad:
-      partialConfig.twistMappingGamepad ?? legacySavedTwistMapping ?? createDefaultGamepadTwistMapping(),
+      partialConfig.twistMappingGamepad ??
+      legacySavedTwistMapping ??
+      createDefaultGamepadTwistMapping(),
     twistMappingKeyboard:
       partialConfig.twistMappingKeyboard ??
       legacySavedManualMapping ??
@@ -93,20 +96,26 @@ export const createDefaultConfig = (saved?: Partial<PanelConfig>): PanelConfig =
     showGamepad: partialConfig.showGamepad ?? true,
     showGamepadRightSide: partialConfig.showGamepadRightSide ?? true,
     gamepadVisualization: normalizeGamepadVisualizationMode(
-      (saved as { gamepadVisualization?: PanelConfig["gamepadVisualization"] | LegacyGamepadVisualizationMode })
-        ?.gamepadVisualization,
+      (
+        saved as {
+          gamepadVisualization?:
+            | PanelConfig["gamepadVisualization"]
+            | LegacyGamepadVisualizationMode;
+        }
+      )?.gamepadVisualization,
     ),
+    gamepadDeadzoneEnabled: partialConfig.gamepadDeadzoneEnabled ?? true,
+    gamepadDeadzone: partialConfig.gamepadDeadzone ?? 0.08,
     showKeyboard: partialConfig.showKeyboard ?? true,
     showKeyboardRightSide: partialConfig.showKeyboardRightSide ?? true,
     showJoystick: partialConfig.showJoystick ?? true,
     showJoystickRightSide: partialConfig.showJoystickRightSide ?? true,
     showControlButtons: partialConfig.showControlButtons ?? true,
     keyboardLayout: partialConfig.keyboardLayout ?? "wasd",
-    joystickAxis: partialConfig.joystickAxis ?? "both",
+    joystickAxisLeft: partialConfig.joystickAxisLeft ?? "both",
+    joystickAxisRight: partialConfig.joystickAxisRight ?? "both",
     joystickSize: partialConfig.joystickSize ?? "md",
     joystickSticky: partialConfig.joystickSticky ?? false,
     joystickSecond: partialConfig.joystickSecond ?? false,
   };
 };
-
-

@@ -53,6 +53,7 @@ export default function KeyboardControl({
         <ToggleGroup
           variant="outline"
           size="sm"
+          data-horizontal
           value={[layout]}
           onValueChange={(values) => {
             const value = values[0] ?? "";
@@ -67,6 +68,14 @@ export default function KeyboardControl({
       </SettingsItem>
     </SettingsSection>
   );
+
+  const settingsSections = [
+    {
+      key: "preferences",
+      label: "Preferences",
+      content: settingsContent,
+    },
+  ];
 
   const rightPaneContent = (
     <div>
@@ -105,7 +114,7 @@ export default function KeyboardControl({
       showPowerButton={showControlButtons && !!onEnabledChange}
       showSettingsButton={showControlButtons}
       showRightPaneToggleButton={showControlButtons}
-      settingsContent={settingsContent}
+      settingsSections={settingsSections}
       rightPaneContent={rightPaneContent}
     >
       <KeyboardVisualization keyState={keyState} layout={layout} enabled={enabled} />

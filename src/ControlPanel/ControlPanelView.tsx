@@ -126,7 +126,7 @@ export function ControlPanelView({
   }, [visiblePanels, config.dataSource, collapseInactiveCards]);
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full bg-background">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4">
         <div ref={cardsStackRef} className="flex flex-col gap-4">
           {config.showGamepad && (
@@ -148,11 +148,19 @@ export function ControlPanelView({
                 showAxes={config.showAxes}
                 gamepadJoyTransform={config.gamepadJoyTransform}
                 gamepadVisualization={config.gamepadVisualization}
+                gamepadDeadzoneEnabled={config.gamepadDeadzoneEnabled}
+                gamepadDeadzone={config.gamepadDeadzone}
                 onGamepadJoyTransformChange={(gamepadJoyTransform) =>
                   onConfigChange({ gamepadJoyTransform })
                 }
                 onGamepadVisualizationChange={(gamepadVisualization) =>
                   onConfigChange({ gamepadVisualization })
+                }
+                onGamepadDeadzoneEnabledChange={({ gamepadDeadzoneEnabled }) =>
+                  onConfigChange({ gamepadDeadzoneEnabled })
+                }
+                onGamepadDeadzoneChange={(gamepadDeadzone) =>
+                  onConfigChange({ gamepadDeadzone })
                 }
                 onShowButtonsChange={({ showButtons }) => onConfigChange({ showButtons })}
                 onShowAxesChange={({ showAxes }) => onConfigChange({ showAxes })}
@@ -171,13 +179,15 @@ export function ControlPanelView({
               <JoystickControl
                 onInteractiveJoy={onInteractiveJoy}
                 compact={collapseInactiveCards && !isJoystickEnabled}
-                axis={config.joystickAxis}
+                axisLeft={config.joystickAxisLeft}
+                axisRight={config.joystickAxisRight}
                 size={config.joystickSize}
                 sticky={config.joystickSticky}
                 secondJoystick={config.joystickSecond}
                 showControlButtons={config.showControlButtons}
                 showRightSide={config.showJoystickRightSide}
-                onAxisChange={(joystickAxis) => onConfigChange({ joystickAxis })}
+                onAxisLeftChange={(joystickAxisLeft) => onConfigChange({ joystickAxisLeft })}
+                onAxisRightChange={(joystickAxisRight) => onConfigChange({ joystickAxisRight })}
                 onSizeChange={(joystickSize) => onConfigChange({ joystickSize })}
                 onStickyChange={({ sticky }) => onConfigChange({ joystickSticky: sticky })}
                 onSecondJoystickChange={({ secondJoystick }) =>

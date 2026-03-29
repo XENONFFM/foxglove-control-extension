@@ -17,6 +17,8 @@ export type RenderContext = {
   axes: number[];
   getButtonColor: (elementId: string) => string;
   getButtonFill: (elementId: string) => string;
+  idleOutline: string;
+  idleFill: string;
   lstickAxisX: number;
   lstickAxisY: number;
   lstickMagnitude: number;
@@ -28,6 +30,11 @@ export type RenderContext = {
   triggerL2: number;
   triggerR2: number;
 };
+
+export interface ControllerDeadzoneSettings {
+  enabled?: boolean;
+  value?: number;
+}
 
 export interface ControllerRendererProps {
   ctx: RenderContext;

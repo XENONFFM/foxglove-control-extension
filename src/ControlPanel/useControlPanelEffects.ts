@@ -1,4 +1,4 @@
-import { PanelExtensionContext, SettingsTreeAction } from "@foxglove/extension";
+import { PanelExtensionContext, SettingsTreeAction, SettingsTreeNodes } from "@foxglove/extension";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useControlPanelState } from "./useControlPanelState";
@@ -14,6 +14,7 @@ export type ControlPanelEffectsProps = {
   joy: Joy | undefined;
   setJoy: (joy: Joy | undefined) => void;
   availableControllers: Gamepad[];
+  buildSettingsTreeFn?: (config: ReturnType<typeof useControlPanelState>["config"], availableControllers: Gamepad[]) => SettingsTreeNodes;
 };
 
 export function useControlPanelEffects({
@@ -23,6 +24,7 @@ export function useControlPanelEffects({
   joy,
   setJoy,
   availableControllers,
+  buildSettingsTreeFn = buildSettingsTree,
 }: ControlPanelEffectsProps): void {
   // Keyboard state — private to this hook, not needed by any other consumer
   const [trackedKeys, setTrackedKeys] = useState<Map<string, KbMap> | undefined>(() =>
@@ -65,9 +67,9 @@ export function useControlPanelEffects({
       actionHandler: (action: SettingsTreeAction) => {
         setConfig((prevConfig) => settingsActionReducer(prevConfig, action));
       },
-      nodes: buildSettingsTree(config, availableControllers),
+      nodes: buildSettingsTreeFn(config, availableControllers),
     });
-  }, [context, config, setConfig, availableControllers]);
+  }, [context, config, setConfig, availableControllers, buildSettingsTreeFn]);
 
   // Keyboard event listeners
   useEffect(() => {

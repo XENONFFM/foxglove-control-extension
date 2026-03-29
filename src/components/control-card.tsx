@@ -4,8 +4,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Power, PanelRightOpen, PanelRightClose, Settings, X } from "lucide-react";
 import * as React from "react";
 
+import type { SettingsMenuSection } from "@/components/settings-menu";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SettingsMenuLayout } from "@/components/settings-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export interface ControlCardProps {
   children: React.ReactNode;
@@ -19,6 +22,7 @@ export interface ControlCardProps {
   showRightPane?: boolean;
   onRightPaneChange?: (options: { show: boolean }) => void;
   settingsContent?: React.ReactNode;
+  settingsSections?: Array<SettingsMenuSection & { content: React.ReactNode }>;
   rightPaneContent?: React.ReactNode;
   leftPaneReservedWidth?: number;
   rightPaneMinWidth?: number;
@@ -37,6 +41,7 @@ export function ControlCard({
   showRightPane: controlledShowRightPane,
   onRightPaneChange,
   settingsContent,
+  settingsSections,
   rightPaneContent,
   leftPaneReservedWidth = 420,
   rightPaneMinWidth = 320,
@@ -47,6 +52,9 @@ export function ControlCard({
   const expandSettleMs = 240;
   const [internalShowRightPane, setInternalShowRightPane] = React.useState(true);
   const [showSettings, setShowSettings] = React.useState(false);
+  const [selectedSettingsSectionKey, setSelectedSettingsSectionKey] = React.useState<
+    string | undefined
+  >(undefined);
   const [hasEnoughRightSpace, setHasEnoughRightSpace] = React.useState(true);
   const [showExpandedContent, setShowExpandedContent] = React.useState(!compact);
   const cardRef = React.useRef<HTMLDivElement>(null);
@@ -91,6 +99,18 @@ export function ControlCard({
     }
   }, [showSettingsButton]);
 
+  React.useEffect(() => {
+    if (!settingsSections || settingsSections.length === 0) {
+      setSelectedSettingsSectionKey(undefined);
+      return;
+    }
+
+    const hasSelected = settingsSections.some((section) => section.key === selectedSettingsSectionKey);
+    if (!hasSelected) {
+      setSelectedSettingsSectionKey(settingsSections[0]?.key);
+    }
+  }, [selectedSettingsSectionKey, settingsSections]);
+
   React.useLayoutEffect(() => {
     let revealTimer: number | undefined;
 
@@ -116,6 +136,14 @@ export function ControlCard({
   }, [compact]);
 
   const shouldShowRightPane = showRightPane && hasRightPaneContent && hasEnoughRightSpace;
+  const selectedSettingsSection = settingsSections?.find(
+    (section) => section.key === selectedSettingsSectionKey,
+  );
+  const resolvedSettingsContent =
+    settingsSections && settingsSections.length > 0
+      ? selectedSettingsSection?.content ?? settingsSections[0]?.content
+      : settingsContent;
+  const hasSettingsSections = Boolean(settingsSections && settingsSections.length > 0);
 
   const handleRightPaneToggle = () => {
     const newValue = !showRightPane;
@@ -136,18 +164,27 @@ export function ControlCard({
               <div className="flex items-center justify-between px-2 py-1">
                 <span className="text-sm font-medium text-muted-foreground">{title ?? "Control"}</span>
                 {showPowerButton && onEnabledChange && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      onEnabledChange({ enabled: !enabled });
-                    }}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Power
-                      className={`h-4 w-4 ${enabled ? "text-green-600" : "text-muted-foreground"}`}
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            onEnabledChange({ enabled: !enabled });
+                          }}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Power
+                            className={`h-4 w-4 ${enabled ? "text-green-600" : "text-muted-foreground"}`}
+                          />
+                        </Button>
+                      }
                     />
-                  </Button>
+                    <TooltipContent>
+                      <p>{enabled ? "Disable" : "Enable"}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
             </motion.div>
@@ -174,18 +211,27 @@ export function ControlCard({
                   {/* Power Button - Top Right */}
                   {showPowerButton && onEnabledChange && (
                     <div className="absolute top-0 right-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          onEnabledChange({ enabled: !enabled });
-                        }}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Power
-                          className={`h-4 w-4 ${enabled ? "text-green-600" : "text-muted-foreground"}`}
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                onEnabledChange({ enabled: !enabled });
+                              }}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Power
+                                className={`h-4 w-4 ${enabled ? "text-green-600" : "text-muted-foreground"}`}
+                              />
+                            </Button>
+                          }
                         />
-                      </Button>
+                        <TooltipContent>
+                          <p>{enabled ? "Disable" : "Enable"}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   )}
 
@@ -193,36 +239,54 @@ export function ControlCard({
                   {children}
 
                   {/* Settings Button - Bottom Left */}
-                  {showSettingsButton && Boolean(settingsContent) && (
+                  {showSettingsButton && Boolean(resolvedSettingsContent) && (
                     <div className="absolute bottom-0 left-2 flex flex-col gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setShowSettings(!showSettings);
-                        }}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Settings className="h-4 w-4" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setShowSettings(!showSettings);
+                              }}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Settings className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>
+                          <p>{showSettings ? "Hide Settings" : "Show Settings"}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   )}
 
                   {/* Right Pane Toggle - Bottom Right */}
                   {hasRightPaneContent && showRightPaneToggleButton && hasEnoughRightSpace && (
                     <div className="absolute bottom-0 right-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleRightPaneToggle}
-                        className="h-8 w-8 p-0"
-                      >
-                        {shouldShowRightPane ? (
-                          <PanelRightClose className="h-4 w-4" />
-                        ) : (
-                          <PanelRightOpen className="h-4 w-4" />
-                        )}
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={handleRightPaneToggle}
+                              className="h-8 w-8 p-0"
+                            >
+                              {shouldShowRightPane ? (
+                                <PanelRightClose className="h-4 w-4" />
+                              ) : (
+                                <PanelRightOpen className="h-4 w-4" />
+                              )}
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>
+                          <p>{shouldShowRightPane ? "Hide Side Panel" : "Show Side Panel"}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   )}
                 </div>
@@ -250,39 +314,64 @@ export function ControlCard({
                 )}
                 </motion.div>
 
-              {/* Settings Overlay */}
-                <AnimatePresence initial={false}>
-                  {showSettings && Boolean(settingsContent) && (
-                    <motion.div
-                      key="settings-overlay"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="absolute inset-0 z-10 flex flex-col bg-background/95 p-4 backdrop-blur-sm"
-                    >
-                      <div className="mb-6 flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">Settings</h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setShowSettings(false);
-                          }}
-                          className="h-8 w-8 p-0"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <div className="min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                        <div className="space-y-4">{settingsContent}</div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
             </motion.div>
           )}
+
+          <AnimatePresence initial={false}>
+            {showSettings && Boolean(resolvedSettingsContent) && (
+              <motion.div
+                key="settings-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: "easeInOut" }}
+                className="absolute inset-0 z-10 flex flex-col bg-background/95 p-4"
+              >
+                <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl">
+                  <SettingsMenuLayout
+                    title={title ? `${title} Settings` : "Settings"}
+                    className="rounded-none border-0 bg-transparent p-0"
+                    sections={
+                      hasSettingsSections
+                        ? settingsSections?.map((section) => ({ key: section.key, label: section.label }))
+                        : undefined
+                    }
+                    selectedSectionKey={selectedSettingsSectionKey}
+                    onSectionSelect={
+                      hasSettingsSections
+                        ? (key) => {
+                            setSelectedSettingsSectionKey(key);
+                          }
+                        : undefined
+                    }
+                    action={
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setShowSettings(false);
+                              }}
+                              className="h-8 w-8 rounded-lg p-0 text-muted-foreground hover:text-foreground"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>
+                          <p>Close Settings</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    }
+                  >
+                    {resolvedSettingsContent}
+                  </SettingsMenuLayout>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Card>
       </motion.div>
     </div>

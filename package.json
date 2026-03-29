@@ -4,7 +4,7 @@
   "description": "Foxglove panel for remote control.",
   "publisher": "ASLZ",
   "homepage": "",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.5",
   "type": "module",
   "license": "MIT",
   "main": "./dist/extension.js",

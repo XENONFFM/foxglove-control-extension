@@ -1,16 +1,24 @@
 {
-    "cSpell.words": [
-        "disp",
-        "fracwidth",
-        "gamepadconnected",
-        "gamepaddisconnected",
-        "immer",
-        "ipega",
-        "kbmapping",
-        "nsec",
-        "rostime",
-        "steamdeck",
-        "unadvertise",
-        "wasd"
-    ]
+  "cSpell.words": [
+    "disp",
+    "fracwidth",
+    "gamepadconnected",
+    "gamepaddisconnected",
+    "immer",
+    "ipega",
+    "kbmapping",
+    "nsec",
+    "rostime",
+    "steamdeck",
+    "unadvertise",
+    "wasd"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

@@ -3,12 +3,8 @@ import { GamepadJoyTransformKey } from "@/mappings/gamepadJoyTransforms";
 export type InputSourceType = "none" | "axis" | "button";
 export type AxisVisualizationMode = "plots" | "bars";
 export type JoystickAxisMode = "x" | "y" | "both";
-export type JoystickSize = "xs" | "sm" | "md" | "lg" | "xl";
-export type GamepadVisualizationMode =
-  | "auto"
-  | "generic"
-  | "xbox"
-  | "dualsense";
+export type JoystickSize = "auto" | "xs" | "sm" | "md" | "lg" | "xl";
+export type GamepadVisualizationMode = "auto" | "generic" | "xbox" | "dualsense";
 
 export type InputMapping = {
   sourceType: InputSourceType; // "none", "axis", "button"
@@ -27,6 +23,7 @@ export type TwistMapping = {
 };
 
 export type PanelConfig = {
+  showLiteTabBar: boolean;
   showKeyboard: boolean;
   showKeyboardRightSide: boolean;
   showJoystick: boolean;
@@ -44,8 +41,11 @@ export type PanelConfig = {
   showGamepad: boolean;
   showGamepadRightSide: boolean;
   gamepadVisualization: GamepadVisualizationMode;
+  gamepadDeadzoneEnabled: boolean;
+  gamepadDeadzone: number;
   keyboardLayout: "wasd" | "arrows";
-  joystickAxis: JoystickAxisMode;
+  joystickAxisLeft: JoystickAxisMode;
+  joystickAxisRight: JoystickAxisMode;
   joystickSize: JoystickSize;
   joystickSticky: boolean;
   joystickSecond: boolean;

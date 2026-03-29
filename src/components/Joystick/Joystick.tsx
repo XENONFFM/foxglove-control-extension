@@ -50,6 +50,7 @@ const joystickVariants = cva(
   {
     variants: {
       size: {
+        xxs: "size-16",
         xs: "size-24",
         sm: "size-28",
         md: "size-40",
@@ -74,6 +75,7 @@ const thumbVariants = cva(
   {
     variants: {
       size: {
+        xxs: "size-4",
         xs: "size-6",
         sm: "size-8",
         md: "size-12",
@@ -172,7 +174,17 @@ const Joystick = React.forwardRef<HTMLDivElement, JoystickProps>(
 
     // Thumb size offset (half the thumb width) – we derive from the size variant
     const thumbRadius =
-      size === "xs" ? 12 : size === "sm" ? 16 : size === "lg" ? 32 : size === "xl" ? 40 : 24;
+      size === "xxs"
+        ? 8
+        : size === "xs"
+          ? 12
+          : size === "sm"
+            ? 16
+            : size === "lg"
+              ? 32
+              : size === "xl"
+                ? 40
+                : 24;
 
     /* ---- Controlled position ---- */
     React.useEffect(() => {

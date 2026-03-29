@@ -1,6 +1,7 @@
 import { PanelExtensionContext } from "@foxglove/extension";
 import { createRoot } from "react-dom/client";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ControlPanel } from "./ControlPanel";
 
 /**
@@ -10,9 +11,11 @@ import { ControlPanel } from "./ControlPanel";
 export function initControlPanel(context: PanelExtensionContext): () => void {
   const root = createRoot(context.panelElement);
   root.render(
-    <div className="h-full w-full bg-background">
-      <ControlPanel context={context} />
-    </div>,
+    <TooltipProvider delay={1000}>
+      <div className="h-full w-full">
+        <ControlPanel context={context} />
+      </div>
+    </TooltipProvider>,
   );
   return () => {
     root.unmount();
