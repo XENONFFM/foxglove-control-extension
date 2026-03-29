@@ -1,11 +1,12 @@
-# Control Extension
+# ASLZ Control Extension
 
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/XENONFFM/foxglove-joystick)
+![https://github.com/Autonomous-System-ZHAW](https://img.shields.io/badge/ASLZ-Autonomous%20System%20Lab%20Zurich-grey?style=flat&labelColor=0000ff) 
+[![Open in Dev Containers](https://img.shields.io/badge/DevContainers-Open-blue?style=flat&labelColor=grey)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/XENONFFM/foxglove-joystick)
 
 A [Foxglove Studio](https://github.com/foxglove/studio) panel extension for teleoperating robots. It accepts input from a gamepad, keyboard, or on-screen joystick, and publishes `sensor_msgs/Joy` and/or `geometry_msgs/Twist` messages over a Foxglove WebSocket connection.
-|||
-|-|-|
 | ![Control Extension screenshot](docs/Control_panel.webp) | ![Control Extension screenshot](docs/Control-lite_panel.webp) |
+|:-:|:-:|
+|[**❇️ ASLZ Control Panel**](docs/CONTROL_PANEL.md) <br> Optimized for larger panel sizes |  [**❇️ ASLZ Control Panel** ***Lite***](docs/CONTROL_PANEL_LITE.md) <br> Optimized for tiny panel sizes |
 
 ## Features
 
@@ -60,7 +61,7 @@ This extension provides **two panel variants** optimized for different use cases
 
 ### [ASLZ Control](docs/CONTROL_PANEL.md) — Full-Featured
 
-**Best for** larger displays and detailed configuration. Displays all control sources in a stacked card layout, all visible at once. Includes advanced Twist mapping, multiple visualization modes, and a Subscribe card for monitoring.
+**Best for** larger displays and larger panel sizes. Displays all control sources in a stacked card layout, all visible at once. Includes advanced Twist mapping and multiple visualization modes.
 
 - Multiple cards stacked on screen
 - Collapsible/expandable layout
@@ -72,7 +73,7 @@ This extension provides **two panel variants** optimized for different use cases
 
 ### [ASLZ Control Lite](docs/CONTROL_PANEL_LITE.md) — Streamlined & Compact
 
-**Best for** touch screens and minimal UIs. Displays one control source at a time via a tab bar. Optimized for embedded displays and mobile teleoperation.
+**Best for** touch screens and minimal UIs. Displays one control source at a time via a tab bar. Optimized for small panel sizes on dense dashboards.
 
 - Single card view (tab-based switching)
 - Large, touch-friendly controls
@@ -137,39 +138,22 @@ Built-in mappings are defined in [src/mappings/gamepadJoyTransforms.ts](src/mapp
 
 ---
 
-## Platform Notes
-
-### Steam Deck
-
-See [docs/steamdeck.md](docs/steamdeck.md) for a full step-by-step guide to running Foxglove or the web harness on a Steam Deck with correct controller passthrough.
-
-### Snap (Linux)
-
-The `snap` package of Foxglove Studio does **not** support gamepad input — snaps block joystick device access by default. Use the `.deb` or AppImage version instead.
-
----
-
 ## Project Structure
 
 ```
-src/
-  ControlPanel/       # Top-level panel logic (state, effects, callbacks)
-  components/
-    Gamepad/          # Gamepad control UI + SVG overlay
-    Joystick/         # On-screen joystick
-    Keyboard/         # Keyboard input UI
-    ui/               # Shared UI primitives (shadcn/ui)
-  config/             # PanelConfig types, defaults, Foxglove settings tree
-  hooks/              # useGamepad, useGamepadInteractions, usePanPrevention
-  mappings/           # Gamepad→Joy transform definitions + keyboard map JSONs
-  types/              # Shared TypeScript types
-  utils/              # Twist mapping helpers
 dev/                  # Vite dev harness (no Foxglove required)
-docs/                 # Platform-specific guides
+src/
+  ControlPanel/       # App (panel)
+  ControlPanelLite/   # App (panel)
+  components/         # Shared UI components
+  config/             # PanelConfig types, defaults, Foxglove settings tree
+  hooks/              
+  mappings/           # Gamepad→Joy transform definitions + keyboard map JSONs
+  types/              
+  utils/              
 ```
 
 ---
 
 ## Acknowledgements
-
-Based on [studio-extension-gamepad](https://github.com/ARMADAMarineRobotics/studio-extension-gamepad) by [rgov](https://github.com/rgov). The core gamepad polling hook ([src/hooks/useGamepad.ts](src/hooks/useGamepad.ts)) is derived from that project. The rest of the extension has been substantially rewritten.
+The ASLZ Control Panel and ASLZ Control Panel Lite are full rewrites of the [foxglove-joystick](https://github.com/anjrew/foxglove-joystick) fork by [Andrew Johnson](https://github.com/anjrew) of the original [foxglove-joystick](https://github.com/joshnewans/foxglove-joystick) by [Josh Newans](https://github.com/joshnewans).
