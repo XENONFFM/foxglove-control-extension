@@ -1,12 +1,12 @@
 # ASLZ Control Extension
 
-![https://github.com/Autonomous-System-ZHAW](https://img.shields.io/badge/ASLZ-Autonomous%20System%20Lab%20Zurich-grey?style=flat&labelColor=0000ff)
+[![ASLZ (Autonomous System Lab Zürich)](https://img.shields.io/badge/ASLZ-Autonomous%20System%20Lab%20Zurich-grey?style=flat&labelColor=0000ff)](https://github.com/Autonomous-System-ZHAW)
 [![Open in Dev Containers](https://img.shields.io/badge/DevContainers-Open-blue?style=flat&labelColor=grey)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/XENONFFM/foxglove-joystick)
 
 A [Foxglove](https://foxglove.dev/) panel extension for teleoperating robots. It accepts input from a gamepad, keyboard, or on-screen joystick, and publishes `sensor_msgs/Joy` and/or `geometry_msgs/Twist` messages over a Foxglove WebSocket connection.
-| ![Control Extension screenshot](docs/images/1.webp) | ![Control Extension screenshot](docs/images/2.webp) |
+| ![Control Extension screenshot](https://raw.githubusercontent.com/XENONFFM/foxglove-joystick/6216dfd701c18e6e43718e96340cce5c26cd0a5c/docs/images/1.webp) | ![Control Extension screenshot](https://raw.githubusercontent.com/XENONFFM/foxglove-joystick/6216dfd701c18e6e43718e96340cce5c26cd0a5c/docs/images/2.webp) |
 |:-:|:-:|
-|[**❇️ ASLZ Control Panel**](docs/CONTROL_PANEL.md) <br> Optimized for larger panel sizes | [**❇️ ASLZ Control Panel** **_Lite_**](docs/CONTROL_PANEL_LITE.md) <br> Optimized for tiny panel sizes |
+|[**❇️ ASLZ Control Panel**](docs/CONTROL_PANEL.md) <br> Optimized for larger panel sizes | [**❇️ ASLZ Control Panel** **_Lite_**](docs/CONTROL_PANEL_LITE.md) <br> Optimized for small panel sizes |
 
 ## Features
 
