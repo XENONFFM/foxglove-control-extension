@@ -3,7 +3,7 @@
 ![https://github.com/Autonomous-System-ZHAW](https://img.shields.io/badge/ASLZ-Autonomous%20System%20Lab%20Zurich-grey?style=flat&labelColor=0000ff)
 [![Open in Dev Containers](https://img.shields.io/badge/DevContainers-Open-blue?style=flat&labelColor=grey)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/XENONFFM/foxglove-joystick)
 
-A [Foxglove Studio](https://github.com/foxglove/studio) panel extension for teleoperating robots. It accepts input from a gamepad, keyboard, or on-screen joystick, and publishes `sensor_msgs/Joy` and/or `geometry_msgs/Twist` messages over a Foxglove WebSocket connection.
+A [Foxglove](https://foxglove.dev/) panel extension for teleoperating robots. It accepts input from a gamepad, keyboard, or on-screen joystick, and publishes `sensor_msgs/Joy` and/or `geometry_msgs/Twist` messages over a Foxglove WebSocket connection.
 | ![Control Extension screenshot](docs/images/1.webp) | ![Control Extension screenshot](docs/images/2.webp) |
 |:-:|:-:|
 |[**❇️ ASLZ Control Panel**](docs/CONTROL_PANEL.md) <br> Optimized for larger panel sizes | [**❇️ ASLZ Control Panel** **_Lite_**](docs/CONTROL_PANEL_LITE.md) <br> Optimized for tiny panel sizes |
@@ -53,8 +53,6 @@ A [Foxglove Studio](https://github.com/foxglove/studio) panel extension for tele
 
 All panel options are exposed in the Foxglove settings tree so they persist across sessions and can be managed from the Foxglove settings sidebar.
 
----
-
 ## Panels
 
 This extension provides **two panel variants** optimized for different use cases:
@@ -83,13 +81,11 @@ This extension provides **two panel variants** optimized for different use cases
 
 **[→ Full Documentation](docs/CONTROL_PANEL_LITE.md)**
 
----
-
 ## Installation
 
 ### Release `.foxe` file
 
-Download the latest `.foxe` from the [Releases](../../releases/latest) page and drag-and-drop it onto Foxglove Studio (desktop or web).
+Download the latest `.foxe` from the [Releases](https://github.com/XENONFFM/foxglove-joystick/releases) page and drag-and-drop it onto Foxglove Studio (desktop or web).
 
 ### Build from source
 
@@ -120,8 +116,6 @@ The harness renders both panel variants with a mocked Foxglove context, allowing
 
 **[→ Full Dev Harness Documentation](docs/DEV_HARNESS.md)**
 
----
-
 ## Controller Mappings
 
 Different controllers (and the same controller on different platforms) lay out buttons and axes differently. Select the correct mapping in the Gamepad panel settings.
@@ -135,8 +129,6 @@ Built-in mappings are defined in [src/mappings/gamepadJoyTransforms.ts](src/mapp
 3. The new key will automatically appear in the panel settings dropdown.
 
 > **Note:** the browser Gamepad API reports axes with reversed sign compared to the standard ROS `joy` driver. The extension corrects for this automatically.
-
----
 
 ## Project Structure
 
@@ -152,8 +144,6 @@ src/
   types/
   utils/
 ```
-
----
 
 ## Acknowledgements
 
