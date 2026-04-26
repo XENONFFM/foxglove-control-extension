@@ -1,0 +1,65 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run pnpm dev",
+      "type": "shell",
+      "command": "pnpm run dev",
+      "presentation": {
+        "clear": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "close": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Tailwind CSS",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "@tailwindcss/cli",
+        "-i",
+        "./src/styles/globals.css",
+        "-o",
+        "./src/styles/output.css"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Watch Tailwind CSS",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "@tailwindcss/cli",
+        "-i",
+        "./src/styles/globals.css",
+        "-o",
+        "./src/styles/output.css",
+        "--watch"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "tailwind-watch",
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "."
+        }
+      },
+      "group": "build"
+    }
+  ]
+}

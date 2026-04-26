@@ -1,0 +1,21 @@
+# Don't format these folders
+node_modules
+.next
+build
+dist
+
+# Don't format these files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+.env
+.env.local
+
+# Don't format images and icons
+public/**/*.svg
+public/**/*.png
+public/**/*.jpg
+
+# Don't format shadcn/ui component files
+src/components/ui/**
+src/styles/output.css
